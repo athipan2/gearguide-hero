@@ -1,7 +1,7 @@
 import { RatingStars } from "@/components/RatingStars";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { ExternalLink, ThumbsUp, ThumbsDown } from "lucide-react";
+import { Link } from "react-router-dom";
 
 interface ProductCardProps {
   name: string;
@@ -12,6 +12,7 @@ interface ProductCardProps {
   badge?: string;
   pros: string[];
   cons: string[];
+  slug?: string;
 }
 
 const badgeColors: Record<string, string> = {
@@ -20,7 +21,7 @@ const badgeColors: Record<string, string> = {
   "Top Pick": "bg-badge-top-pick text-accent-foreground",
 };
 
-export function ProductCard({ name, brand, image, rating, price, badge, pros, cons }: ProductCardProps) {
+export function ProductCard({ name, brand, image, rating, price, badge, pros, cons, slug }: ProductCardProps) {
   return (
     <div className="group bg-card rounded-xl border overflow-hidden hover:shadow-xl transition-all duration-300">
       {/* Image */}
@@ -71,9 +72,13 @@ export function ProductCard({ name, brand, image, rating, price, badge, pros, co
             ดูราคา
             <ExternalLink className="ml-1 h-3.5 w-3.5" />
           </Button>
-          <Button variant="outline" size="sm">
-            รีวิวเต็ม
-          </Button>
+          {slug ? (
+            <Button variant="outline" size="sm" asChild>
+              <Link to={`/review/${slug}`}>รีวิวเต็ม</Link>
+            </Button>
+          ) : (
+            <Button variant="outline" size="sm">รีวิวเต็ม</Button>
+          )}
         </div>
       </div>
     </div>

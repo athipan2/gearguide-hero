@@ -10,6 +10,7 @@ const products = [
     badge: "Top Pick",
     pros: ["เบามาก", "แรงคืนตัวดี"],
     cons: ["ราคาสูง", "ทนทานปานกลาง"],
+    slug: "nike-vaporfly-3",
   },
   {
     name: "Salomon Speedcross 6",
@@ -20,6 +21,7 @@ const products = [
     badge: "แนะนำ",
     pros: ["เกาะถนนดี", "กันน้ำ"],
     cons: ["แข็งนิดหน่อย", "หนักกว่ารุ่นอื่น"],
+    slug: "salomon-speedcross-6",
   },
   {
     name: "Naturehike Cloud Up 2",
