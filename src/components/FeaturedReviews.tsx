@@ -1,0 +1,65 @@
+import { ProductCard } from "@/components/ProductCard";
+
+const products = [
+  {
+    name: "Nike Vaporfly 3",
+    brand: "Nike",
+    image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600&h=450&fit=crop",
+    rating: 4.8,
+    price: "฿8,500",
+    badge: "Top Pick",
+    pros: ["เบามาก", "แรงคืนตัวดี"],
+    cons: ["ราคาสูง", "ทนทานปานกลาง"],
+  },
+  {
+    name: "Salomon Speedcross 6",
+    brand: "Salomon",
+    image: "https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?w=600&h=450&fit=crop",
+    rating: 4.6,
+    price: "฿5,900",
+    badge: "แนะนำ",
+    pros: ["เกาะถนนดี", "กันน้ำ"],
+    cons: ["แข็งนิดหน่อย", "หนักกว่ารุ่นอื่น"],
+  },
+  {
+    name: "Naturehike Cloud Up 2",
+    brand: "Naturehike",
+    image: "https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=600&h=450&fit=crop",
+    rating: 4.5,
+    price: "฿3,200",
+    badge: "คุ้มค่าที่สุด",
+    pros: ["น้ำหนักเบา", "ราคาดี"],
+    cons: ["ทนฝนปานกลาง", "พื้นที่จำกัด"],
+  },
+  {
+    name: "Garmin Forerunner 265",
+    brand: "Garmin",
+    image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600&h=450&fit=crop",
+    rating: 4.7,
+    price: "฿14,900",
+    badge: "แนะนำ",
+    pros: ["AMOLED สวย", "แบตอึด"],
+    cons: ["แพง", "ขนาดใหญ่"],
+  },
+];
+
+export function FeaturedReviews() {
+  return (
+    <section className="container mx-auto px-4 py-16">
+      <div className="flex items-end justify-between mb-8">
+        <div>
+          <h2 className="font-heading text-2xl md:text-3xl font-bold text-foreground">รีวิวล่าสุด</h2>
+          <p className="text-muted-foreground mt-1">ทดสอบจริง รีวิวจริง อัปเดตทุกสัปดาห์</p>
+        </div>
+        <a href="#" className="hidden md:inline-flex text-sm font-medium text-primary hover:text-accent transition-colors">
+          ดูทั้งหมด →
+        </a>
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        {products.map((p) => (
+          <ProductCard key={p.name} {...p} />
+        ))}
+      </div>
+    </section>
+  );
+}
