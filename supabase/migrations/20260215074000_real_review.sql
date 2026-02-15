@@ -9,7 +9,8 @@ BEGIN
 
   IF target_user_id IS NOT NULL THEN
     -- Confirm their email if it's not already
-    UPDATE auth.users SET email_confirmed_at = now(), confirmed_at = now() WHERE id = target_user_id;
+    -- Note: only updating email_confirmed_at as confirmed_at might be a generated column in some versions
+    UPDATE auth.users SET email_confirmed_at = now() WHERE id = target_user_id;
 
     -- Assign admin role
     INSERT INTO public.user_roles (user_id, role)
