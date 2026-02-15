@@ -23,13 +23,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isEditor, setIsEditor] = useState(false);
 
   const checkRoles = async (userId: string) => {
-    const { data } = await supabase
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", userId);
-    const roles = data?.map((r) => r.role) || [];
-    setIsAdmin(roles.includes("admin"));
-    setIsEditor(roles.includes("editor"));
+    try {
+      const { data, error } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", userId);
+
+      if (error) {
+        console.error("Error checking roles:", error);
+        return;
+      }
+
+      const roles = data?.map((r) => r.role) || [];
+      setIsAdmin(roles.includes("admin"));
+      setIsEditor(roles.includes("editor"));
+    } catch (err) {
+      console.error("Unexpected error checking roles:", err);
+    }
   };
 
   useEffect(() => {
