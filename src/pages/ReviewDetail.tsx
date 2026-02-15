@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
@@ -5,93 +6,48 @@ import { RatingStars } from "@/components/RatingStars";
 import { SEOHead } from "@/components/SEOHead";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { supabase } from "@/integrations/supabase/client";
 import {
   ExternalLink, ArrowLeft, ThumbsUp, ThumbsDown, Award,
-  Weight, Ruler, Footprints, Shield, Zap, Wind, ChevronRight
+  ChevronRight
 } from "lucide-react";
 
-const reviewData: Record<string, {
-  name: string; brand: string; category: string; price: string; image: string;
-  badge?: string; overallRating: number;
+interface ReviewData {
+  name: string; brand: string; category: string; price: string; image_url: string | null;
+  badge: string | null; overall_rating: number;
   ratings: { label: string; score: number }[];
   specs: { label: string; value: string }[];
   pros: string[]; cons: string[];
-  verdict: string; intro: string; sections: { title: string; body: string }[];
-}> = {
+  verdict: string | null; intro: string | null;
+  sections: { title: string; body: string }[];
+  affiliate_url: string | null; cta_text: string | null;
+}
+
+// Hardcoded fallback data for when DB is empty
+const fallbackData: Record<string, ReviewData> = {
   "nike-vaporfly-3": {
-    name: "Nike Vaporfly 3",
-    brand: "Nike",
-    category: "รองเท้าวิ่งถนน",
-    price: "฿8,500",
-    image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=800&h=600&fit=crop",
-    badge: "Top Pick",
-    overallRating: 4.8,
-    ratings: [
-      { label: "ความเบา", score: 4.9 },
-      { label: "แรงคืนตัว", score: 5.0 },
-      { label: "ความทนทาน", score: 3.8 },
-      { label: "ความคุ้มค่า", score: 3.5 },
-      { label: "ความสบาย", score: 4.7 },
-    ],
-    specs: [
-      { label: "น้ำหนัก", value: "196g (US 9)" },
-      { label: "Drop", value: "8mm" },
-      { label: "พื้นรองเท้า", value: "ZoomX + Carbon Plate" },
-      { label: "พื้นนอก", value: "Rubber Waffle" },
-      { label: "เหมาะกับ", value: "Race / Tempo Run" },
-      { label: "ระยะทาง", value: "10K – Marathon" },
-    ],
-    pros: [
-      "เบาที่สุดในกลุ่ม Racing Shoes",
-      "ZoomX foam ให้แรงคืนตัวชั้นนำ",
-      "Carbon plate ช่วย propulsion ดีเยี่ยม",
-      "ทรงเท้ากว้างขึ้นจากรุ่นเดิม",
-    ],
-    cons: [
-      "ราคาสูงกว่าคู่แข่ง",
-      "ทนทานได้ราว 300-400 กม.",
-      "ไม่เหมาะกับวิ่งซ้อมทั่วไป",
-    ],
+    name: "Nike Vaporfly 3", brand: "Nike", category: "รองเท้าวิ่งถนน", price: "฿8,500",
+    image_url: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=800&h=600&fit=crop",
+    badge: "Top Pick", overall_rating: 4.8,
+    ratings: [{ label: "ความเบา", score: 4.9 }, { label: "แรงคืนตัว", score: 5.0 }, { label: "ความทนทาน", score: 3.8 }, { label: "ความคุ้มค่า", score: 3.5 }, { label: "ความสบาย", score: 4.7 }],
+    specs: [{ label: "น้ำหนัก", value: "196g (US 9)" }, { label: "Drop", value: "8mm" }, { label: "พื้นรองเท้า", value: "ZoomX + Carbon Plate" }, { label: "พื้นนอก", value: "Rubber Waffle" }, { label: "เหมาะกับ", value: "Race / Tempo Run" }, { label: "ระยะทาง", value: "10K – Marathon" }],
+    pros: ["เบาที่สุดในกลุ่ม Racing Shoes", "ZoomX foam ให้แรงคืนตัวชั้นนำ", "Carbon plate ช่วย propulsion ดีเยี่ยม", "ทรงเท้ากว้างขึ้นจากรุ่นเดิม"],
+    cons: ["ราคาสูงกว่าคู่แข่ง", "ทนทานได้ราว 300-400 กม.", "ไม่เหมาะกับวิ่งซ้อมทั่วไป"],
     intro: "Nike Vaporfly 3 ยังคงเป็นมาตรฐานของรองเท้าแข่งวิ่งระดับ Elite ด้วยชุดพื้น ZoomX ที่ให้แรงคืนตัวสูงสุดในตลาด ผสานกับแผ่น Carbon Plate ที่ช่วยส่งแรงไปข้างหน้าอย่างมีประสิทธิภาพ",
     sections: [
-      {
-        title: "ความรู้สึกขณะวิ่ง",
-        body: "ตั้งแต่ก้าวแรกจะรู้สึกถึงความเบาและแรงดีดที่ชัดเจน พื้น ZoomX ให้ความนุ่มแต่ไม่หยุ่นจนเสียความเสถียร ทำให้วิ่งเร็วได้อย่างมั่นใจ เหมาะกับ pace ที่เร็วกว่า 5:00/km ขึ้นไป",
-      },
-      {
-        title: "การเกาะถนน",
-        body: "พื้นนอก Rubber Waffle ยึดเกาะได้ดีบนถนนแห้ง แต่ในสภาพเปียกจะลื่นเล็กน้อย ไม่แนะนำให้ใช้บนเส้นทางที่มีน้ำขัง",
-      },
-      {
-        title: "ความทนทาน",
-        body: "จากการทดสอบ 350 กม. พบว่า ZoomX เริ่มยุบตัวเล็กน้อยที่ส้นเท้า แต่ยังคงประสิทธิภาพได้ดี สำหรับใช้แข่งอย่างเดียวสามารถใช้ได้หลายเรส",
-      },
+      { title: "ความรู้สึกขณะวิ่ง", body: "ตั้งแต่ก้าวแรกจะรู้สึกถึงความเบาและแรงดีดที่ชัดเจน พื้น ZoomX ให้ความนุ่มแต่ไม่หยุ่นจนเสียความเสถียร ทำให้วิ่งเร็วได้อย่างมั่นใจ เหมาะกับ pace ที่เร็วกว่า 5:00/km ขึ้นไป" },
+      { title: "การเกาะถนน", body: "พื้นนอก Rubber Waffle ยึดเกาะได้ดีบนถนนแห้ง แต่ในสภาพเปียกจะลื่นเล็กน้อย ไม่แนะนำให้ใช้บนเส้นทางที่มีน้ำขัง" },
+      { title: "ความทนทาน", body: "จากการทดสอบ 350 กม. พบว่า ZoomX เริ่มยุบตัวเล็กน้อยที่ส้นเท้า แต่ยังคงประสิทธิภาพได้ดี สำหรับใช้แข่งอย่างเดียวสามารถใช้ได้หลายเรส" },
     ],
     verdict: "Nike Vaporfly 3 ยังคงเป็นตัวเลือกอันดับ 1 สำหรับนักวิ่งที่ต้องการ PR ในการแข่ง แม้ราคาจะสูงแต่ประสิทธิภาพคุ้มค่าทุกบาท เหมาะกับนักวิ่งที่จริงจังเรื่องเวลา",
+    affiliate_url: null, cta_text: "ดูราคาล่าสุด",
   },
   "salomon-speedcross-6": {
-    name: "Salomon Speedcross 6",
-    brand: "Salomon",
-    category: "รองเท้าวิ่งเทรล",
-    price: "฿5,900",
-    image: "https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?w=800&h=600&fit=crop",
-    badge: "แนะนำ",
-    overallRating: 4.6,
-    ratings: [
-      { label: "การเกาะถนน", score: 4.9 },
-      { label: "ความทนทาน", score: 4.5 },
-      { label: "การกันน้ำ", score: 4.3 },
-      { label: "ความคุ้มค่า", score: 4.2 },
-      { label: "ความสบาย", score: 4.0 },
-    ],
-    specs: [
-      { label: "น้ำหนัก", value: "310g (US 9)" },
-      { label: "Drop", value: "10mm" },
-      { label: "พื้นรองเท้า", value: "EnergyCell+" },
-      { label: "พื้นนอก", value: "Contagrip MA" },
-      { label: "เหมาะกับ", value: "Trail / Mud / Technical" },
-      { label: "ระยะทาง", value: "5K – Ultra" },
-    ],
+    name: "Salomon Speedcross 6", brand: "Salomon", category: "รองเท้าวิ่งเทรล", price: "฿5,900",
+    image_url: "https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?w=800&h=600&fit=crop",
+    badge: "แนะนำ", overall_rating: 4.6,
+    ratings: [{ label: "การเกาะถนน", score: 4.9 }, { label: "ความทนทาน", score: 4.5 }, { label: "การกันน้ำ", score: 4.3 }, { label: "ความคุ้มค่า", score: 4.2 }, { label: "ความสบาย", score: 4.0 }],
+    specs: [{ label: "น้ำหนัก", value: "310g (US 9)" }, { label: "Drop", value: "10mm" }, { label: "พื้นรองเท้า", value: "EnergyCell+" }, { label: "พื้นนอก", value: "Contagrip MA" }, { label: "เหมาะกับ", value: "Trail / Mud / Technical" }, { label: "ระยะทาง", value: "5K – Ultra" }],
     pros: ["เกาะพื้นดินเปียกและโคลนได้ยอดเยี่ยม", "ทนทานมาก", "ระบบเชือกรัดเร็ว Quicklace", "ปกป้องเท้าจากหินได้ดี"],
     cons: ["หนักกว่าคู่แข่ง", "แข็งเกินไปสำหรับบางคน", "ไม่เหมาะวิ่งถนน"],
     intro: "Salomon Speedcross 6 เป็นรองเท้าเทรลในตำนานที่ถูกปรับปรุงให้ดีขึ้นอีก โดยเฉพาะเรื่องการเกาะพื้นที่ลื่นและเปียก",
@@ -100,6 +56,7 @@ const reviewData: Record<string, {
       { title: "ความสบาย", body: "พื้นค่อนข้างแข็งเมื่อเทียบกับรุ่นอื่น เหมาะกับคนที่ชอบความ firm และ supportive" },
     ],
     verdict: "Speedcross 6 คือ king of mud running ถ้าคุณวิ่งเทรลสายเปียก สายโคลน นี่คือตัวเลือกแรก",
+    affiliate_url: null, cta_text: "ดูราคาล่าสุด",
   },
 };
 
@@ -114,10 +71,7 @@ function RatingBar({ label, score }: { label: string; score: number }) {
     <div className="flex items-center gap-3">
       <span className="text-sm text-muted-foreground w-24 shrink-0">{label}</span>
       <div className="flex-1 h-2.5 bg-muted rounded-full overflow-hidden">
-        <div
-          className="h-full bg-gradient-to-r from-primary to-accent rounded-full transition-all duration-700"
-          style={{ width: `${(score / 5) * 100}%` }}
-        />
+        <div className="h-full bg-gradient-to-r from-primary to-accent rounded-full transition-all duration-700" style={{ width: `${(score / 5) * 100}%` }} />
       </div>
       <span className="text-sm font-semibold text-foreground w-8 text-right">{score.toFixed(1)}</span>
     </div>
@@ -126,7 +80,51 @@ function RatingBar({ label, score }: { label: string; score: number }) {
 
 export default function ReviewDetail() {
   const { slug } = useParams<{ slug: string }>();
-  const review = slug ? reviewData[slug] : undefined;
+  const [review, setReview] = useState<ReviewData | undefined>(undefined);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!slug) { setLoading(false); return; }
+
+    const fetchReview = async () => {
+      const { data } = await supabase
+        .from("reviews")
+        .select("*")
+        .eq("slug", slug)
+        .eq("published", true)
+        .maybeSingle();
+
+      if (data) {
+        setReview({
+          name: data.name, brand: data.brand, category: data.category, price: data.price,
+          image_url: data.image_url, badge: data.badge, overall_rating: Number(data.overall_rating),
+          ratings: (data.ratings as unknown as ReviewData["ratings"]) || [],
+          specs: (data.specs as unknown as ReviewData["specs"]) || [],
+          pros: (data.pros as unknown as string[]) || [],
+          cons: (data.cons as unknown as string[]) || [],
+          intro: data.intro, verdict: data.verdict,
+          sections: (data.sections as unknown as ReviewData["sections"]) || [],
+          affiliate_url: data.affiliate_url, cta_text: data.cta_text,
+        });
+      } else if (fallbackData[slug]) {
+        setReview(fallbackData[slug]);
+      }
+      setLoading(false);
+    };
+    fetchReview();
+  }, [slug]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Navbar />
+        <div className="container mx-auto px-4 py-20 text-center">
+          <p className="text-muted-foreground">กำลังโหลด...</p>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
 
   if (!review) {
     return (
@@ -134,35 +132,34 @@ export default function ReviewDetail() {
         <Navbar />
         <div className="container mx-auto px-4 py-20 text-center">
           <h1 className="font-heading text-3xl font-bold mb-4">ไม่พบรีวิว</h1>
-          <Link to="/">
-            <Button variant="cta">กลับหน้าหลัก</Button>
-          </Link>
+          <Link to="/"><Button variant="cta">กลับหน้าหลัก</Button></Link>
         </div>
         <Footer />
       </div>
     );
   }
 
+  const ctaText = review.cta_text || "ดูราคาล่าสุด";
+  const ctaProps = review.affiliate_url
+    ? { as: "a" as const, href: review.affiliate_url, target: "_blank", rel: "noopener noreferrer nofollow" }
+    : {};
+
   return (
     <div className="min-h-screen bg-background">
       <SEOHead
         title={`${review.name} รีวิว — GearTrail`}
-        description={`รีวิว ${review.name} จาก ${review.brand}: ${review.intro.slice(0, 120)}...`}
+        description={`รีวิว ${review.name} จาก ${review.brand}: ${(review.intro || "").slice(0, 120)}...`}
         canonical={`https://gearguide-hero.lovable.app/review/${slug}`}
         jsonLd={{
           "@context": "https://schema.org",
           "@type": "Product",
           name: review.name,
           brand: { "@type": "Brand", name: review.brand },
-          image: review.image,
+          image: review.image_url,
           description: review.intro,
           review: {
             "@type": "Review",
-            reviewRating: {
-              "@type": "Rating",
-              ratingValue: review.overallRating,
-              bestRating: 5,
-            },
+            reviewRating: { "@type": "Rating", ratingValue: review.overall_rating, bestRating: 5 },
             author: { "@type": "Organization", name: "GearTrail" },
             reviewBody: review.verdict,
           },
@@ -191,7 +188,7 @@ export default function ReviewDetail() {
         {/* Header */}
         <div className="grid md:grid-cols-2 gap-8 mb-12">
           <div className="relative rounded-2xl overflow-hidden bg-muted aspect-[4/3]">
-            <img src={review.image} alt={review.name} className="w-full h-full object-cover" />
+            <img src={review.image_url || ""} alt={review.name} className="w-full h-full object-cover" />
             {review.badge && (
               <div className={`absolute top-4 left-4 px-4 py-1.5 rounded-full text-sm font-bold flex items-center gap-1.5 ${badgeColors[review.badge] || "bg-primary text-primary-foreground"}`}>
                 <Award className="h-4 w-4" />
@@ -205,24 +202,20 @@ export default function ReviewDetail() {
               <p className="text-sm font-medium text-muted-foreground uppercase tracking-wider">{review.brand} · {review.category}</p>
               <h1 className="font-heading text-3xl md:text-4xl font-bold text-foreground mt-1">{review.name}</h1>
             </div>
-
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-2 bg-muted rounded-xl px-4 py-2.5">
-                <span className="font-heading text-3xl font-bold text-foreground">{review.overallRating}</span>
+                <span className="font-heading text-3xl font-bold text-foreground">{review.overall_rating}</span>
                 <div>
-                  <RatingStars rating={review.overallRating} />
+                  <RatingStars rating={review.overall_rating} />
                   <p className="text-xs text-muted-foreground mt-0.5">คะแนนรวม</p>
                 </div>
               </div>
               <span className="font-heading text-2xl font-bold text-foreground">{review.price}</span>
             </div>
-
             <p className="text-muted-foreground leading-relaxed">{review.intro}</p>
-
-            {/* Sticky CTA for desktop */}
             <div className="flex gap-3 pt-2">
-              <Button variant="hero" size="lg" className="flex-1 md:flex-none">
-                ดูราคาล่าสุด
+              <Button variant="hero" size="lg" className="flex-1 md:flex-none" {...ctaProps}>
+                {ctaText}
                 <ExternalLink className="ml-2 h-5 w-5" />
               </Button>
               <Button variant="outline" size="lg">เปรียบเทียบ</Button>
@@ -231,41 +224,36 @@ export default function ReviewDetail() {
         </div>
 
         <div className="grid lg:grid-cols-3 gap-8">
-          {/* Main content */}
           <div className="lg:col-span-2 space-y-8">
             {/* Pros / Cons */}
             <div className="grid sm:grid-cols-2 gap-4">
               <div className="bg-badge-recommended/5 border border-badge-recommended/20 rounded-xl p-5">
                 <h3 className="font-heading font-semibold text-badge-recommended flex items-center gap-2 mb-3">
-                  <ThumbsUp className="h-5 w-5" />
-                  ข้อดี
+                  <ThumbsUp className="h-5 w-5" /> ข้อดี
                 </h3>
                 <ul className="space-y-2">
                   {review.pros.map((p) => (
                     <li key={p} className="flex items-start gap-2 text-sm text-foreground">
-                      <span className="text-badge-recommended mt-0.5">✓</span>
-                      {p}
+                      <span className="text-badge-recommended mt-0.5">✓</span>{p}
                     </li>
                   ))}
                 </ul>
               </div>
               <div className="bg-destructive/5 border border-destructive/20 rounded-xl p-5">
                 <h3 className="font-heading font-semibold text-destructive flex items-center gap-2 mb-3">
-                  <ThumbsDown className="h-5 w-5" />
-                  ข้อเสีย
+                  <ThumbsDown className="h-5 w-5" /> ข้อเสีย
                 </h3>
                 <ul className="space-y-2">
                   {review.cons.map((c) => (
                     <li key={c} className="flex items-start gap-2 text-sm text-foreground">
-                      <span className="text-destructive mt-0.5">✗</span>
-                      {c}
+                      <span className="text-destructive mt-0.5">✗</span>{c}
                     </li>
                   ))}
                 </ul>
               </div>
             </div>
 
-            {/* Review sections */}
+            {/* Sections */}
             {review.sections.map((s) => (
               <div key={s.title}>
                 <h2 className="font-heading text-xl font-bold text-foreground mb-3">{s.title}</h2>
@@ -276,12 +264,11 @@ export default function ReviewDetail() {
             {/* Verdict */}
             <div className="bg-primary/5 border border-primary/20 rounded-xl p-6">
               <h2 className="font-heading text-xl font-bold text-foreground flex items-center gap-2 mb-3">
-                <Award className="h-5 w-5 text-cta" />
-                สรุป
+                <Award className="h-5 w-5 text-cta" /> สรุป
               </h2>
               <p className="text-foreground leading-relaxed">{review.verdict}</p>
-              <Button variant="cta" size="lg" className="mt-4">
-                ดูราคาล่าสุด
+              <Button variant="cta" size="lg" className="mt-4" {...ctaProps}>
+                {ctaText}
                 <ExternalLink className="ml-2 h-5 w-5" />
               </Button>
             </div>
@@ -289,15 +276,12 @@ export default function ReviewDetail() {
 
           {/* Sidebar */}
           <aside className="space-y-6">
-            {/* Ratings breakdown */}
             <div className="bg-card rounded-xl border p-5 space-y-4 sticky top-20">
               <h3 className="font-heading font-semibold text-foreground">คะแนนแต่ละด้าน</h3>
               {review.ratings.map((r) => (
                 <RatingBar key={r.label} label={r.label} score={r.score} />
               ))}
             </div>
-
-            {/* Specs */}
             <div className="bg-card rounded-xl border p-5">
               <h3 className="font-heading font-semibold text-foreground mb-4">สเปค</h3>
               <dl className="space-y-3">
@@ -309,12 +293,10 @@ export default function ReviewDetail() {
                 ))}
               </dl>
             </div>
-
-            {/* Sticky CTA sidebar */}
             <div className="bg-cta/10 rounded-xl border border-cta/30 p-5 text-center sticky top-[26rem]">
               <p className="font-heading font-bold text-foreground text-lg mb-1">{review.price}</p>
-              <Button variant="hero" className="w-full">
-                ดูราคาล่าสุด
+              <Button variant="hero" className="w-full" {...ctaProps}>
+                {ctaText}
                 <ExternalLink className="ml-2 h-4 w-4" />
               </Button>
             </div>
@@ -327,10 +309,10 @@ export default function ReviewDetail() {
         <div className="flex items-center gap-3">
           <div>
             <p className="font-heading font-bold text-foreground">{review.price}</p>
-            <RatingStars rating={review.overallRating} />
+            <RatingStars rating={review.overall_rating} />
           </div>
-          <Button variant="hero" className="flex-1">
-            ดูราคาล่าสุด
+          <Button variant="hero" className="flex-1" {...ctaProps}>
+            {ctaText}
             <ExternalLink className="ml-2 h-4 w-4" />
           </Button>
         </div>
