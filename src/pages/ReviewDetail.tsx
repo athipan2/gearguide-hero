@@ -2,6 +2,7 @@ import { useParams, Link } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { RatingStars } from "@/components/RatingStars";
+import { SEOHead } from "@/components/SEOHead";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -144,6 +145,35 @@ export default function ReviewDetail() {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEOHead
+        title={`${review.name} รีวิว — GearTrail`}
+        description={`รีวิว ${review.name} จาก ${review.brand}: ${review.intro.slice(0, 120)}...`}
+        canonical={`https://gearguide-hero.lovable.app/review/${slug}`}
+        jsonLd={{
+          "@context": "https://schema.org",
+          "@type": "Product",
+          name: review.name,
+          brand: { "@type": "Brand", name: review.brand },
+          image: review.image,
+          description: review.intro,
+          review: {
+            "@type": "Review",
+            reviewRating: {
+              "@type": "Rating",
+              ratingValue: review.overallRating,
+              bestRating: 5,
+            },
+            author: { "@type": "Organization", name: "GearTrail" },
+            reviewBody: review.verdict,
+          },
+          offers: {
+            "@type": "Offer",
+            price: review.price.replace(/[^\d]/g, ""),
+            priceCurrency: "THB",
+            availability: "https://schema.org/InStock",
+          },
+        }}
+      />
       <Navbar />
 
       {/* Breadcrumb */}
