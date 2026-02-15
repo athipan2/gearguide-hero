@@ -13,6 +13,7 @@ interface ProductCardProps {
   pros: string[];
   cons: string[];
   slug?: string;
+  affiliateUrl?: string | null;
 }
 
 const badgeColors: Record<string, string> = {
@@ -21,7 +22,7 @@ const badgeColors: Record<string, string> = {
   "Top Pick": "bg-badge-top-pick text-accent-foreground",
 };
 
-export function ProductCard({ name, brand, image, rating, price, badge, pros, cons, slug }: ProductCardProps) {
+export function ProductCard({ name, brand, image, rating, price, badge, pros, cons, slug, affiliateUrl }: ProductCardProps) {
   return (
     <div className="group bg-card rounded-xl border overflow-hidden hover:shadow-xl transition-all duration-300">
       {/* Image */}
@@ -68,9 +69,18 @@ export function ProductCard({ name, brand, image, rating, price, badge, pros, co
 
         {/* CTAs */}
         <div className="flex gap-2 pt-1">
-          <Button variant="cta" size="sm" className="flex-1">
-            ดูราคา
-            <ExternalLink className="ml-1 h-3.5 w-3.5" />
+          <Button variant="cta" size="sm" className="flex-1" asChild={!!affiliateUrl}>
+            {affiliateUrl ? (
+              <a href={affiliateUrl} target="_blank" rel="noopener noreferrer nofollow">
+                ดูราคา
+                <ExternalLink className="ml-1 h-3.5 w-3.5" />
+              </a>
+            ) : (
+              <div className="flex items-center justify-center">
+                ดูราคา
+                <ExternalLink className="ml-1 h-3.5 w-3.5" />
+              </div>
+            )}
           </Button>
           {slug ? (
             <Button variant="outline" size="sm" asChild>

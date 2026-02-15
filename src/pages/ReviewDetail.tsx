@@ -141,8 +141,27 @@ export default function ReviewDetail() {
 
   const ctaText = review.cta_text || "ดูราคาล่าสุด";
   const ctaProps = review.affiliate_url
-    ? { as: "a" as const, href: review.affiliate_url, target: "_blank", rel: "noopener noreferrer nofollow" }
+    ? { href: review.affiliate_url, target: "_blank", rel: "noopener noreferrer nofollow" }
     : {};
+
+  const CTAButton = ({ className, variant = "hero", size = "lg", isSidebar = false }: { className?: string, variant?: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link" | "cta" | "hero", size?: "default" | "sm" | "lg" | "icon", isSidebar?: boolean }) => {
+    const iconClass = isSidebar ? "h-4 w-4" : "h-5 w-5";
+    return (
+      <Button variant={variant} size={size} className={className} asChild={!!review.affiliate_url}>
+        {review.affiliate_url ? (
+          <a {...ctaProps}>
+            {ctaText}
+            <ExternalLink className={`ml-2 ${iconClass}`} />
+          </a>
+        ) : (
+          <div className="flex items-center">
+            {ctaText}
+            <ExternalLink className={`ml-2 ${iconClass}`} />
+          </div>
+        )}
+      </Button>
+    );
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -214,10 +233,7 @@ export default function ReviewDetail() {
             </div>
             <p className="text-muted-foreground leading-relaxed">{review.intro}</p>
             <div className="flex gap-3 pt-2">
-              <Button variant="hero" size="lg" className="flex-1 md:flex-none" {...ctaProps}>
-                {ctaText}
-                <ExternalLink className="ml-2 h-5 w-5" />
-              </Button>
+              <CTAButton className="flex-1 md:flex-none" />
               <Button variant="outline" size="lg">เปรียบเทียบ</Button>
             </div>
           </div>
@@ -267,10 +283,7 @@ export default function ReviewDetail() {
                 <Award className="h-5 w-5 text-cta" /> สรุป
               </h2>
               <p className="text-foreground leading-relaxed">{review.verdict}</p>
-              <Button variant="cta" size="lg" className="mt-4" {...ctaProps}>
-                {ctaText}
-                <ExternalLink className="ml-2 h-5 w-5" />
-              </Button>
+              <CTAButton variant="cta" className="mt-4" />
             </div>
           </div>
 
@@ -295,10 +308,7 @@ export default function ReviewDetail() {
             </div>
             <div className="bg-cta/10 rounded-xl border border-cta/30 p-5 text-center sticky top-[26rem]">
               <p className="font-heading font-bold text-foreground text-lg mb-1">{review.price}</p>
-              <Button variant="hero" className="w-full" {...ctaProps}>
-                {ctaText}
-                <ExternalLink className="ml-2 h-4 w-4" />
-              </Button>
+              <CTAButton className="w-full" isSidebar />
             </div>
           </aside>
         </div>
@@ -311,10 +321,7 @@ export default function ReviewDetail() {
             <p className="font-heading font-bold text-foreground">{review.price}</p>
             <RatingStars rating={review.overall_rating} />
           </div>
-          <Button variant="hero" className="flex-1" {...ctaProps}>
-            {ctaText}
-            <ExternalLink className="ml-2 h-4 w-4" />
-          </Button>
+          <CTAButton className="flex-1" isSidebar />
         </div>
       </div>
 

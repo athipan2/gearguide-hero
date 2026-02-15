@@ -38,7 +38,7 @@ export function FeaturedReviews() {
     const fetchReviews = async () => {
       const { data } = await supabase
         .from("reviews")
-        .select("name, brand, image_url, overall_rating, price, badge, pros, cons, slug")
+        .select("name, brand, image_url, overall_rating, price, badge, pros, cons, slug, affiliate_url")
         .eq("published", true)
         .order("created_at", { ascending: false })
         .limit(8);
@@ -55,6 +55,7 @@ export function FeaturedReviews() {
             pros: (r.pros as unknown as string[]) || [],
             cons: (r.cons as unknown as string[]) || [],
             slug: r.slug,
+            affiliateUrl: r.affiliate_url,
           }))
         );
       }
