@@ -11,9 +11,21 @@ export default function AdminLogin() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const { signIn } = useAuth();
+  const [resending, setResending] = useState(false);
+  const { signIn, resendConfirmation } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  const handleResendConfirmation = async () => {
+    setResending(true);
+    const { error } = await resendConfirmation(email);
+    setResending(false);
+    if (error) {
+      toast({ title: "ไม่สามารถส่งอีเมลได้", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "ส่งอีเมลยืนยันแล้ว", description: "กรุณาตรวจสอบกล่องจดหมายของคุณ" });
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -21,7 +33,18 @@ export default function AdminLogin() {
     const { error } = await signIn(email, password);
     setLoading(false);
     if (error) {
-      toast({ title: "เข้าสู่ระบบไม่สำเร็จ", description: error.message, variant: "destructive" });
+      const isEmailNotConfirmed = error.message.toLowerCase().includes("email not confirmed");
+
+      toast({
+        title: "เข้าสู่ระบบไม่สำเร็จ",
+        description: error.message,
+        variant: "destructive",
+        action: isEmailNotConfirmed ? (
+          <Button variant="secondary" size="sm" onClick={handleResendConfirmation} disabled={resending}>
+            {resending ? "กำลังส่ง..." : "ส่งอีเมลอีกครั้ง"}
+          </Button>
+        ) : undefined
+      });
     } else {
       navigate("/admin");
     }
