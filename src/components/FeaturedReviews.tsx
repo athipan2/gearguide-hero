@@ -42,6 +42,7 @@ interface ReviewData {
   cons: unknown;
   slug: string;
   affiliate_url: string | null;
+  created_at: string;
 }
 
 export function FeaturedReviews() {
@@ -52,7 +53,7 @@ export function FeaturedReviews() {
       try {
         const { data, error } = await supabase
           .from("reviews")
-          .select("name, brand, image_url, overall_rating, price, badge, pros, cons, slug, affiliate_url")
+          .select("name, brand, image_url, overall_rating, price, badge, pros, cons, slug, affiliate_url, created_at")
           .eq("published", true)
           .order("created_at", { ascending: false })
           .limit(8);
@@ -72,6 +73,7 @@ export function FeaturedReviews() {
               cons: Array.isArray(r.cons) ? (r.cons as string[]) : [],
               slug: r.slug,
               affiliateUrl: r.affiliate_url || undefined,
+              createdAt: r.created_at,
             }))
           );
         }

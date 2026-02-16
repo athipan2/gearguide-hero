@@ -7,12 +7,14 @@ import { SEOHead } from "@/components/SEOHead";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
+import { CommentSection } from "@/components/CommentSection";
 import {
   ExternalLink, ArrowLeft, ThumbsUp, ThumbsDown, Award,
   ChevronRight
 } from "lucide-react";
 
 interface ReviewData {
+  id?: string;
   name: string; brand: string; category: string; price: string; image_url: string | null;
   badge: string | null; overall_rating: number;
   ratings: { label: string; score: number }[];
@@ -96,6 +98,7 @@ export default function ReviewDetail() {
 
       if (data) {
         setReview({
+          id: data.id,
           name: data.name, brand: data.brand, category: data.category, price: data.price,
           image_url: data.image_url, badge: data.badge, overall_rating: Number(data.overall_rating),
           ratings: (data.ratings as unknown as ReviewData["ratings"]) || [],
@@ -312,6 +315,8 @@ export default function ReviewDetail() {
             </div>
           </aside>
         </div>
+        {/* Comments Section */}
+        {review.id && <CommentSection reviewId={review.id} />}
       </article>
 
       {/* Mobile sticky CTA */}

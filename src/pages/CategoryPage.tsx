@@ -41,6 +41,45 @@ function parsePriceNum(price: string): number {
   return isNaN(n) ? 0 : n;
 }
 
+const fallbackReviews: ReviewItem[] = [
+  {
+    name: "Nike Vaporfly 3", brand: "Nike",
+    image_url: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600&h=450&fit=crop",
+    overall_rating: 4.8, price: "฿8,500", badge: "Top Pick",
+    pros: ["เบามาก", "แรงคืนตัวดี"], cons: ["ราคาสูง", "ทนทานปานกลาง"],
+    slug: "nike-vaporfly-3", category: "รองเท้าวิ่งถนน",
+    created_at: new Date().toISOString(),
+    affiliate_url: null,
+  },
+  {
+    name: "Salomon Speedcross 6", brand: "Salomon",
+    image_url: "https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?w=600&h=450&fit=crop",
+    overall_rating: 4.6, price: "฿5,900", badge: "แนะนำ",
+    pros: ["เกาะถนนดี", "กันน้ำ"], cons: ["แข็งนิดหน่อย", "หนักกว่ารุ่นอื่น"],
+    slug: "salomon-speedcross-6", category: "อุปกรณ์วิ่งเทรล",
+    created_at: new Date().toISOString(),
+    affiliate_url: null,
+  },
+  {
+    name: "Naturehike Cloud Up 2", brand: "Naturehike",
+    image_url: "https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=600&h=450&fit=crop",
+    overall_rating: 4.5, price: "฿3,200", badge: "คุ้มค่าที่สุด",
+    pros: ["น้ำหนักเบา", "ราคาดี"], cons: ["ทนฝนปานกลาง", "พื้นที่จำกัด"],
+    slug: "naturehike-cloud-up-2", category: "camping-gear",
+    created_at: new Date().toISOString(),
+    affiliate_url: null,
+  },
+  {
+    name: "Garmin Forerunner 265", brand: "Garmin",
+    image_url: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600&h=450&fit=crop",
+    overall_rating: 4.7, price: "฿14,900", badge: "แนะนำ",
+    pros: ["AMOLED สวย", "แบตอึด"], cons: ["แพง", "ขนาดใหญ่"],
+    slug: "garmin-forerunner-265", category: "นาฬิกา-gps",
+    created_at: new Date().toISOString(),
+    affiliate_url: null,
+  },
+];
+
 export default function CategoryPage() {
   const { category } = useParams<{ category: string }>();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -53,6 +92,7 @@ export default function CategoryPage() {
   // Filters
   const [searchQuery, setSearchQuery] = useState(searchParams.get("q") || "");
   const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
+  const [minRating, setMinRating] = useState<number>(0);
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 50000]);
   const [maxPrice, setMaxPrice] = useState(50000);
   const [sortBy, setSortBy] = useState<SortOption>("newest");
@@ -75,23 +115,31 @@ export default function CategoryPage() {
 
       const { data, error } = await query.order("created_at", { ascending: false });
 
-      if (!error && data) {
-        const items = data as unknown as ReviewItem[];
-        setReviews(items);
+      let items = (data as unknown as ReviewItem[]) || [];
 
-        // Extract unique brands & categories
-        const brands = [...new Set(items.map((r) => r.brand))].sort();
-        setAllBrands(brands);
-
-        const cats = [...new Set(items.map((r) => r.category))].sort();
-        setAllCategories(cats);
-
-        // Calculate max price
-        const prices = items.map((r) => parsePriceNum(r.price));
-        const mp = Math.max(...prices, 50000);
-        setMaxPrice(mp);
-        setPriceRange([0, mp]);
+      if ((error || items.length === 0) && !category) {
+        items = fallbackReviews;
+      } else if (category) {
+        // If specific category requested and no data, filter fallback
+        const decoded = decodeURIComponent(category);
+        items = items.length > 0 ? items : fallbackReviews.filter(r => r.category === decoded);
       }
+
+      setReviews(items);
+
+      // Extract unique brands & categories
+      const brands = [...new Set(items.map((r) => r.brand))].sort();
+      setAllBrands(brands);
+
+      const cats = [...new Set(items.map((r) => r.category))].sort();
+      setAllCategories(cats);
+
+      // Calculate max price
+      const prices = items.map((r) => parsePriceNum(r.price));
+      const mp = Math.max(...prices, 50000);
+      setMaxPrice(mp);
+      setPriceRange([0, mp]);
+
       setLoading(false);
     };
     fetch();
@@ -106,11 +154,12 @@ export default function CategoryPage() {
   const clearFilters = () => {
     setSearchQuery("");
     setSelectedBrands([]);
+    setMinRating(0);
     setPriceRange([0, maxPrice]);
     setSortBy("newest");
   };
 
-  const hasActiveFilters = searchQuery || selectedBrands.length > 0 || priceRange[0] > 0 || priceRange[1] < maxPrice;
+  const hasActiveFilters = searchQuery || selectedBrands.length > 0 || minRating > 0 || priceRange[0] > 0 || priceRange[1] < maxPrice;
 
   // Filtered & sorted results
   const filtered = useMemo(() => {
@@ -120,13 +169,21 @@ export default function CategoryPage() {
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
       result = result.filter(
-        (r) => r.name.toLowerCase().includes(q) || r.brand.toLowerCase().includes(q)
+        (r) =>
+          r.name.toLowerCase().includes(q) ||
+          r.brand.toLowerCase().includes(q) ||
+          r.category.toLowerCase().includes(q)
       );
     }
 
     // Brand filter
     if (selectedBrands.length > 0) {
       result = result.filter((r) => selectedBrands.includes(r.brand));
+    }
+
+    // Rating filter
+    if (minRating > 0) {
+      result = result.filter((r) => r.overall_rating >= minRating);
     }
 
     // Price filter
@@ -151,7 +208,7 @@ export default function CategoryPage() {
     }
 
     return result;
-  }, [reviews, searchQuery, selectedBrands, priceRange, sortBy]);
+  }, [reviews, searchQuery, selectedBrands, priceRange, sortBy, minRating]);
 
   const meta = category ? CATEGORY_META[decodeURIComponent(category)] : null;
   const pageTitle = meta?.label || "สินค้าทั้งหมด";
@@ -222,6 +279,27 @@ export default function CategoryPage() {
                   {allBrands.length === 0 && (
                     <p className="text-xs text-muted-foreground">ไม่มีแบรนด์</p>
                   )}
+                </div>
+              </div>
+
+              {/* Rating Filter */}
+              <div>
+                <h3 className="font-heading font-semibold text-sm text-foreground mb-3">คะแนนรีวิว</h3>
+                <div className="space-y-2">
+                  {[4.5, 4, 3.5, 3].map((rating) => (
+                    <label key={rating} className="flex items-center gap-2 cursor-pointer group">
+                      <input
+                        type="radio"
+                        name="rating"
+                        className="w-4 h-4 accent-primary"
+                        checked={minRating === rating}
+                        onChange={() => setMinRating(rating)}
+                      />
+                      <span className="text-sm text-muted-foreground group-hover:text-foreground">
+                        {rating}+ ดาว
+                      </span>
+                    </label>
+                  ))}
                 </div>
               </div>
 
