@@ -52,13 +52,18 @@ export default function AdminMedia() {
         continue;
       }
 
-      await supabase.from("media_library").insert({
+      const { error: insertError } = await supabase.from("media_library").insert({
         file_name: file.name,
         file_path: path,
         file_size: file.size,
         mime_type: file.type,
         uploaded_by: user.id,
       });
+
+      if (insertError) {
+        console.error("Insert error:", insertError);
+        toast({ title: `บันทึกข้อมูล ${file.name} ไม่สำเร็จ`, description: insertError.message, variant: "destructive" });
+      }
     }
 
     setUploading(false);
