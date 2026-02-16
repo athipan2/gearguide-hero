@@ -12,6 +12,7 @@ import AdminDashboard from "./pages/AdminDashboard";
 import AdminReviews from "./pages/AdminReviews";
 import AdminReviewForm from "./pages/AdminReviewForm";
 import AdminMedia from "./pages/AdminMedia";
+import CategoryPage from "./pages/CategoryPage";
 
 const queryClient = new QueryClient();
 
@@ -25,6 +26,8 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/review/:slug" element={<ReviewDetail />} />
+            <Route path="/category" element={<CategoryPage />} />
+            <Route path="/category/:category" element={<CategoryPage />} />
             <Route path="/admin/login" element={<AdminLogin />} />
             <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/admin/reviews" element={<AdminReviews />} />

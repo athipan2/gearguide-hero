@@ -1,0 +1,301 @@
+import { useState, useEffect, useMemo } from "react";
+import { useParams, useSearchParams } from "react-router-dom";
+import { Navbar } from "@/components/Navbar";
+import { Footer } from "@/components/Footer";
+import { SEOHead } from "@/components/SEOHead";
+import { ProductCard } from "@/components/ProductCard";
+import { supabase } from "@/integrations/supabase/client";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { Slider } from "@/components/ui/slider";
+import { SlidersHorizontal, X, Search, Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+
+const CATEGORY_META: Record<string, { label: string; description: string }> = {
+  "รองเท้าวิ่งถนน": { label: "รองเท้าวิ่งถนน", description: "รีวิวรองเท้าวิ่งถนนจากแบรนด์ชั้นนำ ทดสอบจริง" },
+  "อุปกรณ์วิ่งเทรล": { label: "อุปกรณ์วิ่งเทรล", description: "รีวิวอุปกรณ์วิ่งเทรล เดินป่า ทดสอบจริง" },
+  "camping-gear": { label: "Camping Gear", description: "รีวิวอุปกรณ์แคมป์ปิ้ง เต็นท์ ถุงนอน" },
+  "นาฬิกา-gps": { label: "นาฬิกา GPS", description: "รีวิวนาฬิกา GPS สำหรับวิ่งและกิจกรรมกลางแจ้ง" },
+};
+
+type SortOption = "newest" | "rating-desc" | "price-asc" | "price-desc";
+
+interface ReviewItem {
+  name: string;
+  brand: string;
+  image_url: string | null;
+  overall_rating: number;
+  price: string;
+  badge: string | null;
+  pros: unknown;
+  cons: unknown;
+  slug: string;
+  affiliate_url: string | null;
+  category: string;
+  created_at: string;
+}
+
+function parsePriceNum(price: string): number {
+  const n = parseFloat(price.replace(/[^0-9.]/g, ""));
+  return isNaN(n) ? 0 : n;
+}
+
+export default function CategoryPage() {
+  const { category } = useParams<{ category: string }>();
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const [reviews, setReviews] = useState<ReviewItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [allBrands, setAllBrands] = useState<string[]>([]);
+  const [allCategories, setAllCategories] = useState<string[]>([]);
+
+  // Filters
+  const [searchQuery, setSearchQuery] = useState(searchParams.get("q") || "");
+  const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
+  const [priceRange, setPriceRange] = useState<[number, number]>([0, 50000]);
+  const [maxPrice, setMaxPrice] = useState(50000);
+  const [sortBy, setSortBy] = useState<SortOption>("newest");
+  const [showFilters, setShowFilters] = useState(false);
+
+  // Fetch all published reviews (optionally filtered by category param)
+  useEffect(() => {
+    const fetch = async () => {
+      setLoading(true);
+      let query = supabase
+        .from("reviews")
+        .select("name, brand, image_url, overall_rating, price, badge, pros, cons, slug, affiliate_url, category, created_at")
+        .eq("published", true);
+
+      if (category) {
+        // Decode category slug back to actual value
+        const decoded = decodeURIComponent(category);
+        query = query.eq("category", decoded);
+      }
+
+      const { data, error } = await query.order("created_at", { ascending: false });
+
+      if (!error && data) {
+        const items = data as unknown as ReviewItem[];
+        setReviews(items);
+
+        // Extract unique brands & categories
+        const brands = [...new Set(items.map((r) => r.brand))].sort();
+        setAllBrands(brands);
+
+        const cats = [...new Set(items.map((r) => r.category))].sort();
+        setAllCategories(cats);
+
+        // Calculate max price
+        const prices = items.map((r) => parsePriceNum(r.price));
+        const mp = Math.max(...prices, 50000);
+        setMaxPrice(mp);
+        setPriceRange([0, mp]);
+      }
+      setLoading(false);
+    };
+    fetch();
+  }, [category]);
+
+  const toggleBrand = (brand: string) => {
+    setSelectedBrands((prev) =>
+      prev.includes(brand) ? prev.filter((b) => b !== brand) : [...prev, brand]
+    );
+  };
+
+  const clearFilters = () => {
+    setSearchQuery("");
+    setSelectedBrands([]);
+    setPriceRange([0, maxPrice]);
+    setSortBy("newest");
+  };
+
+  const hasActiveFilters = searchQuery || selectedBrands.length > 0 || priceRange[0] > 0 || priceRange[1] < maxPrice;
+
+  // Filtered & sorted results
+  const filtered = useMemo(() => {
+    let result = [...reviews];
+
+    // Search
+    if (searchQuery) {
+      const q = searchQuery.toLowerCase();
+      result = result.filter(
+        (r) => r.name.toLowerCase().includes(q) || r.brand.toLowerCase().includes(q)
+      );
+    }
+
+    // Brand filter
+    if (selectedBrands.length > 0) {
+      result = result.filter((r) => selectedBrands.includes(r.brand));
+    }
+
+    // Price filter
+    result = result.filter((r) => {
+      const p = parsePriceNum(r.price);
+      return p >= priceRange[0] && p <= priceRange[1];
+    });
+
+    // Sort
+    switch (sortBy) {
+      case "rating-desc":
+        result.sort((a, b) => b.overall_rating - a.overall_rating);
+        break;
+      case "price-asc":
+        result.sort((a, b) => parsePriceNum(a.price) - parsePriceNum(b.price));
+        break;
+      case "price-desc":
+        result.sort((a, b) => parsePriceNum(b.price) - parsePriceNum(a.price));
+        break;
+      default: // newest
+        result.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+    }
+
+    return result;
+  }, [reviews, searchQuery, selectedBrands, priceRange, sortBy]);
+
+  const meta = category ? CATEGORY_META[decodeURIComponent(category)] : null;
+  const pageTitle = meta?.label || "สินค้าทั้งหมด";
+  const pageDescription = meta?.description || "รีวิวสินค้าทั้งหมด ทดสอบจริง อัปเดตล่าสุด";
+
+  return (
+    <div className="min-h-screen bg-background">
+      <SEOHead title={`${pageTitle} — GearTrail`} description={pageDescription} />
+      <Navbar />
+
+      <main className="container mx-auto px-4 py-8">
+        {/* Header */}
+        <div className="mb-8">
+          <h1 className="font-heading text-3xl md:text-4xl font-bold text-foreground">{pageTitle}</h1>
+          <p className="text-muted-foreground mt-2">{pageDescription}</p>
+        </div>
+
+        {/* Search & Sort bar */}
+        <div className="flex flex-col sm:flex-row gap-3 mb-6">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="ค้นหาชื่อสินค้าหรือแบรนด์..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10"
+            />
+          </div>
+          <Select value={sortBy} onValueChange={(v) => setSortBy(v as SortOption)}>
+            <SelectTrigger className="w-full sm:w-[200px]">
+              <SelectValue placeholder="เรียงลำดับ" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="newest">ใหม่ล่าสุด</SelectItem>
+              <SelectItem value="rating-desc">คะแนนสูงสุด</SelectItem>
+              <SelectItem value="price-asc">ราคาต่ำ → สูง</SelectItem>
+              <SelectItem value="price-desc">ราคาสูง → ต่ำ</SelectItem>
+            </SelectContent>
+          </Select>
+          <Button
+            variant="outline"
+            size="icon"
+            className="shrink-0 md:hidden"
+            onClick={() => setShowFilters(!showFilters)}
+          >
+            <SlidersHorizontal className="h-4 w-4" />
+          </Button>
+        </div>
+
+        <div className="flex gap-6">
+          {/* Sidebar Filters */}
+          <aside className={`${showFilters ? "block" : "hidden"} md:block w-full md:w-64 shrink-0 space-y-6`}>
+            <div className="bg-card rounded-xl border p-5 space-y-6">
+              {/* Brand filter */}
+              <div>
+                <h3 className="font-heading font-semibold text-sm text-foreground mb-3">แบรนด์</h3>
+                <div className="flex flex-wrap gap-2">
+                  {allBrands.map((brand) => (
+                    <Badge
+                      key={brand}
+                      variant={selectedBrands.includes(brand) ? "default" : "outline"}
+                      className="cursor-pointer transition-colors"
+                      onClick={() => toggleBrand(brand)}
+                    >
+                      {brand}
+                    </Badge>
+                  ))}
+                  {allBrands.length === 0 && (
+                    <p className="text-xs text-muted-foreground">ไม่มีแบรนด์</p>
+                  )}
+                </div>
+              </div>
+
+              {/* Price range */}
+              <div>
+                <h3 className="font-heading font-semibold text-sm text-foreground mb-3">ช่วงราคา</h3>
+                <Slider
+                  min={0}
+                  max={maxPrice}
+                  step={100}
+                  value={priceRange}
+                  onValueChange={(v) => setPriceRange(v as [number, number])}
+                  className="mb-2"
+                />
+                <div className="flex items-center justify-between text-xs text-muted-foreground">
+                  <span>฿{priceRange[0].toLocaleString()}</span>
+                  <span>฿{priceRange[1].toLocaleString()}</span>
+                </div>
+              </div>
+
+              {/* Clear filters */}
+              {hasActiveFilters && (
+                <Button variant="ghost" size="sm" className="w-full" onClick={clearFilters}>
+                  <X className="h-3 w-3 mr-1" />
+                  ล้างตัวกรอง
+                </Button>
+              )}
+            </div>
+          </aside>
+
+          {/* Product grid */}
+          <div className="flex-1">
+            {loading ? (
+              <div className="flex items-center justify-center py-20">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+              </div>
+            ) : filtered.length === 0 ? (
+              <div className="text-center py-20">
+                <p className="text-muted-foreground text-lg">ไม่พบสินค้าที่ตรงกับเงื่อนไข</p>
+                {hasActiveFilters && (
+                  <Button variant="link" className="mt-2" onClick={clearFilters}>
+                    ล้างตัวกรองทั้งหมด
+                  </Button>
+                )}
+              </div>
+            ) : (
+              <>
+                <p className="text-sm text-muted-foreground mb-4">
+                  แสดง {filtered.length} รายการ
+                </p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                  {filtered.map((r) => (
+                    <ProductCard
+                      key={r.slug}
+                      name={r.name}
+                      brand={r.brand}
+                      image={r.image_url || ""}
+                      rating={Number(r.overall_rating)}
+                      price={r.price}
+                      badge={r.badge || undefined}
+                      pros={Array.isArray(r.pros) ? (r.pros as string[]) : []}
+                      cons={Array.isArray(r.cons) ? (r.cons as string[]) : []}
+                      slug={r.slug}
+                      affiliateUrl={r.affiliate_url}
+                    />
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      </main>
+
+      <Footer />
+    </div>
+  );
+}
