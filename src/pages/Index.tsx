@@ -2,6 +2,7 @@ import { Navbar } from "@/components/Navbar";
 import { HeroSection } from "@/components/HeroSection";
 import { CategorySection } from "@/components/CategorySection";
 import { FeaturedReviews } from "@/components/FeaturedReviews";
+import { LatestGuides } from "@/components/LatestGuides";
 import { ComparisonTable } from "@/components/ComparisonTable";
 import { NewsletterCTA } from "@/components/NewsletterCTA";
 import { Footer } from "@/components/Footer";
@@ -20,6 +21,7 @@ const Index = () => {
         <HeroSection />
         <CategorySection />
         <FeaturedReviews />
+        <LatestGuides />
         <ComparisonTable />
         <NewsletterCTA />
       </main>

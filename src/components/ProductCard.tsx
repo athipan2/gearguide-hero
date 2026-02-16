@@ -14,6 +14,7 @@ interface ProductCardProps {
   cons: string[];
   slug?: string;
   affiliateUrl?: string | null;
+  createdAt?: string;
 }
 
 const badgeColors: Record<string, string> = {
@@ -22,17 +23,26 @@ const badgeColors: Record<string, string> = {
   "Top Pick": "bg-badge-top-pick text-accent-foreground",
 };
 
-export function ProductCard({ name, brand, image, rating, price, badge, pros, cons, slug, affiliateUrl }: ProductCardProps) {
+export function ProductCard({ name, brand, image, rating, price, badge, pros, cons, slug, affiliateUrl, createdAt }: ProductCardProps) {
+  const isNew = createdAt ? (new Date().getTime() - new Date(createdAt).getTime()) < (30 * 24 * 60 * 60 * 1000) : false;
+
   return (
     <div className="group bg-card rounded-xl border overflow-hidden hover:shadow-xl transition-all duration-300">
       {/* Image */}
       <div className="relative aspect-[4/3] bg-muted overflow-hidden">
         <img src={image} alt={name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" />
-        {badge && (
-          <div className={`absolute top-3 left-3 px-3 py-1 rounded-full text-xs font-bold ${badgeColors[badge] || "bg-primary text-primary-foreground"}`}>
-            {badge}
-          </div>
-        )}
+        <div className="absolute top-3 left-3 flex flex-col gap-2">
+          {isNew && (
+            <div className="bg-cta text-cta-foreground px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider shadow-lg">
+              ใหม่
+            </div>
+          )}
+          {badge && (
+            <div className={`px-3 py-1 rounded-full text-xs font-bold shadow-sm ${badgeColors[badge] || "bg-primary text-primary-foreground"}`}>
+              {badge}
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Content */}

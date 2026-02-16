@@ -1,12 +1,13 @@
 import { useState } from "react";
 import { Menu, X, Search, Mountain } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 
 const navLinks = [
-  { label: "รองเท้าวิ่ง", href: "#" },
-  { label: "Trail Gear", href: "#" },
-  { label: "Camping", href: "#" },
-  { label: "เปรียบเทียบ", href: "#" },
+  { label: "รองเท้าวิ่ง", href: "/category/รองเท้าวิ่งถนน" },
+  { label: "อุปกรณ์เทรล", href: "/category/อุปกรณ์วิ่งเทรล" },
+  { label: "แคมป์ปิ้ง", href: "/category/camping-gear" },
+  { label: "คู่มือ & เทคนิค", href: "/guides" },
   { label: "Best Of 2026", href: "#" },
 ];
 
@@ -16,17 +17,17 @@ export function Navbar() {
   return (
     <nav className="sticky top-0 z-50 bg-card/95 backdrop-blur-md border-b">
       <div className="container mx-auto flex items-center justify-between h-16 px-4">
-        <a href="/" className="flex items-center gap-2 font-heading font-bold text-xl text-primary">
+        <Link to="/" className="flex items-center gap-2 font-heading font-bold text-xl text-primary">
           <Mountain className="h-6 w-6" />
           <span>GearTrail</span>
-        </a>
+        </Link>
 
         {/* Desktop nav */}
         <div className="hidden md:flex items-center gap-6">
           {navLinks.map((l) => (
-            <a key={l.label} href={l.href} className="text-sm font-medium text-foreground/80 hover:text-primary transition-colors">
+            <Link key={l.label} to={l.href} className="text-sm font-medium text-foreground/80 hover:text-primary transition-colors">
               {l.label}
-            </a>
+            </Link>
           ))}
         </div>
 
@@ -44,9 +45,9 @@ export function Navbar() {
       {open && (
         <div className="md:hidden border-t bg-card px-4 pb-4 space-y-2">
           {navLinks.map((l) => (
-            <a key={l.label} href={l.href} className="block py-2 text-sm font-medium text-foreground/80 hover:text-primary">
+            <Link key={l.label} to={l.href} className="block py-2 text-sm font-medium text-foreground/80 hover:text-primary" onClick={() => setOpen(false)}>
               {l.label}
-            </a>
+            </Link>
           ))}
           <div className="flex gap-2 pt-2">
             <Button variant="ghost" size="sm" className="w-full justify-start"><Search className="h-4 w-4 mr-2" />ค้นหา</Button>

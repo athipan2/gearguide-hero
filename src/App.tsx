@@ -13,6 +13,8 @@ import AdminReviews from "./pages/AdminReviews";
 import AdminReviewForm from "./pages/AdminReviewForm";
 import AdminMedia from "./pages/AdminMedia";
 import CategoryPage from "./pages/CategoryPage";
+import GuidesPage from "./pages/GuidesPage";
+import ArticleDetail from "./pages/ArticleDetail";
 
 const queryClient = new QueryClient();
 
@@ -33,6 +35,8 @@ const App = () => (
             <Route path="/admin/reviews" element={<AdminReviews />} />
             <Route path="/admin/reviews/:id" element={<AdminReviewForm />} />
             <Route path="/admin/media" element={<AdminMedia />} />
+            <Route path="/guides" element={<GuidesPage />} />
+            <Route path="/guides/:slug" element={<ArticleDetail />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
