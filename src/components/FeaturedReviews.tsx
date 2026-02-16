@@ -31,33 +31,52 @@ const fallbackProducts = [
   },
 ];
 
+interface ReviewData {
+  name: string;
+  brand: string;
+  image_url: string | null;
+  overall_rating: number;
+  price: string;
+  badge: string | null;
+  pros: unknown;
+  cons: unknown;
+  slug: string;
+  affiliate_url: string | null;
+}
+
 export function FeaturedReviews() {
   const [products, setProducts] = useState(fallbackProducts);
 
   useEffect(() => {
     const fetchReviews = async () => {
-      const { data } = await supabase
-        .from("reviews")
-        .select("name, brand, image_url, overall_rating, price, badge, pros, cons, slug, affiliate_url")
-        .eq("published", true)
-        .order("created_at", { ascending: false })
-        .limit(8);
+      try {
+        const { data, error } = await supabase
+          .from("reviews")
+          .select("name, brand, image_url, overall_rating, price, badge, pros, cons, slug, affiliate_url")
+          .eq("published", true)
+          .order("created_at", { ascending: false })
+          .limit(8);
 
-      if (data && data.length > 0) {
-        setProducts(
-          data.map((r) => ({
-            name: r.name,
-            brand: r.brand,
-            image: r.image_url || "",
-            rating: Number(r.overall_rating),
-            price: r.price,
-            badge: r.badge || undefined,
-            pros: (r.pros as unknown as string[]) || [],
-            cons: (r.cons as unknown as string[]) || [],
-            slug: r.slug,
-            affiliateUrl: r.affiliate_url,
-          }))
-        );
+        if (error) throw error;
+
+        if (data && data.length > 0) {
+          setProducts(
+            (data as unknown as ReviewData[]).map((r) => ({
+              name: r.name,
+              brand: r.brand,
+              image: r.image_url || "",
+              rating: Number(r.overall_rating),
+              price: r.price,
+              badge: r.badge || undefined,
+              pros: Array.isArray(r.pros) ? (r.pros as string[]) : [],
+              cons: Array.isArray(r.cons) ? (r.cons as string[]) : [],
+              slug: r.slug,
+              affiliateUrl: r.affiliate_url || undefined,
+            }))
+          );
+        }
+      } catch (error) {
+        console.error("Error fetching reviews:", error);
       }
     };
     fetchReviews();
