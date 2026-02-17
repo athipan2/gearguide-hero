@@ -4,14 +4,15 @@ import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Mountain, LogIn } from "lucide-react";
+import { Mountain, LogIn, Mail } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { ToastAction } from "@/components/ui/toast";
 
 export default function AdminLogin() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const { signIn } = useAuth();
+  const { signIn, resendConfirmation } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -36,13 +37,45 @@ export default function AdminLogin() {
       const { error } = await signIn(email, password);
       if (error) {
         console.error("Login error:", error);
-        toast({
-          title: "เข้าสู่ระบบไม่สำเร็จ",
-          description: error.message === "Load failed"
-            ? "ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้ (Load failed) กรุณาตรวจสอบอินเทอร์เน็ตหรือการตั้งค่า Supabase"
-            : error.message,
-          variant: "destructive"
-        });
+
+        if (error.message === "Email not confirmed") {
+          toast({
+            title: "อีเมลยังไม่ได้รับการยืนยัน",
+            description: "กรุณาตรวจสอบอีเมลของคุณเพื่อยืนยันการใช้งาน",
+            variant: "default",
+            action: (
+              <ToastAction
+                altText="Resend Confirmation"
+                onClick={async () => {
+                  const { error: resendError } = await resendConfirmation(email);
+                  if (resendError) {
+                    toast({
+                      title: "เกิดข้อผิดพลาด",
+                      description: "ไม่สามารถส่งอีเมลยืนยันได้อีกครั้ง",
+                      variant: "destructive"
+                    });
+                  } else {
+                    toast({
+                      title: "ส่งอีเมลยืนยันแล้ว",
+                      description: "กรุณาตรวจสอบกล่องจดหมายของคุณ",
+                    });
+                  }
+                }}
+              >
+                <Mail className="mr-2 h-4 w-4" />
+                ส่งอีกครั้ง
+              </ToastAction>
+            )
+          });
+        } else {
+          toast({
+            title: "เข้าสู่ระบบไม่สำเร็จ",
+            description: error.message === "Load failed"
+              ? "ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้ (Load failed) กรุณาตรวจสอบอินเทอร์เน็ตหรือการตั้งค่า Supabase"
+              : error.message,
+            variant: "destructive"
+          });
+        }
       } else {
         navigate("/admin");
       }
