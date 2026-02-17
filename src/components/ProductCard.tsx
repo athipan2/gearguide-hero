@@ -1,7 +1,9 @@
 import { RatingStars } from "@/components/RatingStars";
 import { Button } from "@/components/ui/button";
-import { ExternalLink, ThumbsUp, ThumbsDown } from "lucide-react";
+import { ExternalLink, ThumbsUp, ThumbsDown, Plus } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useComparisonStore } from "@/lib/comparison-store";
+import { toast } from "sonner";
 
 interface ProductCardProps {
   name: string;
@@ -78,7 +80,19 @@ export function ProductCard({ name, brand, image, rating, price, badge, pros, co
         </div>
 
         {/* CTAs */}
-        <div className="flex gap-2 pt-1">
+        <div className="flex flex-wrap gap-2 pt-1">
+          <Button
+            variant="outline"
+            size="sm"
+            className="flex-1 border-primary/20 hover:bg-primary/5"
+            onClick={() => {
+              useComparisonStore.getState().addItem({ name, brand, image, rating, price, slug });
+              toast.success(`เพิ่ม ${name} เข้าสู่การเปรียบเทียบ`);
+            }}
+          >
+            <Plus className="h-3.5 w-3.5 mr-1" />
+            เทียบ
+          </Button>
           <Button variant="cta" size="sm" className="flex-1" asChild={!!affiliateUrl}>
             {affiliateUrl ? (
               <a href={affiliateUrl} target="_blank" rel="noopener noreferrer nofollow">

@@ -1,35 +1,54 @@
 import heroBanner from "@/assets/hero-banner.jpg";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, TrendingUp } from "lucide-react";
+import { SearchBar } from "./SearchBar";
 
 export function HeroSection() {
   return (
-    <section className="relative overflow-hidden">
+    <section className="relative min-h-[85vh] flex items-center overflow-hidden">
       <div className="absolute inset-0">
-        <img src={heroBanner} alt="Trail runner at golden hour in mountains" className="w-full h-full object-cover" />
-        <div className="absolute inset-0 bg-gradient-to-r from-foreground/80 via-foreground/50 to-transparent" />
+        <img
+          src={heroBanner}
+          alt="Trail runner at golden hour in mountains"
+          className="w-full h-full object-cover object-center scale-105"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-primary/90 via-primary/40 to-transparent md:bg-gradient-to-r" />
       </div>
-      <div className="relative container mx-auto px-4 py-20 md:py-32">
-        <div className="max-w-xl space-y-6">
-          <div className="inline-flex items-center gap-2 bg-cta/20 text-cta-foreground px-3 py-1 rounded-full text-sm font-medium backdrop-blur-sm">
-            <TrendingUp className="h-4 w-4" />
-            อัปเดต 2026
+
+      <div className="relative container mx-auto px-4 py-20">
+        <div className="max-w-3xl space-y-10">
+          <div className="space-y-6">
+            <div className="inline-flex items-center gap-2 bg-accent text-accent-foreground px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest shadow-lg">
+              <TrendingUp className="h-4 w-4" />
+              Trusted by 10,000+ Runners
+            </div>
+
+            <h1 className="font-heading text-5xl md:text-7xl lg:text-8xl font-black text-primary-foreground leading-[0.9] tracking-tighter">
+              GEAR FOR THE <br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent to-orange-400">WILD SIDE</span>
+            </h1>
+
+            <p className="text-primary-foreground/90 text-xl md:text-2xl max-w-xl font-medium leading-relaxed">
+              รีวิวจริง ทดสอบจริง สำหรับนักวิ่ง สายเทรล และนักผจญภัยที่ต้องการข้อมูลที่แม่นยำที่สุด
+            </p>
           </div>
-          <h1 className="font-heading text-4xl md:text-5xl lg:text-6xl font-bold text-primary-foreground leading-tight">
-            รีวิวอุปกรณ์<br />
-            <span className="text-cta">ที่คุณวางใจได้</span>
-          </h1>
-          <p className="text-primary-foreground/80 text-lg md:text-xl max-w-md">
-            รีวิวจริง ทดสอบจริง สำหรับนักวิ่ง สายเทรล และนักผจญภัย
-          </p>
-          <div className="flex flex-wrap gap-3">
-            <Button variant="hero" size="lg">
-              ดูรีวิวล่าสุด
-              <ArrowRight className="ml-2 h-5 w-5" />
-            </Button>
-            <Button variant="outline" size="lg" className="bg-primary-foreground/10 text-primary-foreground border-primary-foreground/30 hover:bg-primary-foreground/20 backdrop-blur-sm">
-              เปรียบเทียบอุปกรณ์
-            </Button>
+
+          <div className="space-y-8">
+            <SearchBar className="max-w-xl" />
+
+            <div className="flex flex-wrap gap-4">
+              <Button variant="hero" size="lg" className="rounded-full px-10">
+                ดูรีวิวล่าสุด
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </Button>
+              <Button
+                variant="outline"
+                size="lg"
+                className="rounded-full bg-white/10 text-white border-white/20 hover:bg-white/20 backdrop-blur-md px-10"
+              >
+                เปรียบเทียบอุปกรณ์
+              </Button>
+            </div>
           </div>
         </div>
       </div>

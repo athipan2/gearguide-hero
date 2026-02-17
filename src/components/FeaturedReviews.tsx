@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { ProductCard } from "@/components/ProductCard";
 import { supabase } from "@/integrations/supabase/client";
+import { FastFilters } from "./FastFilters";
 
 const fallbackProducts = [
   {
@@ -88,13 +89,16 @@ export function FeaturedReviews() {
     <section className="container mx-auto px-4 py-16">
       <div className="flex items-end justify-between mb-8">
         <div>
-          <h2 className="font-heading text-2xl md:text-3xl font-bold text-foreground">รีวิวล่าสุด</h2>
+          <h2 className="font-heading text-4xl font-black text-primary tracking-tighter uppercase">รีวิวล่าสุด</h2>
           <p className="text-muted-foreground mt-1">ทดสอบจริง รีวิวจริง อัปเดตทุกสัปดาห์</p>
         </div>
-        <a href="#" className="hidden md:inline-flex text-sm font-medium text-primary hover:text-accent transition-colors">
+        <a href="#" className="hidden md:inline-flex text-sm font-bold uppercase tracking-widest text-primary hover:text-accent transition-colors">
           ดูทั้งหมด →
         </a>
       </div>
+
+      <FastFilters />
+
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
         {products.map((p) => (
           <ProductCard key={p.name} {...p} />
