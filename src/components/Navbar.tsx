@@ -15,29 +15,38 @@ export function Navbar() {
   const [open, setOpen] = useState(false);
 
   return (
-    <nav className="sticky top-0 z-50 bg-card/95 backdrop-blur-md border-b">
-      <div className="container mx-auto flex items-center justify-between h-16 px-4">
-        <Link to="/" className="flex items-center gap-2 font-heading font-bold text-xl text-primary">
-          <Mountain className="h-6 w-6" />
-          <span>GearTrail</span>
+    <nav className="sticky top-0 z-50 bg-background/80 backdrop-blur-md border-b border-primary/5">
+      <div className="container mx-auto flex items-center justify-between h-20 px-4">
+        <Link to="/" className="flex items-center gap-2 font-heading font-extrabold text-2xl text-primary tracking-tight">
+          <Mountain className="h-8 w-8 text-accent" />
+          <span>GEARTRAIL</span>
         </Link>
 
         {/* Desktop nav */}
-        <div className="hidden md:flex items-center gap-6">
+        <div className="hidden md:flex items-center gap-8">
           {navLinks.map((l) => (
-            <Link key={l.label} to={l.href} className="text-sm font-medium text-foreground/80 hover:text-primary transition-colors">
+            <Link
+              key={l.label}
+              to={l.href}
+              className="text-sm font-bold uppercase tracking-widest text-foreground/70 hover:text-primary transition-colors"
+            >
               {l.label}
             </Link>
           ))}
         </div>
 
-        <div className="hidden md:flex items-center gap-2">
-          <Button variant="ghost" size="icon"><Search className="h-5 w-5" /></Button>
+        <div className="hidden md:flex items-center gap-4">
+          <Button variant="ghost" size="icon" className="text-primary hover:bg-primary/5">
+            <Search className="h-5 w-5" />
+          </Button>
+          <Button variant="cta" size="sm" className="hidden lg:flex">
+            ส่งรีวิว
+          </Button>
         </div>
 
         {/* Mobile toggle */}
-        <button className="md:hidden p-2" onClick={() => setOpen(!open)}>
-          {open ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+        <button className="md:hidden p-2 text-primary" onClick={() => setOpen(!open)}>
+          {open ? <X className="h-7 w-7" /> : <Menu className="h-7 w-7" />}
         </button>
       </div>
 

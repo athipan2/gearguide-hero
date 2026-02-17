@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Manrope:wght@500;600;700;800&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,44 +6,44 @@
 
 @layer base {
   :root {
-    --background: 40 20% 97%;
-    --foreground: 160 20% 10%;
+    --background: 45 23% 94%;
+    --foreground: 0 0% 18%;
 
     --card: 0 0% 100%;
-    --card-foreground: 160 20% 10%;
+    --card-foreground: 0 0% 18%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 160 20% 10%;
+    --popover-foreground: 0 0% 18%;
 
-    --primary: 160 35% 22%;
-    --primary-foreground: 40 20% 97%;
+    --primary: 145 32% 18%;
+    --primary-foreground: 45 23% 94%;
 
-    --secondary: 40 15% 92%;
-    --secondary-foreground: 160 20% 15%;
+    --secondary: 45 15% 88%;
+    --secondary-foreground: 145 32% 12%;
 
-    --muted: 40 10% 94%;
-    --muted-foreground: 160 8% 45%;
+    --muted: 45 10% 90%;
+    --muted-foreground: 0 0% 40%;
 
-    --accent: 25 95% 53%;
+    --accent: 12 76% 61%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 40 12% 88%;
-    --input: 40 12% 88%;
-    --ring: 160 35% 22%;
+    --border: 45 12% 82%;
+    --input: 45 12% 82%;
+    --ring: 145 32% 18%;
 
-    --radius: 0.75rem;
+    --radius: 0.5rem;
 
-    --cta: 25 95% 53%;
+    --cta: 12 76% 61%;
     --cta-foreground: 0 0% 100%;
-    --cta-hover: 25 95% 46%;
+    --cta-hover: 12 76% 54%;
 
     --rating: 45 93% 47%;
-    --badge-recommended: 160 50% 40%;
-    --badge-best-value: 220 70% 50%;
-    --badge-top-pick: 25 95% 53%;
+    --badge-recommended: 145 50% 30%;
+    --badge-best-value: 220 70% 40%;
+    --badge-top-pick: 12 76% 61%;
 
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
@@ -54,7 +54,7 @@
     --sidebar-border: 220 13% 91%;
     --sidebar-ring: 217.2 91.2% 59.8%;
 
-    --font-heading: 'Space Grotesk', system-ui, sans-serif;
+    --font-heading: 'Manrope', system-ui, sans-serif;
     --font-body: 'Inter', system-ui, sans-serif;
   }
 

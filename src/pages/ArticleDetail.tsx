@@ -125,22 +125,22 @@ export default function ArticleDetail() {
           กลับไปหน้าคู่มือ
         </Link>
 
-        <header className="mb-8">
-          <div className="flex items-center gap-2 mb-4">
-            <span className="text-xs font-bold text-primary uppercase tracking-wider bg-primary/10 px-2 py-1 rounded">
+        <header className="mb-12">
+          <div className="flex items-center gap-2 mb-6">
+            <span className="text-xs font-black text-accent uppercase tracking-[0.3em]">
               {article.category}
             </span>
           </div>
-          <h1 className="font-heading text-3xl md:text-5xl font-bold text-foreground mb-6 leading-tight">
+          <h1 className="font-heading text-4xl md:text-6xl font-black text-primary mb-8 leading-[0.9] tracking-tighter uppercase">
             {article.title}
           </h1>
-          <div className="flex items-center gap-6 text-sm text-muted-foreground">
+          <div className="flex items-center gap-8 text-xs font-bold uppercase tracking-widest text-muted-foreground border-t border-b border-primary/5 py-4">
             <div className="flex items-center gap-2">
-              <User className="h-4 w-4" />
+              <User className="h-4 w-4 text-accent" />
               <span>ทีมงาน GearTrail</span>
             </div>
             <div className="flex items-center gap-2">
-              <Calendar className="h-4 w-4" />
+              <Calendar className="h-4 w-4 text-accent" />
               <span>{new Date(article.created_at).toLocaleDateString('th-TH', {
                 year: 'numeric',
                 month: 'long',
@@ -151,12 +151,13 @@ export default function ArticleDetail() {
         </header>
 
         {article.image_url && (
-          <div className="rounded-2xl overflow-hidden mb-12 aspect-[21/9]">
+          <div className="rounded-[2rem] overflow-hidden mb-16 aspect-[21/9] shadow-2xl relative">
             <img
               src={article.image_url}
               alt={article.title}
               className="w-full h-full object-cover"
             />
+            <div className="absolute inset-0 ring-1 ring-inset ring-black/10" />
           </div>
         )}
 
