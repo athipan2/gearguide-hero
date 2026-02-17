@@ -17,13 +17,44 @@ export default function AdminLogin() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Check for missing Supabase configuration
+    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+    const supabaseKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+
+    if (!supabaseUrl || !supabaseKey || supabaseUrl.includes("placeholder")) {
+      toast({
+        title: "การตั้งค่าไม่สมบูรณ์",
+        description: "ไม่พบการตั้งค่า Supabase กรุณาตรวจสอบ Environment Variables (VITE_SUPABASE_URL และ VITE_SUPABASE_PUBLISHABLE_KEY)",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setLoading(true);
-    const { error } = await signIn(email, password);
-    setLoading(false);
-    if (error) {
-      toast({ title: "เข้าสู่ระบบไม่สำเร็จ", description: error.message, variant: "destructive" });
-    } else {
-      navigate("/admin");
+    try {
+      const { error } = await signIn(email, password);
+      if (error) {
+        console.error("Login error:", error);
+        toast({
+          title: "เข้าสู่ระบบไม่สำเร็จ",
+          description: error.message === "Load failed"
+            ? "ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้ (Load failed) กรุณาตรวจสอบอินเทอร์เน็ตหรือการตั้งค่า Supabase"
+            : error.message,
+          variant: "destructive"
+        });
+      } else {
+        navigate("/admin");
+      }
+    } catch (err) {
+      console.error("Unexpected login error:", err);
+      toast({
+        title: "เกิดข้อผิดพลาดไม่คาดคิด",
+        description: "กรุณาลองใหม่อีกครั้ง",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
     }
   };
 
