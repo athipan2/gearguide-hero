@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { CommentSection } from "@/components/CommentSection";
+import { RelatedReviews } from "@/components/RelatedReviews";
 import {
   ExternalLink, ArrowLeft, ThumbsUp, ThumbsDown, Award,
   ChevronRight
@@ -342,6 +343,15 @@ export default function ReviewDetail() {
         {/* Comments Section */}
         {review.id && <CommentSection reviewId={review.id} />}
       </article>
+
+      {/* Related Reviews */}
+      <RelatedReviews currentReview={{
+        id: review.id,
+        category: review.category,
+        overall_rating: review.overall_rating,
+        price: review.price,
+        slug: slug
+      }} />
 
       {/* Mobile sticky CTA */}
       <div className="lg:hidden fixed bottom-0 inset-x-0 bg-card/95 backdrop-blur-md border-t p-3 z-50">
