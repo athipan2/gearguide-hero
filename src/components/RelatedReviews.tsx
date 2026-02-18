@@ -13,6 +13,7 @@ interface RelatedReview {
   slug: string;
   pros: unknown;
   cons: unknown;
+  specs: unknown;
   badge: string | null;
   affiliate_url: string | null;
   created_at: string;
@@ -120,6 +121,7 @@ export function RelatedReviews({ currentReview }: RelatedReviewsProps) {
             badge={rev.badge || undefined}
             pros={Array.isArray(rev.pros) ? (rev.pros as string[]) : []}
             cons={Array.isArray(rev.cons) ? (rev.cons as string[]) : []}
+            specs={Array.isArray(rev.specs) ? (rev.specs as { label: string; value: string }[]) : []}
             slug={rev.slug}
             affiliateUrl={rev.affiliate_url}
             createdAt={rev.created_at}

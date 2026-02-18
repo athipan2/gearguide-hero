@@ -9,9 +9,11 @@ import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { CommentSection } from "@/components/CommentSection";
 import { RelatedReviews } from "@/components/RelatedReviews";
+import { useComparisonStore } from "@/lib/comparison-store";
+import { toast } from "sonner";
 import {
   ExternalLink, ArrowLeft, ThumbsUp, ThumbsDown, Award,
-  ChevronRight
+  ChevronRight, Plus
 } from "lucide-react";
 
 interface ReviewData {
@@ -246,7 +248,29 @@ export default function ReviewDetail() {
 
             <div className="flex flex-wrap gap-4 pt-4">
               <CTAButton className="flex-1 md:flex-none rounded-full h-14 px-10 shadow-xl" />
-              <Button variant="outline" size="lg" className="rounded-full h-14 px-10 border-primary/20">เพิ่มลงเปรียบเทียบ</Button>
+              <Button
+                variant="outline"
+                size="lg"
+                className="rounded-full h-14 px-10 border-primary/20"
+                onClick={() => {
+                  const weight = review.specs?.find(s => s.label.toLowerCase().includes('weight') || s.label.includes('น้ำหนัก'))?.value;
+                  const drop = review.specs?.find(s => s.label.toLowerCase().includes('drop'))?.value;
+                  useComparisonStore.getState().addItem({
+                    name: review.name,
+                    brand: review.brand,
+                    image: review.image_url || "",
+                    rating: review.overall_rating,
+                    price: review.price,
+                    slug: slug,
+                    weight,
+                    drop
+                  });
+                  toast.success(`เพิ่ม ${review.name} เข้าสู่การเปรียบเทียบ`);
+                }}
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                เพิ่มลงเปรียบเทียบ
+              </Button>
             </div>
           </div>
         </div>
