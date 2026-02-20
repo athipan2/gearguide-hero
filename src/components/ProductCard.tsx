@@ -33,13 +33,13 @@ export function ProductCard({ name, brand, image, rating, price, badge, pros, co
   const drop = specs?.find(s => s.label.toLowerCase().includes('drop'))?.value;
 
   return (
-    <div className="group bg-card rounded-xl border overflow-hidden hover:shadow-[0_20px_50px_rgba(31,61,43,0.12)] hover:border-primary/10 transition-all duration-300">
+    <div className="group bg-card rounded-xl border overflow-hidden hover:shadow-[0_20px_50px_rgba(31,61,43,0.2)] hover:border-primary/10 transition-all duration-300 hover:-translate-y-2">
       {/* Image */}
       <div className="relative aspect-[4/3] bg-muted overflow-hidden">
         <img src={image} alt={name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out" loading="lazy" />
         <div className="absolute top-3 left-3 flex flex-col gap-2">
           {isNew && (
-            <div className="bg-cta text-cta-foreground px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider shadow-lg">
+            <div className="bg-gradient-to-r from-accent to-orange-500 text-accent-foreground px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider shadow-lg shadow-orange-500/20">
               ใหม่
             </div>
           )}
