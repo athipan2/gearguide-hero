@@ -33,10 +33,10 @@ export function ProductCard({ name, brand, image, rating, price, badge, pros, co
   const drop = specs?.find(s => s.label.toLowerCase().includes('drop'))?.value;
 
   return (
-    <div className="group bg-card rounded-xl border overflow-hidden hover:shadow-xl transition-all duration-300">
+    <div className="group bg-card rounded-xl border overflow-hidden hover:shadow-[0_20px_50px_rgba(31,61,43,0.12)] hover:border-primary/10 transition-all duration-300">
       {/* Image */}
       <div className="relative aspect-[4/3] bg-muted overflow-hidden">
-        <img src={image} alt={name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" />
+        <img src={image} alt={name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out" loading="lazy" />
         <div className="absolute top-3 left-3 flex flex-col gap-2">
           {isNew && (
             <div className="bg-cta text-cta-foreground px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider shadow-lg">
@@ -64,20 +64,20 @@ export function ProductCard({ name, brand, image, rating, price, badge, pros, co
         </div>
 
         {/* Pros / Cons */}
-        <div className="grid grid-cols-2 gap-2 text-xs">
-          <div className="space-y-1">
+        <div className="grid grid-cols-2 gap-3 text-[11px] py-1">
+          <div className="space-y-1.5">
             {pros.slice(0, 2).map((p) => (
-              <div key={p} className="flex items-start gap-1 text-badge-recommended">
+              <div key={p} className="flex items-start gap-1.5 text-badge-recommended/80">
                 <ThumbsUp className="h-3 w-3 mt-0.5 shrink-0" />
-                <span className="text-muted-foreground">{p}</span>
+                <span className="text-muted-foreground/90 line-clamp-1">{p}</span>
               </div>
             ))}
           </div>
-          <div className="space-y-1">
+          <div className="space-y-1.5">
             {cons.slice(0, 2).map((c) => (
-              <div key={c} className="flex items-start gap-1 text-destructive">
+              <div key={c} className="flex items-start gap-1.5 text-destructive/70">
                 <ThumbsDown className="h-3 w-3 mt-0.5 shrink-0" />
-                <span className="text-muted-foreground">{c}</span>
+                <span className="text-muted-foreground/90 line-clamp-1">{c}</span>
               </div>
             ))}
           </div>
