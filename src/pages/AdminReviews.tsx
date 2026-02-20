@@ -39,16 +39,24 @@ export default function AdminReviews() {
   useEffect(() => { fetchReviews(); }, []);
 
   const togglePublish = async (id: string, published: boolean) => {
-    await supabase.from("reviews").update({ published: !published }).eq("id", id);
-    fetchReviews();
-    toast({ title: !published ? "เผยแพร่แล้ว" : "ถอนเผยแพร่แล้ว" });
+    const { error } = await supabase.from("reviews").update({ published: !published }).eq("id", id);
+    if (error) {
+      toast({ title: "ดำเนินการไม่สำเร็จ", description: error.message, variant: "destructive" });
+    } else {
+      fetchReviews();
+      toast({ title: !published ? "เผยแพร่แล้ว" : "ถอนเผยแพร่แล้ว" });
+    }
   };
 
   const deleteReview = async (id: string, name: string) => {
     if (!confirm(`ลบรีวิว "${name}"?`)) return;
-    await supabase.from("reviews").delete().eq("id", id);
-    fetchReviews();
-    toast({ title: "ลบรีวิวแล้ว" });
+    const { error } = await supabase.from("reviews").delete().eq("id", id);
+    if (error) {
+      toast({ title: "ลบรีวิวไม่สำเร็จ", description: error.message, variant: "destructive" });
+    } else {
+      fetchReviews();
+      toast({ title: "ลบรีวิวแล้ว" });
+    }
   };
 
   const filtered = reviews.filter((r) =>

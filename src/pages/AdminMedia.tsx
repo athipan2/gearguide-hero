@@ -74,10 +74,44 @@ export default function AdminMedia() {
 
   const deleteMedia = async (item: MediaItem) => {
     if (!confirm(`ลบ "${item.file_name}"?`)) return;
-    await supabase.storage.from("review-media").remove([item.file_path]);
-    await supabase.from("media_library").delete().eq("id", item.id);
-    fetchMedia();
-    toast({ title: "ลบแล้ว" });
+
+    try {
+      // 1. Delete from storage
+      const { error: storageError } = await supabase.storage
+        .from("review-media")
+        .remove([item.file_path]);
+
+      if (storageError) {
+        console.error("Storage delete error:", storageError);
+        // We continue even if storage delete fails (e.g. file already gone)
+        // so the user can clean up the database record.
+      }
+
+      // 2. Delete from database
+      const { error: dbError } = await supabase
+        .from("media_library")
+        .delete()
+        .eq("id", item.id);
+
+      if (dbError) {
+        console.error("Database delete error:", dbError);
+        toast({
+          title: "ลบข้อมูลไม่สำเร็จ",
+          description: dbError.message,
+          variant: "destructive"
+        });
+      } else {
+        toast({ title: "ลบไฟล์สำเร็จแล้ว" });
+        fetchMedia();
+      }
+    } catch (error) {
+      console.error("Delete error:", error);
+      toast({
+        title: "เกิดข้อผิดพลาดในการลบ",
+        description: error instanceof Error ? error.message : "เกิดข้อผิดพลาดไม่ทราบสาเหตุ",
+        variant: "destructive"
+      });
+    }
   };
 
   const copyUrl = (path: string) => {
@@ -137,9 +171,19 @@ export default function AdminMedia() {
                   </Button>
                 </div>
               </div>
-              <div className="p-2">
-                <p className="text-xs text-foreground truncate">{m.file_name}</p>
-                <p className="text-xs text-muted-foreground">{m.file_size ? `${(m.file_size / 1024).toFixed(0)} KB` : ""}</p>
+              <div className="p-2 flex items-center justify-between gap-2">
+                <div className="min-w-0 flex-1">
+                  <p className="text-xs text-foreground truncate" title={m.file_name}>{m.file_name}</p>
+                  <p className="text-xs text-muted-foreground">{m.file_size ? `${(m.file_size / 1024).toFixed(0)} KB` : ""}</p>
+                </div>
+                <div className="flex gap-1 md:hidden">
+                  <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => copyUrl(m.file_path)}>
+                    <Copy className="h-4 w-4" />
+                  </Button>
+                  <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => deleteMedia(m)}>
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
             </div>
           ))}
