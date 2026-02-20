@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Menu, X, Search, Mountain } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
+import { cn } from "@/lib/utils";
 
 const navLinks = [
   { label: "รองเท้าวิ่ง", href: "/category/รองเท้าวิ่งถนน" },
@@ -13,10 +14,26 @@ const navLinks = [
 
 export function Navbar() {
   const [open, setOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 20);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   return (
-    <nav className="sticky top-0 z-50 bg-background/80 backdrop-blur-md border-b border-primary/5">
-      <div className="container mx-auto flex items-center justify-between h-20 px-4">
+    <nav
+      className={cn(
+        "sticky top-0 z-50 w-full transition-all duration-300 border-b",
+        isScrolled
+          ? "bg-background/95 backdrop-blur-lg border-primary/10 shadow-sm h-16"
+          : "bg-background/80 backdrop-blur-md border-transparent h-20"
+      )}
+    >
+      <div className="container mx-auto flex items-center justify-between h-full px-4">
         <Link to="/" className="flex items-center gap-2 font-heading font-extrabold text-2xl text-primary tracking-tight">
           <Mountain className="h-8 w-8 text-accent" />
           <span>GEARTRAIL</span>
