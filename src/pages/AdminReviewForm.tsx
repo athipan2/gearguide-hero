@@ -147,8 +147,34 @@ export default function AdminReviewForm() {
                 <Input value={form.badge} onChange={(e) => updateField("badge", e.target.value)} placeholder="Top Pick / แนะนำ / คุ้มค่าที่สุด" />
               </div>
               <div className="space-y-2">
-                <Label>URL รูปภาพหลัก</Label>
-                <Input value={form.image_url} onChange={(e) => updateField("image_url", e.target.value)} placeholder="https://..." />
+                <div className="flex items-center justify-between">
+                  <Label>URL รูปภาพหลัก</Label>
+                  {form.image_url && (
+                    <button
+                      type="button"
+                      onClick={() => updateField("image_url", "")}
+                      className="text-xs text-destructive hover:underline"
+                    >
+                      ลบรูป
+                    </button>
+                  )}
+                </div>
+                <div className="flex gap-2">
+                  <Input
+                    value={form.image_url}
+                    onChange={(e) => updateField("image_url", e.target.value)}
+                    placeholder="https://..."
+                    className="flex-1"
+                  />
+                  {form.image_url && (
+                    <img
+                      src={form.image_url}
+                      alt="preview"
+                      className="h-10 w-10 rounded object-cover border shrink-0"
+                      onError={(e) => (e.currentTarget.style.display = 'none')}
+                    />
+                  )}
+                </div>
               </div>
             </div>
           </div>
