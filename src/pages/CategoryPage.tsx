@@ -11,6 +11,103 @@ import { Badge } from "@/components/ui/badge";
 import { Slider } from "@/components/ui/slider";
 import { SlidersHorizontal, X, Search, Loader2, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+
+interface FilterContentProps {
+  allBrands: string[];
+  selectedBrands: string[];
+  toggleBrand: (brand: string) => void;
+  minRating: number;
+  setMinRating: (rating: number) => void;
+  priceRange: [number, number];
+  setPriceRange: (range: [number, number]) => void;
+  maxPrice: number;
+  hasActiveFilters: string | number | boolean;
+  clearFilters: () => void;
+}
+
+function FilterContent({
+  allBrands,
+  selectedBrands,
+  toggleBrand,
+  minRating,
+  setMinRating,
+  priceRange,
+  setPriceRange,
+  maxPrice,
+  hasActiveFilters,
+  clearFilters,
+}: FilterContentProps) {
+  return (
+    <>
+      {/* Brand filter */}
+      <div>
+        <h3 className="font-heading font-semibold text-sm text-foreground mb-3">แบรนด์</h3>
+        <div className="flex flex-wrap gap-2">
+          {allBrands.map((brand) => (
+            <Badge
+              key={brand}
+              variant={selectedBrands.includes(brand) ? "default" : "outline"}
+              className="cursor-pointer transition-colors"
+              onClick={() => toggleBrand(brand)}
+            >
+              {brand}
+            </Badge>
+          ))}
+          {allBrands.length === 0 && (
+            <p className="text-xs text-muted-foreground">ไม่มีแบรนด์</p>
+          )}
+        </div>
+      </div>
+
+      {/* Rating Filter */}
+      <div>
+        <h3 className="font-heading font-semibold text-sm text-foreground mb-3">คะแนนรีวิว</h3>
+        <div className="space-y-2">
+          {[4.5, 4, 3.5, 3].map((rating) => (
+            <label key={rating} className="flex items-center gap-2 cursor-pointer group">
+              <input
+                type="radio"
+                name="rating"
+                className="w-4 h-4 accent-primary"
+                checked={minRating === rating}
+                onChange={() => setMinRating(rating)}
+              />
+              <span className="text-sm text-muted-foreground group-hover:text-foreground">
+                {rating}+ ดาว
+              </span>
+            </label>
+          ))}
+        </div>
+      </div>
+
+      {/* Price range */}
+      <div>
+        <h3 className="font-heading font-semibold text-sm text-foreground mb-3">ช่วงราคา</h3>
+        <Slider
+          min={0}
+          max={maxPrice}
+          step={100}
+          value={priceRange}
+          onValueChange={(v) => setPriceRange(v as [number, number])}
+          className="mb-2"
+        />
+        <div className="flex items-center justify-between text-xs text-muted-foreground">
+          <span>฿{priceRange[0].toLocaleString()}</span>
+          <span>฿{priceRange[1].toLocaleString()}</span>
+        </div>
+      </div>
+
+      {/* Clear filters */}
+      {hasActiveFilters && (
+        <Button variant="ghost" size="sm" className="w-full" onClick={clearFilters}>
+          <X className="h-3 w-3 mr-1" />
+          ล้างตัวกรอง
+        </Button>
+      )}
+    </>
+  );
+}
 
 const CATEGORY_META: Record<string, { label: string; description: string }> = {
   "รองเท้าวิ่งถนน": { label: "รองเท้าวิ่งถนน", description: "รีวิวรองเท้าวิ่งถนนจากแบรนด์ชั้นนำ ทดสอบจริง" },
@@ -255,85 +352,55 @@ export default function CategoryPage() {
               <SelectItem value="price-desc">ราคาสูง → ต่ำ</SelectItem>
             </SelectContent>
           </Select>
-          <Button
-            variant="outline"
-            size="icon"
-            className="shrink-0 md:hidden"
-            onClick={() => setShowFilters(!showFilters)}
-          >
-            <SlidersHorizontal className="h-4 w-4" />
-          </Button>
+          <Sheet open={showFilters} onOpenChange={setShowFilters}>
+            <SheetTrigger asChild>
+              <Button
+                variant="outline"
+                size="icon"
+                className="shrink-0 md:hidden"
+                data-testid="mobile-filter-button"
+              >
+                <SlidersHorizontal className="h-4 w-4" />
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="left" className="w-[300px] sm:w-[400px]">
+              <SheetHeader className="mb-6">
+                <SheetTitle>ตัวกรองสินค้า</SheetTitle>
+              </SheetHeader>
+              <div className="space-y-6">
+                <FilterContent
+                  allBrands={allBrands}
+                  selectedBrands={selectedBrands}
+                  toggleBrand={toggleBrand}
+                  minRating={minRating}
+                  setMinRating={setMinRating}
+                  priceRange={priceRange}
+                  setPriceRange={setPriceRange}
+                  maxPrice={maxPrice}
+                  hasActiveFilters={hasActiveFilters}
+                  clearFilters={clearFilters}
+                />
+              </div>
+            </SheetContent>
+          </Sheet>
         </div>
 
         <div className="flex gap-6">
-          {/* Sidebar Filters */}
-          <aside className={`${showFilters ? "block" : "hidden"} md:block w-full md:w-64 shrink-0 space-y-6`}>
-            <div className="bg-card rounded-xl border p-5 space-y-6">
-              {/* Brand filter */}
-              <div>
-                <h3 className="font-heading font-semibold text-sm text-foreground mb-3">แบรนด์</h3>
-                <div className="flex flex-wrap gap-2">
-                  {allBrands.map((brand) => (
-                    <Badge
-                      key={brand}
-                      variant={selectedBrands.includes(brand) ? "default" : "outline"}
-                      className="cursor-pointer transition-colors"
-                      onClick={() => toggleBrand(brand)}
-                    >
-                      {brand}
-                    </Badge>
-                  ))}
-                  {allBrands.length === 0 && (
-                    <p className="text-xs text-muted-foreground">ไม่มีแบรนด์</p>
-                  )}
-                </div>
-              </div>
-
-              {/* Rating Filter */}
-              <div>
-                <h3 className="font-heading font-semibold text-sm text-foreground mb-3">คะแนนรีวิว</h3>
-                <div className="space-y-2">
-                  {[4.5, 4, 3.5, 3].map((rating) => (
-                    <label key={rating} className="flex items-center gap-2 cursor-pointer group">
-                      <input
-                        type="radio"
-                        name="rating"
-                        className="w-4 h-4 accent-primary"
-                        checked={minRating === rating}
-                        onChange={() => setMinRating(rating)}
-                      />
-                      <span className="text-sm text-muted-foreground group-hover:text-foreground">
-                        {rating}+ ดาว
-                      </span>
-                    </label>
-                  ))}
-                </div>
-              </div>
-
-              {/* Price range */}
-              <div>
-                <h3 className="font-heading font-semibold text-sm text-foreground mb-3">ช่วงราคา</h3>
-                <Slider
-                  min={0}
-                  max={maxPrice}
-                  step={100}
-                  value={priceRange}
-                  onValueChange={(v) => setPriceRange(v as [number, number])}
-                  className="mb-2"
-                />
-                <div className="flex items-center justify-between text-xs text-muted-foreground">
-                  <span>฿{priceRange[0].toLocaleString()}</span>
-                  <span>฿{priceRange[1].toLocaleString()}</span>
-                </div>
-              </div>
-
-              {/* Clear filters */}
-              {hasActiveFilters && (
-                <Button variant="ghost" size="sm" className="w-full" onClick={clearFilters}>
-                  <X className="h-3 w-3 mr-1" />
-                  ล้างตัวกรอง
-                </Button>
-              )}
+          {/* Desktop Sidebar Filters */}
+          <aside className="hidden md:block w-64 shrink-0">
+            <div className="bg-card rounded-xl border p-5 space-y-6 sticky top-24">
+              <FilterContent
+                allBrands={allBrands}
+                selectedBrands={selectedBrands}
+                toggleBrand={toggleBrand}
+                minRating={minRating}
+                setMinRating={setMinRating}
+                priceRange={priceRange}
+                setPriceRange={setPriceRange}
+                maxPrice={maxPrice}
+                hasActiveFilters={hasActiveFilters}
+                clearFilters={clearFilters}
+              />
             </div>
           </aside>
 

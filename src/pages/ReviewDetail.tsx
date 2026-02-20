@@ -214,9 +214,9 @@ export default function ReviewDetail() {
         </nav>
       </div>
 
-      <article className="container mx-auto px-4 pb-24">
+      <article className="container mx-auto px-4 pb-24 pt-4 md:pt-0">
         {/* Header */}
-        <div className="grid md:grid-cols-2 gap-12 mb-16 items-center">
+        <div className="grid md:grid-cols-2 gap-6 md:gap-12 mb-10 md:mb-16 items-center">
           <ImageGallery
             mainImage={review.image_url || ""}
             images={review.images}
@@ -226,36 +226,36 @@ export default function ReviewDetail() {
             badgeIcon={<Award className="h-4 w-4" />}
           />
 
-          <div className="flex flex-col justify-center space-y-8">
+          <div className="flex flex-col justify-center space-y-6 md:space-y-8">
             <div className="space-y-2">
-              <p className="text-sm font-black text-accent uppercase tracking-[0.3em]">{review.brand} // {review.category}</p>
-              <h1 className="font-heading text-4xl md:text-6xl font-black text-primary leading-[0.9] tracking-tighter uppercase">{review.name}</h1>
+              <p className="text-[10px] md:text-sm font-black text-accent uppercase tracking-[0.3em]">{review.brand} // {review.category}</p>
+              <h1 className="font-heading text-3xl md:text-6xl font-black text-primary leading-[0.9] tracking-tighter uppercase">{review.name}</h1>
             </div>
 
-            <div className="flex flex-wrap items-center gap-6">
-              <div className="flex items-center gap-4 bg-primary text-primary-foreground rounded-2xl px-6 py-4 shadow-lg">
-                <span className="font-heading text-5xl font-black">{review.overall_rating}</span>
+            <div className="flex flex-col sm:flex-row sm:items-center gap-4 md:gap-6">
+              <div className="flex items-center gap-4 bg-primary text-primary-foreground rounded-2xl px-5 py-3 md:px-6 md:py-4 shadow-lg w-fit">
+                <span className="font-heading text-4xl md:text-5xl font-black">{review.overall_rating}</span>
                 <div>
                   <RatingStars rating={review.overall_rating} />
                   <p className="text-[10px] font-bold uppercase tracking-widest opacity-60 mt-0.5">Overall Performance</p>
                 </div>
               </div>
-              <div className="space-y-1">
+              <div className="space-y-0.5 md:space-y-1">
                 <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Price Estimate</p>
-                <span className="font-heading text-3xl font-black text-primary">{review.price}</span>
+                <span className="font-heading text-2xl md:text-3xl font-black text-primary">{review.price}</span>
               </div>
             </div>
 
-            <p className="text-muted-foreground text-lg leading-relaxed border-l-4 border-accent pl-6 py-2 italic font-medium">
+            <p className="text-muted-foreground text-base md:text-lg leading-relaxed border-l-4 border-accent pl-4 md:pl-6 py-1 md:py-2 italic font-medium">
               "{review.intro}"
             </p>
 
-            <div className="flex flex-wrap gap-4 pt-4">
-              <CTAButton className="flex-1 md:flex-none rounded-full h-14 px-10 shadow-xl" />
+            <div className="flex flex-wrap gap-3 md:gap-4 pt-2 md:pt-4">
+              <CTAButton className="flex-1 md:flex-none rounded-full h-12 md:h-14 px-8 md:px-10 shadow-xl text-sm md:text-base" />
               <Button
                 variant="outline"
                 size="lg"
-                className="rounded-full h-14 px-10 border-primary/20"
+                className="flex-1 md:flex-none rounded-full h-12 md:h-14 px-8 md:px-10 border-primary/20 text-sm md:text-base"
                 onClick={() => {
                   const weight = review.specs?.find(s => s.label.toLowerCase().includes('weight') || s.label.includes('น้ำหนัก'))?.value;
                   const drop = review.specs?.find(s => s.label.toLowerCase().includes('drop'))?.value;
@@ -329,17 +329,17 @@ export default function ReviewDetail() {
             </div>
 
             {/* Verdict */}
-            <div className="bg-primary text-primary-foreground rounded-[2rem] p-10 shadow-2xl relative overflow-hidden">
+            <div className="bg-primary text-primary-foreground rounded-[2rem] p-6 md:p-10 shadow-2xl relative overflow-hidden">
               <div className="absolute top-0 right-0 p-8 opacity-10">
-                <Award className="h-32 w-32" />
+                <Award className="h-24 w-24 md:h-32 md:h-32" />
               </div>
-              <h2 className="font-heading text-3xl font-black mb-4 uppercase tracking-tighter">
+              <h2 className="font-heading text-2xl md:text-3xl font-black mb-4 uppercase tracking-tighter">
                 GEARTRAIL VERDICT
               </h2>
-              <p className="text-primary-foreground/90 text-xl leading-relaxed font-medium mb-8 border-l-2 border-accent/50 pl-6">
+              <p className="text-primary-foreground/90 text-lg md:text-xl leading-relaxed font-medium mb-8 border-l-2 border-accent/50 pl-4 md:pl-6">
                 {review.verdict}
               </p>
-              <CTAButton variant="cta" className="h-14 px-10 rounded-full text-base" />
+              <CTAButton variant="cta" className="h-12 md:h-14 px-8 md:px-10 rounded-full text-sm md:text-base w-full md:w-auto" />
             </div>
           </div>
 
