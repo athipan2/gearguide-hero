@@ -85,7 +85,12 @@ export default function AdminReviewForm() {
 
     setSaving(false);
     if (error) {
-      toast({ title: "บันทึกไม่สำเร็จ", description: error.message, variant: "destructive" });
+      console.error("Supabase save error:", error);
+      toast({
+        title: "บันทึกไม่สำเร็จ",
+        description: error.message || "เกิดข้อผิดพลาดในการเชื่อมต่อฐานข้อมูล",
+        variant: "destructive"
+      });
     } else {
       toast({ title: isEdit ? "อัปเดตแล้ว" : "สร้างรีวิวแล้ว" });
       navigate("/admin/reviews");
