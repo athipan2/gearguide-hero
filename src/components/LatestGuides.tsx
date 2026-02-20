@@ -36,7 +36,7 @@ export function LatestGuides() {
 
   useEffect(() => {
     const fetchArticles = async () => {
-      const { data } = await (supabase as any)
+      const { data } = await supabase
         .from("articles")
         .select("id, slug, title, category, image_url, created_at")
         .eq("published", true)

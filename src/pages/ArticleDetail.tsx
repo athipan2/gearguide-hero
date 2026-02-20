@@ -68,7 +68,7 @@ export default function ArticleDetail() {
   useEffect(() => {
     const fetchArticle = async () => {
       setLoading(true);
-      const { data, error } = await (supabase as any)
+      const { data, error } = await supabase
         .from("articles")
         .select("id, title, category, content, image_url, created_at")
         .eq("slug", slug)

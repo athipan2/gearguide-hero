@@ -44,7 +44,7 @@ export default function GuidesPage() {
 
   useEffect(() => {
     const fetchArticles = async () => {
-      const { data, error } = await (supabase as any)
+      const { data, error } = await supabase
         .from("articles")
         .select("id, slug, title, category, excerpt, image_url, created_at")
         .eq("published", true)
