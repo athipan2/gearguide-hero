@@ -80,6 +80,7 @@ export type Database = {
           cta_text: string | null
           id: string
           image_url: string | null
+          images: Json
           intro: string | null
           name: string
           overall_rating: number
@@ -104,6 +105,7 @@ export type Database = {
           cta_text?: string | null
           id?: string
           image_url?: string | null
+          images?: Json
           intro?: string | null
           name: string
           overall_rating?: number
@@ -128,6 +130,7 @@ export type Database = {
           cta_text?: string | null
           id?: string
           image_url?: string | null
+          images?: Json
           intro?: string | null
           name?: string
           overall_rating?: number

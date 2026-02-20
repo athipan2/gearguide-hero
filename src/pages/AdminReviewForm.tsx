@@ -22,6 +22,7 @@ const defaultForm = {
   intro: "", verdict: "", published: false,
 };
 
+
 export default function AdminReviewForm() {
   const { id } = useParams();
   const isEdit = !!id && id !== "new";
@@ -35,6 +36,7 @@ export default function AdminReviewForm() {
   const [pros, setPros] = useState<string[]>([""]);
   const [cons, setCons] = useState<string[]>([""]);
   const [sections, setSections] = useState<SectionItem[]>([{ title: "", body: "" }]);
+  const [images, setImages] = useState<string[]>([]);
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
@@ -53,6 +55,7 @@ export default function AdminReviewForm() {
           setPros((data.pros as unknown as string[]) || [""]);
           setCons((data.cons as unknown as string[]) || [""]);
           setSections((data.sections as unknown as SectionItem[]) || []);
+          setImages((data.images as unknown as string[]) || []);
         }
       });
     }
@@ -72,6 +75,7 @@ export default function AdminReviewForm() {
       pros: JSON.parse(JSON.stringify(pros.filter(Boolean))),
       cons: JSON.parse(JSON.stringify(cons.filter(Boolean))),
       sections: JSON.parse(JSON.stringify(sections.filter((s) => s.title))),
+      images: JSON.parse(JSON.stringify(images.filter(Boolean))),
       ...(isEdit ? {} : { created_by: user?.id }),
     };
 
@@ -138,10 +142,39 @@ export default function AdminReviewForm() {
                 <Input value={form.badge} onChange={(e) => updateField("badge", e.target.value)} placeholder="Top Pick / แนะนำ / คุ้มค่าที่สุด" />
               </div>
               <div className="space-y-2">
-                <Label>URL รูปภาพ</Label>
+                <Label>URL รูปภาพหลัก</Label>
                 <Input value={form.image_url} onChange={(e) => updateField("image_url", e.target.value)} placeholder="https://..." />
               </div>
             </div>
+          </div>
+
+          {/* Additional Images */}
+          <div className="bg-card border rounded-xl p-5 space-y-4">
+            <div className="flex items-center justify-between">
+              <h2 className="font-heading font-semibold text-foreground">รูปภาพเพิ่มเติม</h2>
+              <Button variant="ghost" size="sm" onClick={() => setImages([...images, ""])}>
+                <Plus className="h-4 w-4 mr-1" /> เพิ่มรูป
+              </Button>
+            </div>
+            {images.length === 0 && (
+              <p className="text-sm text-muted-foreground">ยังไม่มีรูปภาพเพิ่มเติม กดปุ่ม "เพิ่มรูป" เพื่อเพิ่ม URL รูปภาพ</p>
+            )}
+            {images.map((img, i) => (
+              <div key={i} className="flex gap-2 items-center">
+                <Input
+                  placeholder="https://..."
+                  value={img}
+                  onChange={(e) => { const n = [...images]; n[i] = e.target.value; setImages(n); }}
+                  className="flex-1"
+                />
+                {img && (
+                  <img src={img} alt={`preview ${i}`} className="h-10 w-10 rounded object-cover border shrink-0" />
+                )}
+                <Button variant="ghost" size="icon" onClick={() => setImages(images.filter((_, j) => j !== i))}>
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+            ))}
           </div>
 
           {/* Intro & Verdict */}
