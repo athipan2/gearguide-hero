@@ -1,10 +1,10 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Mountain, LogIn, Mail } from "lucide-react";
+import { Mountain, LogIn, Mail, ArrowLeft } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { ToastAction } from "@/components/ui/toast";
 
@@ -94,6 +94,13 @@ export default function AdminLogin() {
   return (
     <div className="min-h-screen bg-background flex items-center justify-center px-4">
       <div className="w-full max-w-sm space-y-6">
+        <Link
+          to="/"
+          className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-2"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          กลับสู่หน้าเว็บไซต์
+        </Link>
         <div className="text-center space-y-2">
           <div className="inline-flex items-center gap-2 text-primary">
             <Mountain className="h-8 w-8" />
