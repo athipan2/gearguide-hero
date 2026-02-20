@@ -3,6 +3,7 @@ import { useParams, Link } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { RatingStars } from "@/components/RatingStars";
+import { ImageGallery } from "@/components/ImageGallery";
 import { SEOHead } from "@/components/SEOHead";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -19,6 +20,7 @@ import {
 interface ReviewData {
   id?: string;
   name: string; brand: string; category: string; price: string; image_url: string | null;
+  images: string[];
   badge: string | null; overall_rating: number;
   ratings: { label: string; score: number }[];
   specs: { label: string; value: string }[];
@@ -33,6 +35,7 @@ const fallbackData: Record<string, ReviewData> = {
   "nike-vaporfly-3": {
     name: "Nike Vaporfly 3", brand: "Nike", category: "รองเท้าวิ่งถนน", price: "฿8,500",
     image_url: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=800&h=600&fit=crop",
+    images: [],
     badge: "Top Pick", overall_rating: 4.8,
     ratings: [{ label: "ความเบา", score: 4.9 }, { label: "แรงคืนตัว", score: 5.0 }, { label: "ความทนทาน", score: 3.8 }, { label: "ความคุ้มค่า", score: 3.5 }, { label: "ความสบาย", score: 4.7 }],
     specs: [{ label: "น้ำหนัก", value: "196g (US 9)" }, { label: "Drop", value: "8mm" }, { label: "พื้นรองเท้า", value: "ZoomX + Carbon Plate" }, { label: "พื้นนอก", value: "Rubber Waffle" }, { label: "เหมาะกับ", value: "Race / Tempo Run" }, { label: "ระยะทาง", value: "10K – Marathon" }],
@@ -50,6 +53,7 @@ const fallbackData: Record<string, ReviewData> = {
   "salomon-speedcross-6": {
     name: "Salomon Speedcross 6", brand: "Salomon", category: "รองเท้าวิ่งเทรล", price: "฿5,900",
     image_url: "https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?w=800&h=600&fit=crop",
+    images: [],
     badge: "แนะนำ", overall_rating: 4.6,
     ratings: [{ label: "การเกาะถนน", score: 4.9 }, { label: "ความทนทาน", score: 4.5 }, { label: "การกันน้ำ", score: 4.3 }, { label: "ความคุ้มค่า", score: 4.2 }, { label: "ความสบาย", score: 4.0 }],
     specs: [{ label: "น้ำหนัก", value: "310g (US 9)" }, { label: "Drop", value: "10mm" }, { label: "พื้นรองเท้า", value: "EnergyCell+" }, { label: "พื้นนอก", value: "Contagrip MA" }, { label: "เหมาะกับ", value: "Trail / Mud / Technical" }, { label: "ระยะทาง", value: "5K – Ultra" }],
@@ -104,6 +108,7 @@ export default function ReviewDetail() {
           id: data.id,
           name: data.name, brand: data.brand, category: data.category, price: data.price,
           image_url: data.image_url, badge: data.badge, overall_rating: Number(data.overall_rating),
+          images: (data.images as unknown as string[]) || [],
           ratings: (data.ratings as unknown as ReviewData["ratings"]) || [],
           specs: (data.specs as unknown as ReviewData["specs"]) || [],
           pros: (data.pros as unknown as string[]) || [],
@@ -212,15 +217,14 @@ export default function ReviewDetail() {
       <article className="container mx-auto px-4 pb-24">
         {/* Header */}
         <div className="grid md:grid-cols-2 gap-12 mb-16 items-center">
-          <div className="relative rounded-[2rem] overflow-hidden bg-muted shadow-2xl aspect-[4/3]">
-            <img src={review.image_url || ""} alt={review.name} className="w-full h-full object-cover hover:scale-105 transition-transform duration-700" />
-            {review.badge && (
-              <div className={`absolute top-6 left-6 px-5 py-2 rounded-full text-xs font-black uppercase tracking-widest flex items-center gap-2 shadow-xl ${badgeColors[review.badge] || "bg-primary text-primary-foreground"}`}>
-                <Award className="h-4 w-4" />
-                {review.badge}
-              </div>
-            )}
-          </div>
+          <ImageGallery
+            mainImage={review.image_url || ""}
+            images={review.images}
+            alt={review.name}
+            badge={review.badge}
+            badgeClassName={badgeColors[review.badge || ""] || "bg-primary text-primary-foreground"}
+            badgeIcon={<Award className="h-4 w-4" />}
+          />
 
           <div className="flex flex-col justify-center space-y-8">
             <div className="space-y-2">
