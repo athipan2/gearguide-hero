@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import { useParams, useSearchParams } from "react-router-dom";
+import { useParams, useSearchParams, Link } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { SEOHead } from "@/components/SEOHead";
@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Slider } from "@/components/ui/slider";
-import { SlidersHorizontal, X, Search, Loader2 } from "lucide-react";
+import { SlidersHorizontal, X, Search, Loader2, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const CATEGORY_META: Record<string, { label: string; description: string }> = {
@@ -220,6 +220,13 @@ export default function CategoryPage() {
       <Navbar />
 
       <main className="container mx-auto px-4 py-8">
+        <Link
+          to="/"
+          className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors mb-6"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          กลับสู่หน้าหลัก
+        </Link>
         {/* Header */}
         <div className="mb-8">
           <h1 className="font-heading text-3xl md:text-4xl font-bold text-foreground">{pageTitle}</h1>
