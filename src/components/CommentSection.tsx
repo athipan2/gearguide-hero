@@ -31,7 +31,7 @@ export function CommentSection({ reviewId, articleId }: CommentSectionProps) {
     if (!referenceId) return;
 
     setLoading(true);
-    let query = (supabase as any)
+    let query = supabase
       .from("comments")
       .select("id, content, user_name, created_at")
       .order("created_at", { ascending: false });
@@ -60,7 +60,7 @@ export function CommentSection({ reviewId, articleId }: CommentSectionProps) {
     if (!newComment.trim()) return;
 
     setSubmitting(true);
-    const { error } = await (supabase as any).from("comments").insert({
+    const { error } = await supabase.from("comments").insert({
       content: newComment,
       user_id: user.id,
       user_name: user.email?.split("@")[0] || "ผู้ใช้งาน",
