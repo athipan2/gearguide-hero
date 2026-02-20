@@ -20,7 +20,15 @@ export function AdminLayout({ children }: { children: ReactNode }) {
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center space-y-4">
           <p className="text-muted-foreground">ไม่มีสิทธิ์เข้าถึง</p>
-          <Button variant="outline" onClick={() => navigate("/admin/login")}>เข้าสู่ระบบ</Button>
+          <div className="flex flex-col sm:flex-row gap-2 justify-center">
+            <Button variant="outline" onClick={() => navigate("/")}>
+              <Mountain className="mr-2 h-4 w-4" />
+              กลับหน้าหลัก
+            </Button>
+            <Button onClick={() => navigate("/admin/login")}>
+              เข้าสู่ระบบ
+            </Button>
+          </div>
         </div>
       </div>
     );

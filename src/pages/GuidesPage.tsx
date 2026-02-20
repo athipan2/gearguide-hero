@@ -5,7 +5,7 @@ import { SEOHead } from "@/components/SEOHead";
 import { supabase } from "@/integrations/supabase/client";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Loader2, BookOpen, Clock } from "lucide-react";
+import { Loader2, BookOpen, Clock, ArrowLeft } from "lucide-react";
 
 interface Article {
   id: string;
@@ -68,7 +68,14 @@ export default function GuidesPage() {
       />
       <Navbar />
 
-      <main className="container mx-auto px-4 py-12">
+      <main className="container mx-auto px-4 py-8">
+        <Link
+          to="/"
+          className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors mb-6"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          กลับสู่หน้าหลัก
+        </Link>
         <header className="mb-12 text-center max-w-2xl mx-auto">
           <h1 className="font-heading text-3xl md:text-5xl font-bold text-foreground mb-4">
             คู่มือ & เทคนิค
