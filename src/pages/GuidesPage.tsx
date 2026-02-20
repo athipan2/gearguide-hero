@@ -44,14 +44,14 @@ export default function GuidesPage() {
 
   useEffect(() => {
     const fetchArticles = async () => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from("articles")
         .select("id, slug, title, category, excerpt, image_url, created_at")
         .eq("published", true)
         .order("created_at", { ascending: false });
 
       if (!error && data && data.length > 0) {
-        setArticles(data);
+        setArticles(data as Article[]);
       } else {
         setArticles(fallbackArticles);
       }

@@ -36,7 +36,7 @@ export function LatestGuides() {
 
   useEffect(() => {
     const fetchArticles = async () => {
-      const { data } = await supabase
+      const { data } = await (supabase as any)
         .from("articles")
         .select("id, slug, title, category, image_url, created_at")
         .eq("published", true)
@@ -44,7 +44,7 @@ export function LatestGuides() {
         .limit(3);
 
       if (data && data.length > 0) {
-        setArticles(data);
+        setArticles(data as Article[]);
       } else {
         setArticles(fallbackArticles);
       }

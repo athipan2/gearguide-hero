@@ -68,7 +68,7 @@ export default function ArticleDetail() {
   useEffect(() => {
     const fetchArticle = async () => {
       setLoading(true);
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from("articles")
         .select("id, title, category, content, image_url, created_at")
         .eq("slug", slug)
@@ -76,7 +76,7 @@ export default function ArticleDetail() {
         .maybeSingle();
 
       if (!error && data) {
-        setArticle(data);
+        setArticle(data as Article);
       } else if (slug && fallbackArticles[slug]) {
         // Use fallback if DB is empty or article not found
         setArticle(fallbackArticles[slug]);
