@@ -1,8 +1,16 @@
 import { useState, useEffect } from "react";
-import { Menu, X, Search, Mountain } from "lucide-react";
+import { Menu, Search, Mountain } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
+import {
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 
 const navLinks = [
   { label: "รองเท้าวิ่ง", href: "/category/รองเท้าวิ่งถนน" },
@@ -13,7 +21,6 @@ const navLinks = [
 ];
 
 export function Navbar() {
-  const [open, setOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
@@ -61,25 +68,46 @@ export function Navbar() {
           </Button>
         </div>
 
-        {/* Mobile toggle */}
-        <button className="md:hidden p-2 text-primary" onClick={() => setOpen(!open)}>
-          {open ? <X className="h-7 w-7" /> : <Menu className="h-7 w-7" />}
-        </button>
-      </div>
-
-      {/* Mobile menu */}
-      {open && (
-        <div className="md:hidden border-t bg-card px-4 pb-4 space-y-2">
-          {navLinks.map((l) => (
-            <Link key={l.label} to={l.href} className="block py-2 text-sm font-medium text-foreground/80 hover:text-primary" onClick={() => setOpen(false)}>
-              {l.label}
-            </Link>
-          ))}
-          <div className="flex gap-2 pt-2">
-            <Button variant="ghost" size="sm" className="w-full justify-start"><Search className="h-4 w-4 mr-2" />ค้นหา</Button>
-          </div>
+        {/* Mobile toggle with Sheet */}
+        <div className="md:hidden">
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button variant="ghost" size="icon" className="text-primary" data-testid="mobile-menu-trigger">
+                <Menu className="h-7 w-7" />
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="right" className="w-[300px] sm:w-[400px] p-0">
+              <SheetHeader className="p-6 border-b text-left">
+                <SheetTitle className="flex items-center gap-2 font-heading font-extrabold text-xl text-primary tracking-tight">
+                  <Mountain className="h-6 w-6 text-accent" />
+                  <span>GEARTRAIL</span>
+                </SheetTitle>
+              </SheetHeader>
+              <div className="flex flex-col py-6">
+                {navLinks.map((l) => (
+                  <SheetClose asChild key={l.label}>
+                    <Link
+                      to={l.href}
+                      className="px-6 py-4 text-lg font-bold uppercase tracking-widest text-foreground/70 hover:text-primary hover:bg-primary/5 transition-all"
+                    >
+                      {l.label}
+                    </Link>
+                  </SheetClose>
+                ))}
+                <div className="mt-4 px-6 pt-6 border-t space-y-4">
+                  <Button variant="ghost" className="w-full justify-start text-lg font-bold uppercase tracking-widest" size="lg">
+                    <Search className="h-5 w-5 mr-3" />
+                    ค้นหา
+                  </Button>
+                  <Button variant="cta" className="w-full text-lg font-bold uppercase tracking-widest" size="lg">
+                    ส่งรีวิว
+                  </Button>
+                </div>
+              </div>
+            </SheetContent>
+          </Sheet>
         </div>
-      )}
+      </div>
     </nav>
   );
 }

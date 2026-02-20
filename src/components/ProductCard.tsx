@@ -84,11 +84,11 @@ export function ProductCard({ name, brand, image, rating, price, badge, pros, co
         </div>
 
         {/* CTAs */}
-        <div className="flex flex-wrap gap-2 pt-1">
+        <div className="grid grid-cols-2 gap-2 pt-1 md:flex md:flex-wrap">
           <Button
             variant="outline"
             size="sm"
-            className="flex-1 border-primary/20 hover:bg-primary/5"
+            className="w-full md:flex-1 border-primary/20 hover:bg-primary/5 text-xs h-9"
             onClick={() => {
               useComparisonStore.getState().addItem({ name, brand, image, rating, price, slug, weight, drop });
               toast.success(`เพิ่ม ${name} เข้าสู่การเปรียบเทียบ`);
@@ -97,7 +97,16 @@ export function ProductCard({ name, brand, image, rating, price, badge, pros, co
             <Plus className="h-3.5 w-3.5 mr-1" />
             เทียบ
           </Button>
-          <Button variant="cta" size="sm" className="flex-1" asChild={!!affiliateUrl}>
+
+          {slug ? (
+            <Button variant="outline" size="sm" className="w-full md:flex-1 text-xs h-9" asChild>
+              <Link to={`/review/${slug}`}>รีวิวเต็ม</Link>
+            </Button>
+          ) : (
+            <Button variant="outline" size="sm" className="w-full md:flex-1 text-xs h-9">รีวิวเต็ม</Button>
+          )}
+
+          <Button variant="cta" size="sm" className="col-span-2 md:flex-1 text-xs h-9" asChild={!!affiliateUrl}>
             {affiliateUrl ? (
               <a href={affiliateUrl} target="_blank" rel="noopener noreferrer nofollow">
                 ดูราคา
@@ -110,13 +119,6 @@ export function ProductCard({ name, brand, image, rating, price, badge, pros, co
               </div>
             )}
           </Button>
-          {slug ? (
-            <Button variant="outline" size="sm" asChild>
-              <Link to={`/review/${slug}`}>รีวิวเต็ม</Link>
-            </Button>
-          ) : (
-            <Button variant="outline" size="sm">รีวิวเต็ม</Button>
-          )}
         </div>
       </div>
     </div>
