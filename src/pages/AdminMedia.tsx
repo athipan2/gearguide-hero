@@ -73,18 +73,18 @@ export default function AdminMedia() {
   };
 
   const deleteMedia = async (item: MediaItem) => {
-    if (!confirm(`ลบ "${item.file_name}"?`)) return;
+    if (!confirm(`คุณแน่ใจหรือไม่ว่าต้องการลบ "${item.file_name}"?`)) return;
 
     try {
-      // 1. Delete from storage
+      // 1. Delete from storage first
       const { error: storageError } = await supabase.storage
         .from("review-media")
         .remove([item.file_path]);
 
       if (storageError) {
         console.error("Storage delete error:", storageError);
-        // We continue even if storage delete fails (e.g. file already gone)
-        // so the user can clean up the database record.
+        // Continue to delete DB record even if storage fails
+        // (the file might have been manually deleted or missing)
       }
 
       // 2. Delete from database
@@ -96,19 +96,22 @@ export default function AdminMedia() {
       if (dbError) {
         console.error("Database delete error:", dbError);
         toast({
-          title: "ลบข้อมูลไม่สำเร็จ",
+          title: "ลบข้อมูลจากฐานข้อมูลไม่สำเร็จ",
           description: dbError.message,
           variant: "destructive"
         });
       } else {
-        toast({ title: "ลบไฟล์สำเร็จแล้ว" });
+        toast({
+          title: "ลบสำเร็จ",
+          description: `ลบไฟล์ ${item.file_name} เรียบร้อยแล้ว`,
+        });
         fetchMedia();
       }
     } catch (error) {
-      console.error("Delete error:", error);
+      console.error("Unexpected delete error:", error);
       toast({
-        title: "เกิดข้อผิดพลาดในการลบ",
-        description: error instanceof Error ? error.message : "เกิดข้อผิดพลาดไม่ทราบสาเหตุ",
+        title: "เกิดข้อผิดพลาดไม่คาดคิด",
+        description: error instanceof Error ? error.message : "ไม่สามารถลบไฟล์ได้",
         variant: "destructive"
       });
     }
@@ -151,42 +154,69 @@ export default function AdminMedia() {
           <p>ยังไม่มีไฟล์</p>
         </div>
       ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-          {filtered.map((m) => (
-            <div key={m.id} className="bg-card border rounded-xl overflow-hidden group">
-              <div className="aspect-square bg-muted relative">
-                {m.mime_type?.startsWith("image/") ? (
-                  <img src={getPublicUrl(m.file_path)} alt={m.file_name} className="w-full h-full object-cover" loading="lazy" />
-                ) : (
-                  <div className="flex items-center justify-center h-full">
-                    <ImageIcon className="h-8 w-8 text-muted-foreground" />
-                  </div>
-                )}
-                <div className="absolute inset-0 bg-foreground/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                  <Button variant="secondary" size="icon" onClick={() => copyUrl(m.file_path)}>
-                    <Copy className="h-4 w-4" />
-                  </Button>
-                  <Button variant="destructive" size="icon" onClick={() => deleteMedia(m)}>
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
-              <div className="p-2 flex items-center justify-between gap-2">
-                <div className="min-w-0 flex-1">
-                  <p className="text-xs text-foreground truncate" title={m.file_name}>{m.file_name}</p>
-                  <p className="text-xs text-muted-foreground">{m.file_size ? `${(m.file_size / 1024).toFixed(0)} KB` : ""}</p>
-                </div>
-                <div className="flex gap-1 md:hidden">
-                  <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => copyUrl(m.file_path)}>
-                    <Copy className="h-4 w-4" />
-                  </Button>
-                  <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => deleteMedia(m)}>
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
-            </div>
-          ))}
+        <div className="bg-card border rounded-xl overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b bg-muted/50">
+                  <th className="text-left px-4 py-3 font-medium text-muted-foreground w-16">ID</th>
+                  <th className="text-left px-4 py-3 font-medium text-muted-foreground w-24">รูปภาพ</th>
+                  <th className="text-left px-4 py-3 font-medium text-muted-foreground">คำอธิบาย</th>
+                  <th className="text-right px-4 py-3 font-medium text-muted-foreground w-32">จัดการ</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filtered.map((m, index) => (
+                  <tr key={m.id} className="border-b last:border-0 hover:bg-muted/30">
+                    <td className="px-4 py-3 text-muted-foreground">{index + 1}</td>
+                    <td className="px-4 py-3">
+                      <div className="w-12 h-12 rounded overflow-hidden bg-muted border">
+                        {m.mime_type?.startsWith("image/") ? (
+                          <img
+                            src={getPublicUrl(m.file_path)}
+                            alt={m.file_name}
+                            className="w-full h-full object-cover"
+                            loading="lazy"
+                          />
+                        ) : (
+                          <div className="flex items-center justify-center h-full">
+                            <ImageIcon className="h-6 w-6 text-muted-foreground" />
+                          </div>
+                        )}
+                      </div>
+                    </td>
+                    <td className="px-4 py-3">
+                      <p className="font-medium text-foreground">{m.file_name}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {m.file_size ? `${(m.file_size / 1024).toFixed(0)} KB` : ""} • {m.mime_type}
+                      </p>
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="flex items-center justify-end gap-1">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => copyUrl(m.file_path)}
+                          title="คัดลอก URL"
+                        >
+                          <Copy className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => deleteMedia(m)}
+                          className="text-destructive hover:bg-destructive/10"
+                          title="ลบไฟล์"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
     </AdminLayout>
