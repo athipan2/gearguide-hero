@@ -106,10 +106,10 @@ export function RelatedReviews({ currentReview }: RelatedReviewsProps) {
   return (
     <section className="container mx-auto px-4 py-16 border-t">
       <div className="mb-8">
-        <h2 className="font-heading text-3xl font-black text-primary tracking-tighter uppercase">รีวิวที่เกี่ยวข้อง</h2>
-        <p className="text-muted-foreground mt-1">สินค้าที่คุณอาจจะสนใจตามความใกล้เคียงของสเปคและราคา</p>
+        <h2 className="font-heading text-2xl md:text-3xl font-black text-primary tracking-tighter uppercase">รีวิวที่เกี่ยวข้อง</h2>
+        <p className="text-sm md:text-base text-muted-foreground mt-1">สินค้าที่คุณอาจจะสนใจตามความใกล้เคียงของสเปคและราคา</p>
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 md:gap-6">
         {related.map((rev) => (
           <ProductCard
             key={rev.id}
