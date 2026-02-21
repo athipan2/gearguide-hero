@@ -35,7 +35,10 @@ const fallbackData: Record<string, ReviewData> = {
   "nike-vaporfly-3": {
     name: "Nike Vaporfly 3", brand: "Nike", category: "รองเท้าวิ่งถนน", price: "฿8,500",
     image_url: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=800&h=600&fit=crop",
-    images: [],
+    images: [
+      "https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?w=800&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=800&h=600&fit=crop"
+    ],
     badge: "Top Pick", overall_rating: 4.8,
     ratings: [{ label: "ความเบา", score: 4.9 }, { label: "แรงคืนตัว", score: 5.0 }, { label: "ความทนทาน", score: 3.8 }, { label: "ความคุ้มค่า", score: 3.5 }, { label: "ความสบาย", score: 4.7 }],
     specs: [{ label: "น้ำหนัก", value: "196g (US 9)" }, { label: "Drop", value: "8mm" }, { label: "พื้นรองเท้า", value: "ZoomX + Carbon Plate" }, { label: "พื้นนอก", value: "Rubber Waffle" }, { label: "เหมาะกับ", value: "Race / Tempo Run" }, { label: "ระยะทาง", value: "10K – Marathon" }],
@@ -214,9 +217,9 @@ export default function ReviewDetail() {
         </nav>
       </div>
 
-      <article className="container mx-auto px-4 pb-24 pt-2 md:pt-0">
+      <article className="container mx-auto px-4 pb-16 md:pb-24 pt-2 md:pt-0">
         {/* Header */}
-        <div className="grid md:grid-cols-2 gap-4 md:gap-12 mb-6 md:mb-16 items-center">
+        <div className="grid md:grid-cols-2 gap-3 md:gap-12 mb-4 md:mb-16 items-center">
           <ImageGallery
             mainImage={review.image_url || ""}
             images={review.images}
@@ -226,27 +229,29 @@ export default function ReviewDetail() {
             badgeIcon={<Award className="h-4 w-4" />}
           />
 
-          <div className="flex flex-col justify-center space-y-6 md:space-y-8">
-            <div className="space-y-2">
-              <p className="text-[10px] md:text-sm font-black text-accent uppercase tracking-[0.3em]">{review.brand} // {review.category}</p>
-              <h1 className="font-heading text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-primary leading-[0.9] tracking-tighter uppercase">{review.name}</h1>
+          <div className="flex flex-col justify-center space-y-4 md:space-y-8">
+            <div className="space-y-1 md:space-y-2">
+              <p className="text-[9px] md:text-sm font-black text-accent uppercase tracking-[0.3em]">{review.brand} // {review.category}</p>
+              <h1 className="font-heading text-xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-primary leading-[0.9] tracking-tighter uppercase">{review.name}</h1>
             </div>
 
-            <div className="flex flex-col sm:flex-row sm:items-center gap-4 md:gap-6">
-              <div className="flex items-center gap-4 bg-primary text-primary-foreground rounded-2xl px-4 py-2 md:px-6 md:py-4 shadow-lg w-fit">
-                <span className="font-heading text-3xl md:text-5xl font-black">{review.overall_rating}</span>
+            <div className="flex flex-col sm:flex-row sm:items-center gap-3 md:gap-6">
+              <div className="flex items-center gap-3 md:gap-4 bg-primary text-primary-foreground rounded-2xl px-3 py-1.5 md:px-6 md:py-4 shadow-lg w-fit">
+                <span className="font-heading text-2xl md:text-5xl font-black">{review.overall_rating}</span>
                 <div>
-                  <RatingStars rating={review.overall_rating} />
-                  <p className="text-[10px] font-bold uppercase tracking-widest opacity-60 mt-0.5">Overall Performance</p>
+                  <div className="scale-90 md:scale-100 origin-left">
+                    <RatingStars rating={review.overall_rating} />
+                  </div>
+                  <p className="text-[8px] md:text-[10px] font-bold uppercase tracking-widest opacity-60 mt-0.5">Overall Performance</p>
                 </div>
               </div>
-              <div className="space-y-0.5 md:space-y-1">
-                <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Price Estimate</p>
-                <span className="font-heading text-2xl md:text-3xl font-black text-primary">{review.price}</span>
+              <div className="space-y-0 md:space-y-1">
+                <p className="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-muted-foreground">Price Estimate</p>
+                <span className="font-heading text-xl md:text-3xl font-black text-primary">{review.price}</span>
               </div>
             </div>
 
-            <p className="text-muted-foreground text-sm md:text-lg leading-relaxed border-l-4 border-accent pl-4 md:pl-6 py-1 md:py-2 italic font-medium">
+            <p className="text-muted-foreground text-xs md:text-lg leading-relaxed border-l-4 border-accent pl-3 md:pl-6 py-0.5 md:py-2 italic font-medium">
               "{review.intro}"
             </p>
 
@@ -339,14 +344,14 @@ export default function ReviewDetail() {
             </div>
 
             {/* Sections */}
-            <div className="space-y-8 pt-4">
+            <div className="space-y-6 md:space-y-8 pt-2 md:pt-4">
               {review.sections.map((s) => (
-                <div key={s.title} className="space-y-2">
-                  <h2 className="font-heading text-xl md:text-3xl font-black text-primary uppercase tracking-tight flex items-center gap-3">
-                    <span className="h-6 w-1 bg-accent rounded-full" />
+                <div key={s.title} className="space-y-1 md:space-y-2">
+                  <h2 className="font-heading text-lg md:text-3xl font-black text-primary uppercase tracking-tight flex items-center gap-2 md:gap-3">
+                    <span className="h-5 md:h-6 w-1 bg-accent rounded-full" />
                     {s.title}
                   </h2>
-                  <p className="text-muted-foreground text-base leading-relaxed whitespace-pre-wrap">{s.body}</p>
+                  <p className="text-muted-foreground text-sm md:text-base leading-relaxed whitespace-pre-wrap">{s.body}</p>
                 </div>
               ))}
             </div>

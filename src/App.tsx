@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/hooks/useAuth";
 import { ScrollToTop } from "@/components/ScrollToTop";
+import { ScrollToTopOnNav } from "@/components/ScrollToTopOnNav";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import ReviewDetail from "./pages/ReviewDetail";
@@ -27,6 +28,7 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <ScrollToTop />
+          <ScrollToTopOnNav />
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/review/:slug" element={<ReviewDetail />} />
