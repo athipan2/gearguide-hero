@@ -1,9 +1,9 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Upload, Trash2, Copy, Search, Image as ImageIcon } from "lucide-react";
+import { Upload, Trash2, Copy, Search, Image as ImageIcon, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -20,19 +20,34 @@ export default function AdminMedia() {
   const [media, setMedia] = useState<MediaItem[]>([]);
   const [search, setSearch] = useState("");
   const [uploading, setUploading] = useState(false);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
   const { user } = useAuth();
 
-  const fetchMedia = async () => {
-    const { data } = await supabase
-      .from("media_library")
-      .select("*")
-      .order("created_at", { ascending: false });
-    setMedia(data || []);
-  };
+  const fetchMedia = useCallback(async () => {
+    try {
+      const { data, error } = await supabase
+        .from("media_library")
+        .select("*")
+        .order("created_at", { ascending: false });
 
-  useEffect(() => { fetchMedia(); }, []);
+      if (error) {
+        console.error("Fetch media error:", error);
+        toast({
+          title: "ไม่สามารถโหลดข้อมูลสื่อได้",
+          description: error.message,
+          variant: "destructive",
+        });
+      } else {
+        setMedia(data || []);
+      }
+    } catch (err) {
+      console.error("Fetch media unexpected error:", err);
+    }
+  }, [toast]);
+
+  useEffect(() => { fetchMedia(); }, [fetchMedia]);
 
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -75,6 +90,7 @@ export default function AdminMedia() {
   const deleteMedia = async (item: MediaItem) => {
     if (!confirm(`คุณแน่ใจหรือไม่ว่าต้องการลบ "${item.file_name}"?`)) return;
 
+    setDeletingId(item.id);
     try {
       // 1. Delete from storage first
       const { error: storageError } = await supabase.storage
@@ -83,8 +99,12 @@ export default function AdminMedia() {
 
       if (storageError) {
         console.error("Storage delete error:", storageError);
-        // Continue to delete DB record even if storage fails
-        // (the file might have been manually deleted or missing)
+        // Show warning but continue to delete DB record
+        toast({
+          title: "มีข้อผิดพลาดกับ Storage",
+          description: `ไม่สามารถลบไฟล์จากที่เก็บข้อมูลได้ แต่ระบบจะลองลบจากฐานข้อมูลต่อ (${storageError.message})`,
+          variant: "destructive"
+        });
       }
 
       // 2. Delete from database
@@ -96,8 +116,8 @@ export default function AdminMedia() {
       if (dbError) {
         console.error("Database delete error:", dbError);
         toast({
-          title: "ลบข้อมูลจากฐานข้อมูลไม่สำเร็จ",
-          description: dbError.message,
+          title: "ลบไม่สำเร็จ",
+          description: `ไม่สามารถลบข้อมูลจากฐานข้อมูลได้: ${dbError.message}`,
           variant: "destructive"
         });
       } else {
@@ -105,7 +125,7 @@ export default function AdminMedia() {
           title: "ลบสำเร็จ",
           description: `ลบไฟล์ ${item.file_name} เรียบร้อยแล้ว`,
         });
-        fetchMedia();
+        await fetchMedia();
       }
     } catch (error) {
       console.error("Unexpected delete error:", error);
@@ -114,6 +134,8 @@ export default function AdminMedia() {
         description: error instanceof Error ? error.message : "ไม่สามารถลบไฟล์ได้",
         variant: "destructive"
       });
+    } finally {
+      setDeletingId(null);
     }
   };
 
@@ -207,8 +229,13 @@ export default function AdminMedia() {
                           onClick={() => deleteMedia(m)}
                           className="text-destructive hover:bg-destructive/10"
                           title="ลบไฟล์"
+                          disabled={deletingId === m.id}
                         >
-                          <Trash2 className="h-4 w-4" />
+                          {deletingId === m.id ? (
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                          ) : (
+                            <Trash2 className="h-4 w-4" />
+                          )}
                         </Button>
                       </div>
                     </td>
