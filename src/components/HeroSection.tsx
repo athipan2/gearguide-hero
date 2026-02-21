@@ -36,15 +36,15 @@ export function HeroSection() {
           <div className="space-y-8 animate-in fade-in slide-in-from-bottom-10 duration-1000 delay-600 fill-mode-both">
             <SearchBar className="max-w-xl" />
 
-            <div className="flex flex-wrap gap-4">
-              <Button variant="hero" size="lg" className="rounded-full px-10">
+            <div className="flex flex-col sm:flex-row gap-4">
+              <Button variant="hero" size="lg" className="rounded-full px-10 w-full sm:w-auto">
                 ดูรีวิวล่าสุด
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
               <Button
                 variant="outline"
                 size="lg"
-                className="rounded-full bg-white/10 text-white border-white/20 hover:bg-white/20 backdrop-blur-md px-10"
+                className="rounded-full bg-white/10 text-white border-white/20 hover:bg-white/20 backdrop-blur-md px-10 w-full sm:w-auto"
               >
                 เปรียบเทียบอุปกรณ์
               </Button>

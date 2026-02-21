@@ -305,7 +305,7 @@ export default function AdminReviewForm() {
 
         {/* Sidebar */}
         <div className="space-y-4">
-          <div className="bg-card border rounded-xl p-5 space-y-4 sticky top-6">
+          <div className="bg-card border rounded-xl p-5 space-y-4 lg:sticky lg:top-6">
             <h2 className="font-heading font-semibold text-foreground">การเผยแพร่</h2>
             <div className="flex items-center justify-between">
               <Label>เผยแพร่ทันที</Label>
@@ -321,13 +321,25 @@ export default function AdminReviewForm() {
               <Input value={form.cta_text} onChange={(e) => updateField("cta_text", e.target.value)} />
             </div>
 
-            <Button onClick={handleSave} disabled={saving} className="w-full">
+            <Button onClick={handleSave} disabled={saving} className="w-full h-12 lg:h-10">
               <Save className="mr-2 h-4 w-4" />
               {saving ? "กำลังบันทึก..." : "บันทึก"}
             </Button>
           </div>
         </div>
       </div>
+
+      {/* Mobile Sticky Footer */}
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 p-4 bg-background/80 backdrop-blur-md border-t z-50 flex gap-2">
+        <Button variant="outline" className="flex-1 h-12" onClick={() => navigate("/admin/reviews")}>
+          ยกเลิก
+        </Button>
+        <Button onClick={handleSave} disabled={saving} className="flex-[2] h-12">
+          <Save className="mr-2 h-4 w-4" />
+          {saving ? "บันทึก..." : "บันทึกการเปลี่ยนแปลง"}
+        </Button>
+      </div>
+      <div className="h-20 lg:hidden" /> {/* Spacer for sticky footer */}
     </AdminLayout>
   );
 }

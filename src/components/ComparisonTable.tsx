@@ -7,15 +7,15 @@ export function ComparisonTable() {
   const { selectedItems, removeItem, clear } = useComparisonStore();
 
   return (
-    <section className="bg-primary/5 py-24 scroll-mt-20" id="compare">
+    <section className="bg-primary/5 py-12 md:py-24 scroll-mt-20" id="compare">
       <div className="container mx-auto px-4">
-        <div className="flex flex-col md:flex-row items-start md:items-end justify-between gap-4 mb-12">
+        <div className="flex flex-col md:flex-row items-start md:items-end justify-between gap-4 mb-8 md:mb-12">
           <div className="space-y-2">
-            <div className="inline-flex items-center gap-2 text-accent font-bold uppercase tracking-[0.2em] text-sm">
+            <div className="inline-flex items-center gap-2 text-accent font-bold uppercase tracking-[0.2em] text-xs md:text-sm">
               <Scale className="h-4 w-4" />
               Compare Gear
             </div>
-            <h2 className="font-heading text-4xl md:text-5xl font-black text-primary tracking-tighter uppercase">
+            <h2 className="font-heading text-3xl md:text-5xl font-black text-primary tracking-tighter uppercase">
               เปรียบเทียบสเปค
             </h2>
             <p className="text-muted-foreground max-w-lg">

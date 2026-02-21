@@ -91,8 +91,8 @@ export function FeaturedReviews() {
     <section className="container mx-auto px-4 py-16">
       <div className="flex items-end justify-between mb-8">
         <div>
-          <h2 className="font-heading text-4xl font-black text-primary tracking-tighter uppercase">รีวิวล่าสุด</h2>
-          <p className="text-muted-foreground mt-1">ทดสอบจริง รีวิวจริง อัปเดตทุกสัปดาห์</p>
+          <h2 className="font-heading text-3xl sm:text-4xl font-black text-primary tracking-tighter uppercase">รีวิวล่าสุด</h2>
+          <p className="text-sm sm:text-base text-muted-foreground mt-1">ทดสอบจริง รีวิวจริง อัปเดตทุกสัปดาห์</p>
         </div>
         <a href="#" className="hidden md:inline-flex text-sm font-bold uppercase tracking-widest text-primary hover:text-accent transition-colors">
           ดูทั้งหมด →
