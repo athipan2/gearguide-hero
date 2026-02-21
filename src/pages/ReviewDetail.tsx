@@ -214,7 +214,7 @@ export default function ReviewDetail() {
         </nav>
       </div>
 
-      <article className="container mx-auto px-4 pb-24 pt-4 md:pt-0">
+      <article className="container mx-auto px-4 pb-24 pt-2 md:pt-0">
         {/* Header */}
         <div className="grid md:grid-cols-2 gap-6 md:gap-12 mb-10 md:mb-16 items-center">
           <ImageGallery
@@ -229,7 +229,7 @@ export default function ReviewDetail() {
           <div className="flex flex-col justify-center space-y-6 md:space-y-8">
             <div className="space-y-2">
               <p className="text-[10px] md:text-sm font-black text-accent uppercase tracking-[0.3em]">{review.brand} // {review.category}</p>
-              <h1 className="font-heading text-3xl md:text-6xl font-black text-primary leading-[0.9] tracking-tighter uppercase">{review.name}</h1>
+              <h1 className="font-heading text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-primary leading-[0.9] tracking-tighter uppercase">{review.name}</h1>
             </div>
 
             <div className="flex flex-col sm:flex-row sm:items-center gap-4 md:gap-6">
@@ -249,6 +249,29 @@ export default function ReviewDetail() {
             <p className="text-muted-foreground text-base md:text-lg leading-relaxed border-l-4 border-accent pl-4 md:pl-6 py-1 md:py-2 italic font-medium">
               "{review.intro}"
             </p>
+
+            {/* Mobile Ratings & Specs */}
+            <div className="lg:hidden grid sm:grid-cols-2 gap-4 py-2">
+              <div className="bg-card rounded-xl border p-4 space-y-3">
+                <h3 className="font-heading font-semibold text-foreground text-sm">คะแนนแต่ละด้าน</h3>
+                <div className="space-y-3">
+                  {review.ratings.map((r) => (
+                    <RatingBar key={r.label} label={r.label} score={r.score} />
+                  ))}
+                </div>
+              </div>
+              <div className="bg-card rounded-xl border p-4">
+                <h3 className="font-heading font-semibold text-foreground text-sm mb-3">สเปค</h3>
+                <dl className="space-y-2">
+                  {review.specs.map((s) => (
+                    <div key={s.label} className="flex justify-between text-xs">
+                      <dt className="text-muted-foreground">{s.label}</dt>
+                      <dd className="font-medium text-foreground">{s.value}</dd>
+                    </div>
+                  ))}
+                </dl>
+              </div>
+            </div>
 
             <div className="flex flex-wrap gap-3 md:gap-4 pt-2 md:pt-4">
               <CTAButton className="flex-1 md:flex-none rounded-full h-12 md:h-14 px-8 md:px-10 shadow-xl text-sm md:text-base" />
@@ -282,7 +305,7 @@ export default function ReviewDetail() {
         <div className="grid lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-8">
             {/* Pros / Cons */}
-            <div className="grid sm:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               <div className="bg-card border-2 border-badge-recommended/10 rounded-2xl p-6 shadow-sm">
                 <h3 className="font-heading font-black text-badge-recommended flex items-center gap-2 mb-4 uppercase tracking-widest text-sm">
                   <ThumbsUp className="h-5 w-5" /> Pros / จุดเด่น
@@ -329,9 +352,9 @@ export default function ReviewDetail() {
             </div>
 
             {/* Verdict */}
-            <div className="bg-primary text-primary-foreground rounded-[2rem] p-6 md:p-10 shadow-2xl relative overflow-hidden">
-              <div className="absolute top-0 right-0 p-8 opacity-10">
-                <Award className="h-24 w-24 md:h-32 md:h-32" />
+            <div className="bg-primary text-primary-foreground rounded-[2rem] p-5 md:p-10 shadow-2xl relative overflow-hidden">
+              <div className="absolute top-0 right-0 p-8 opacity-5">
+                <Award className="h-24 w-24 md:h-32 md:w-32" />
               </div>
               <h2 className="font-heading text-2xl md:text-3xl font-black mb-4 uppercase tracking-tighter">
                 GEARTRAIL VERDICT
@@ -345,13 +368,13 @@ export default function ReviewDetail() {
 
           {/* Sidebar */}
           <aside className="space-y-6">
-            <div className="bg-card rounded-xl border p-5 space-y-4 sticky top-20">
+            <div className="hidden lg:block bg-card rounded-xl border p-5 space-y-4 sticky top-20">
               <h3 className="font-heading font-semibold text-foreground">คะแนนแต่ละด้าน</h3>
               {review.ratings.map((r) => (
                 <RatingBar key={r.label} label={r.label} score={r.score} />
               ))}
             </div>
-            <div className="bg-card rounded-xl border p-5">
+            <div className="hidden lg:block bg-card rounded-xl border p-5">
               <h3 className="font-heading font-semibold text-foreground mb-4">สเปค</h3>
               <dl className="space-y-3">
                 {review.specs.map((s) => (
@@ -382,13 +405,18 @@ export default function ReviewDetail() {
       }} />
 
       {/* Mobile sticky CTA */}
-      <div className="lg:hidden fixed bottom-0 inset-x-0 bg-card/95 backdrop-blur-md border-t p-3 z-50">
-        <div className="flex items-center gap-3">
-          <div>
-            <p className="font-heading font-bold text-foreground">{review.price}</p>
-            <RatingStars rating={review.overall_rating} />
+      <div className="lg:hidden fixed bottom-0 inset-x-0 bg-card/95 backdrop-blur-md border-t p-3 z-50 pb-safe">
+        <div className="flex items-center gap-4">
+          <div className="flex-1 min-w-0">
+            <p className="text-[10px] font-black text-muted-foreground uppercase truncate mb-1 opacity-70">{review.name}</p>
+            <div className="flex items-center gap-2">
+              <span className="font-heading font-bold text-foreground">{review.price}</span>
+              <div className="scale-75 origin-left">
+                <RatingStars rating={review.overall_rating} />
+              </div>
+            </div>
           </div>
-          <CTAButton className="flex-1" isSidebar />
+          <CTAButton variant="cta" className="flex-1 h-11 rounded-full shadow-lg shadow-primary/20" isSidebar />
         </div>
       </div>
 
