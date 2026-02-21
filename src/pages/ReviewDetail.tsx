@@ -216,7 +216,7 @@ export default function ReviewDetail() {
 
       <article className="container mx-auto px-4 pb-24 pt-2 md:pt-0">
         {/* Header */}
-        <div className="grid md:grid-cols-2 gap-6 md:gap-12 mb-10 md:mb-16 items-center">
+        <div className="grid md:grid-cols-2 gap-4 md:gap-12 mb-6 md:mb-16 items-center">
           <ImageGallery
             mainImage={review.image_url || ""}
             images={review.images}
@@ -229,12 +229,12 @@ export default function ReviewDetail() {
           <div className="flex flex-col justify-center space-y-6 md:space-y-8">
             <div className="space-y-2">
               <p className="text-[10px] md:text-sm font-black text-accent uppercase tracking-[0.3em]">{review.brand} // {review.category}</p>
-              <h1 className="font-heading text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-primary leading-[0.9] tracking-tighter uppercase">{review.name}</h1>
+              <h1 className="font-heading text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-primary leading-[0.9] tracking-tighter uppercase">{review.name}</h1>
             </div>
 
             <div className="flex flex-col sm:flex-row sm:items-center gap-4 md:gap-6">
-              <div className="flex items-center gap-4 bg-primary text-primary-foreground rounded-2xl px-5 py-3 md:px-6 md:py-4 shadow-lg w-fit">
-                <span className="font-heading text-4xl md:text-5xl font-black">{review.overall_rating}</span>
+              <div className="flex items-center gap-4 bg-primary text-primary-foreground rounded-2xl px-4 py-2 md:px-6 md:py-4 shadow-lg w-fit">
+                <span className="font-heading text-3xl md:text-5xl font-black">{review.overall_rating}</span>
                 <div>
                   <RatingStars rating={review.overall_rating} />
                   <p className="text-[10px] font-bold uppercase tracking-widest opacity-60 mt-0.5">Overall Performance</p>
@@ -246,7 +246,7 @@ export default function ReviewDetail() {
               </div>
             </div>
 
-            <p className="text-muted-foreground text-base md:text-lg leading-relaxed border-l-4 border-accent pl-4 md:pl-6 py-1 md:py-2 italic font-medium">
+            <p className="text-muted-foreground text-sm md:text-lg leading-relaxed border-l-4 border-accent pl-4 md:pl-6 py-1 md:py-2 italic font-medium">
               "{review.intro}"
             </p>
 
@@ -303,9 +303,9 @@ export default function ReviewDetail() {
         </div>
 
         <div className="grid lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-2 space-y-8">
+          <div className="lg:col-span-2 space-y-6">
             {/* Pros / Cons */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="bg-card border-2 border-badge-recommended/10 rounded-2xl p-6 shadow-sm">
                 <h3 className="font-heading font-black text-badge-recommended flex items-center gap-2 mb-4 uppercase tracking-widest text-sm">
                   <ThumbsUp className="h-5 w-5" /> Pros / จุดเด่น
@@ -339,14 +339,14 @@ export default function ReviewDetail() {
             </div>
 
             {/* Sections */}
-            <div className="space-y-12 pt-8">
+            <div className="space-y-8 pt-4">
               {review.sections.map((s) => (
-                <div key={s.title} className="space-y-4">
-                  <h2 className="font-heading text-3xl font-black text-primary uppercase tracking-tight flex items-center gap-3">
-                    <span className="h-8 w-1.5 bg-accent rounded-full" />
+                <div key={s.title} className="space-y-2">
+                  <h2 className="font-heading text-xl md:text-3xl font-black text-primary uppercase tracking-tight flex items-center gap-3">
+                    <span className="h-6 w-1 bg-accent rounded-full" />
                     {s.title}
                   </h2>
-                  <p className="text-muted-foreground text-lg leading-relaxed whitespace-pre-wrap">{s.body}</p>
+                  <p className="text-muted-foreground text-base leading-relaxed whitespace-pre-wrap">{s.body}</p>
                 </div>
               ))}
             </div>
@@ -356,7 +356,7 @@ export default function ReviewDetail() {
               <div className="absolute top-0 right-0 p-8 opacity-5">
                 <Award className="h-24 w-24 md:h-32 md:w-32" />
               </div>
-              <h2 className="font-heading text-2xl md:text-3xl font-black mb-4 uppercase tracking-tighter">
+              <h2 className="font-heading text-xl md:text-3xl font-black mb-4 uppercase tracking-tighter">
                 GEARTRAIL VERDICT
               </h2>
               <p className="text-primary-foreground/90 text-lg md:text-xl leading-relaxed font-medium mb-8 border-l-2 border-accent/50 pl-4 md:pl-6">
