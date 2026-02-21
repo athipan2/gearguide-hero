@@ -22,7 +22,7 @@ const categories: FilterOption[] = [
 
 export function FastFilters() {
   return (
-    <div className="space-y-6 mb-10 p-6 bg-card rounded-2xl border border-primary/5 shadow-sm">
+    <div className="space-y-6 mb-10 p-4 sm:p-6 bg-card rounded-2xl border border-primary/5 shadow-sm">
       <div className="space-y-3">
         <h3 className="text-xs font-bold uppercase tracking-widest text-muted-foreground px-1">เลือกระยะทางที่คุณวิ่ง</h3>
         <div className="flex md:flex-wrap gap-2 overflow-x-auto md:overflow-visible pb-2 md:pb-0 scrollbar-hide -mx-1 px-1">

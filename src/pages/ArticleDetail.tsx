@@ -131,10 +131,10 @@ export default function ArticleDetail() {
               {article.category}
             </span>
           </div>
-          <h1 className="font-heading text-4xl md:text-6xl font-black text-primary mb-8 leading-[0.9] tracking-tighter uppercase">
+          <h1 className="font-heading text-3xl md:text-6xl font-black text-primary mb-8 leading-[0.9] tracking-tighter uppercase">
             {article.title}
           </h1>
-          <div className="flex items-center gap-8 text-xs font-bold uppercase tracking-widest text-muted-foreground border-t border-b border-primary/5 py-4">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-8 text-[10px] sm:text-xs font-bold uppercase tracking-widest text-muted-foreground border-t border-b border-primary/5 py-4">
             <div className="flex items-center gap-2">
               <User className="h-4 w-4 text-accent" />
               <span>ทีมงาน GearTrail</span>
@@ -151,7 +151,7 @@ export default function ArticleDetail() {
         </header>
 
         {article.image_url && (
-          <div className="rounded-[2rem] overflow-hidden mb-16 aspect-[21/9] shadow-2xl relative">
+          <div className="rounded-2xl md:rounded-[2rem] overflow-hidden mb-8 md:mb-16 aspect-[16/9] md:aspect-[21/9] shadow-2xl relative">
             <img
               src={article.image_url}
               alt={article.title}
@@ -161,7 +161,7 @@ export default function ArticleDetail() {
           </div>
         )}
 
-        <div className="prose prose-lg max-w-none prose-headings:font-heading prose-headings:font-bold prose-p:text-muted-foreground prose-p:leading-relaxed whitespace-pre-wrap">
+        <div className="prose prose-base md:prose-lg max-w-none prose-headings:font-heading prose-headings:font-bold prose-p:text-muted-foreground prose-p:leading-relaxed whitespace-pre-wrap">
           {article.content}
         </div>
 
