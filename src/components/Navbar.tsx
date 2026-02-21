@@ -3,6 +3,7 @@ import { Menu, Search, Mountain } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
+import { SearchDialog } from "./SearchDialog";
 import {
   Sheet,
   SheetClose,
@@ -22,6 +23,7 @@ const navLinks = [
 
 export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -60,7 +62,12 @@ export function Navbar() {
         </div>
 
         <div className="hidden md:flex items-center gap-4">
-          <Button variant="ghost" size="icon" className="text-primary hover:bg-primary/5">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="text-primary hover:bg-primary/5"
+            onClick={() => setSearchOpen(true)}
+          >
             <Search className="h-5 w-5" />
           </Button>
           <Button variant="cta" size="sm" className="hidden lg:flex">
@@ -95,10 +102,17 @@ export function Navbar() {
                   </SheetClose>
                 ))}
                 <div className="mt-4 px-6 pt-6 border-t space-y-4">
-                  <Button variant="ghost" className="w-full justify-start text-lg font-bold uppercase tracking-widest" size="lg">
-                    <Search className="h-5 w-5 mr-3" />
-                    ค้นหา
-                  </Button>
+                  <SheetClose asChild>
+                    <Button
+                      variant="ghost"
+                      className="w-full justify-start text-lg font-bold uppercase tracking-widest"
+                      size="lg"
+                      onClick={() => setSearchOpen(true)}
+                    >
+                      <Search className="h-5 w-5 mr-3" />
+                      ค้นหา
+                    </Button>
+                  </SheetClose>
                   <Button variant="cta" className="w-full text-lg font-bold uppercase tracking-widest" size="lg">
                     ส่งรีวิว
                   </Button>
@@ -108,6 +122,7 @@ export function Navbar() {
           </Sheet>
         </div>
       </div>
+      <SearchDialog open={searchOpen} onOpenChange={setSearchOpen} />
     </nav>
   );
 }

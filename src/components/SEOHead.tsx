@@ -3,11 +3,12 @@ import { useEffect } from "react";
 interface SEOHeadProps {
   title: string;
   description: string;
+  image?: string;
   canonical?: string;
   jsonLd?: Record<string, unknown>;
 }
 
-export function SEOHead({ title, description, canonical, jsonLd }: SEOHeadProps) {
+export function SEOHead({ title, description, image, canonical, jsonLd }: SEOHeadProps) {
   useEffect(() => {
     document.title = title;
 
@@ -25,6 +26,11 @@ export function SEOHead({ title, description, canonical, jsonLd }: SEOHeadProps)
     setMeta("description", description);
     setMeta("og:title", title, true);
     setMeta("og:description", description, true);
+
+    const ogImage = image || "https://gearguide-hero.lovable.app/og-image.png";
+    setMeta("og:image", ogImage, true);
+    setMeta("twitter:image", ogImage);
+
     if (canonical) {
       setMeta("og:url", canonical, true);
       let link = document.querySelector('link[rel="canonical"]') as HTMLLinkElement | null;

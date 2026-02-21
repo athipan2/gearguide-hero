@@ -116,6 +116,7 @@ export default function ArticleDetail() {
       <SEOHead
         title={`${article.title} — GearTrail`}
         description={article.title}
+        image={article.image_url || undefined}
       />
       <Navbar />
 
