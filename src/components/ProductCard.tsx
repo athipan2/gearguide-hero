@@ -52,19 +52,21 @@ export function ProductCard({ name, brand, image, rating, price, badge, pros, co
       </div>
 
       {/* Content */}
-      <div className="p-4 md:p-5 space-y-3">
+      <div className="p-3 md:p-5 space-y-2 md:space-y-3">
         <div>
-          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">{brand}</p>
-          <h3 className="font-heading font-semibold text-lg text-card-foreground mt-0.5 line-clamp-2">{name}</h3>
+          <p className="text-[10px] md:text-xs font-medium text-muted-foreground uppercase tracking-wider">{brand}</p>
+          <h3 className="font-heading font-semibold text-sm md:text-lg text-card-foreground mt-0.5 line-clamp-2 h-10 md:h-14">{name}</h3>
         </div>
 
-        <div className="flex items-center justify-between">
-          <RatingStars rating={rating} />
-          <span className="font-heading font-bold text-lg text-foreground">{price}</span>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+          <div className="scale-90 md:scale-100 origin-left">
+            <RatingStars rating={rating} />
+          </div>
+          <span className="font-heading font-bold text-base md:text-lg text-foreground">{price}</span>
         </div>
 
-        {/* Pros / Cons */}
-        <div className="grid grid-cols-2 gap-3 text-[11px] py-1">
+        {/* Pros / Cons - Hidden on mobile to keep 2-column layout clean */}
+        <div className="hidden md:grid grid-cols-2 gap-3 text-[11px] py-1">
           <div className="space-y-1.5">
             {pros.slice(0, 2).map((p) => (
               <div key={p} className="flex items-start gap-1.5 text-badge-recommended/80">
@@ -84,38 +86,38 @@ export function ProductCard({ name, brand, image, rating, price, badge, pros, co
         </div>
 
         {/* CTAs */}
-        <div className="grid grid-cols-2 gap-2 pt-1 md:flex md:flex-wrap">
+        <div className="grid grid-cols-2 gap-1.5 pt-1 md:flex md:flex-wrap">
           <Button
             variant="outline"
             size="sm"
-            className="w-full md:flex-1 border-primary/20 hover:bg-primary/5 text-xs h-9"
+            className="w-full md:flex-1 border-primary/20 hover:bg-primary/5 text-[10px] md:text-xs h-8 md:h-9 px-1"
             onClick={() => {
               useComparisonStore.getState().addItem({ name, brand, image, rating, price, slug, weight, drop });
               toast.success(`เพิ่ม ${name} เข้าสู่การเปรียบเทียบ`);
             }}
           >
-            <Plus className="h-3.5 w-3.5 mr-1" />
+            <Plus className="h-3 w-3 md:h-3.5 md:w-3.5 mr-0.5 md:mr-1" />
             เทียบ
           </Button>
 
           {slug ? (
-            <Button variant="outline" size="sm" className="w-full md:flex-1 text-xs h-9" asChild>
+            <Button variant="outline" size="sm" className="w-full md:flex-1 text-[10px] md:text-xs h-8 md:h-9 px-1" asChild>
               <Link to={`/review/${slug}`}>รีวิวเต็ม</Link>
             </Button>
           ) : (
-            <Button variant="outline" size="sm" className="w-full md:flex-1 text-xs h-9">รีวิวเต็ม</Button>
+            <Button variant="outline" size="sm" className="w-full md:flex-1 text-[10px] md:text-xs h-8 md:h-9 px-1">รีวิวเต็ม</Button>
           )}
 
-          <Button variant="cta" size="sm" className="col-span-2 md:flex-1 text-xs h-9" asChild={!!affiliateUrl}>
+          <Button variant="cta" size="sm" className="col-span-2 md:flex-1 text-[10px] md:text-xs h-8 md:h-9" asChild={!!affiliateUrl}>
             {affiliateUrl ? (
               <a href={affiliateUrl} target="_blank" rel="noopener noreferrer nofollow">
                 ดูราคา
-                <ExternalLink className="ml-1 h-3.5 w-3.5" />
+                <ExternalLink className="ml-1 h-3 w-3 md:h-3.5 md:w-3.5" />
               </a>
             ) : (
               <div className="flex items-center justify-center">
                 ดูราคา
-                <ExternalLink className="ml-1 h-3.5 w-3.5" />
+                <ExternalLink className="ml-1 h-3 w-3 md:h-3.5 md:w-3.5" />
               </div>
             )}
           </Button>
