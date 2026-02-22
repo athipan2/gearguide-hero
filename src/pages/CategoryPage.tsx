@@ -9,9 +9,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Slider } from "@/components/ui/slider";
-import { SlidersHorizontal, X, Search, Loader2, ArrowLeft } from "lucide-react";
+import { SlidersHorizontal, X, Search, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { ProductCardSkeleton } from "@/components/ReviewSkeleton";
 
 interface FilterContentProps {
   allBrands: string[];
@@ -188,6 +189,15 @@ export default function CategoryPage() {
 
   // Filters
   const [searchQuery, setSearchQuery] = useState(searchParams.get("q") || "");
+
+  // Sync searchQuery with URL params
+  useEffect(() => {
+    const q = searchParams.get("q");
+    if (q !== null) {
+      setSearchQuery(q);
+    }
+  }, [searchParams]);
+
   const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
   const [minRating, setMinRating] = useState<number>(0);
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 50000]);
@@ -313,7 +323,11 @@ export default function CategoryPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <SEOHead title={`${pageTitle} — GearTrail`} description={pageDescription} />
+      <SEOHead
+        title={`${pageTitle} — GearTrail`}
+        description={pageDescription}
+        canonical={`https://gearguide-hero.lovable.app/category${category ? `/${category}` : ""}`}
+      />
       <Navbar />
 
       <main className="container mx-auto px-4 py-8">
@@ -407,8 +421,10 @@ export default function CategoryPage() {
           {/* Product grid */}
           <div className="flex-1">
             {loading ? (
-              <div className="flex items-center justify-center py-20">
-                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <ProductCardSkeleton key={i} />
+                ))}
               </div>
             ) : filtered.length === 0 ? (
               <div className="text-center py-20">

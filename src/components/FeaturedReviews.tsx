@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { ProductCard } from "@/components/ProductCard";
 import { supabase } from "@/integrations/supabase/client";
 import { FastFilters } from "./FastFilters";
+import { ProductCardSkeleton } from "./ReviewSkeleton";
 
 const fallbackProducts = [
   {
@@ -47,8 +48,24 @@ interface ReviewData {
   created_at: string;
 }
 
+interface MappedProduct {
+  name: string;
+  brand: string;
+  image: string;
+  rating: number;
+  price: string;
+  badge?: string;
+  pros: string[];
+  cons: string[];
+  specs: { label: string; value: string }[];
+  slug: string;
+  affiliateUrl?: string;
+  createdAt?: string;
+}
+
 export function FeaturedReviews() {
-  const [products, setProducts] = useState(fallbackProducts);
+  const [products, setProducts] = useState<MappedProduct[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchReviews = async () => {
@@ -79,9 +96,15 @@ export function FeaturedReviews() {
               createdAt: r.created_at,
             }))
           );
+        } else {
+          // If no data in DB, use fallback
+          setProducts(fallbackProducts as MappedProduct[]);
         }
       } catch (error) {
         console.error("Error fetching reviews:", error);
+        setProducts(fallbackProducts);
+      } finally {
+        setLoading(false);
       }
     };
     fetchReviews();
@@ -102,9 +125,11 @@ export function FeaturedReviews() {
       <FastFilters />
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-        {products.map((p) => (
-          <ProductCard key={p.slug || p.name} {...p} />
-        ))}
+        {loading
+          ? Array.from({ length: 4 }).map((_, i) => <ProductCardSkeleton key={i} />)
+          : products.map((p) => (
+              <ProductCard key={p.slug || p.name} {...p} />
+            ))}
       </div>
     </section>
   );

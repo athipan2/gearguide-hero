@@ -12,6 +12,7 @@ import { CommentSection } from "@/components/CommentSection";
 import { RelatedReviews } from "@/components/RelatedReviews";
 import { useComparisonStore } from "@/lib/comparison-store";
 import { toast } from "sonner";
+import { ReviewDetailSkeleton } from "@/components/ReviewSkeleton";
 import {
   ExternalLink, ArrowLeft, ThumbsUp, ThumbsDown, Award,
   ChevronRight, Plus
@@ -132,9 +133,7 @@ export default function ReviewDetail() {
     return (
       <div className="min-h-screen bg-background">
         <Navbar />
-        <div className="container mx-auto px-4 py-20 text-center">
-          <p className="text-muted-foreground">กำลังโหลด...</p>
-        </div>
+        <ReviewDetailSkeleton />
         <Footer />
       </div>
     );
@@ -182,6 +181,7 @@ export default function ReviewDetail() {
       <SEOHead
         title={`${review.name} รีวิว — GearTrail`}
         description={`รีวิว ${review.name} จาก ${review.brand}: ${(review.intro || "").slice(0, 120)}...`}
+        image={review.image_url || undefined}
         canonical={`https://gearguide-hero.lovable.app/review/${slug}`}
         jsonLd={{
           "@context": "https://schema.org",
