@@ -57,7 +57,7 @@ export function SEOHead({ title, description, image, canonical, jsonLd }: SEOHea
       const s = document.querySelector('script[data-seo-jsonld]');
       if (s) s.remove();
     };
-  }, [title, description, canonical, jsonLd]);
+  }, [title, description, image, canonical, jsonLd]);
 
   return null;
 }

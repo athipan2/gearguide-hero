@@ -27,6 +27,17 @@ interface Recommendation {
   cons?: string[];
 }
 
+interface Criteria {
+  goal?: string;
+  feeling?: string;
+  footType?: string;
+}
+
+interface Spec {
+  label: string;
+  value: string;
+}
+
 export function ShoeWizard({ onClose }: { onClose: () => void }) {
   const [step, setStep] = useState<Step>("entry");
   const [loading, setLoading] = useState(false);
@@ -46,7 +57,7 @@ export function ShoeWizard({ onClose }: { onClose: () => void }) {
 
   const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
 
-  const fetchRecommendations = async (overrideCriteria?: any) => {
+  const fetchRecommendations = async (overrideCriteria?: Criteria) => {
     setLoading(true);
     try {
       let query = supabase.from("reviews").select("*");
@@ -69,7 +80,7 @@ export function ShoeWizard({ onClose }: { onClose: () => void }) {
       if (error) throw error;
 
       if (data && data.length > 0) {
-        setRecommendations(data.map(item => ({
+        const results = data.map(item => ({
           id: item.id,
           name: item.name,
           brand: item.brand,
@@ -77,14 +88,29 @@ export function ShoeWizard({ onClose }: { onClose: () => void }) {
           rating: item.rating || 4.5,
           price: item.price,
           slug: item.slug,
-          weight: item.specs?.find((s: any) => s.label === "น้ำหนัก")?.value,
-          drop: item.specs?.find((s: any) => s.label === "Drop")?.value,
+          weight: item.specs?.find((s: Spec) => s.label === "น้ำหนัก")?.value,
+          drop: item.specs?.find((s: Spec) => s.label === "Drop")?.value,
           pros: item.pros,
           cons: item.cons
-        })));
+        }));
+        setRecommendations(results);
+
+        // Automatically add to comparison
+        results.forEach(rec => {
+          useComparisonStore.getState().addItem({
+            name: rec.name,
+            brand: rec.brand,
+            image: rec.image_url,
+            rating: rec.rating,
+            price: rec.price,
+            slug: rec.slug,
+            weight: rec.weight,
+            drop: rec.drop
+          });
+        });
       } else {
         // Fallback mockup data if DB is empty
-        setRecommendations([
+        const fallback = [
           {
             id: "1",
             name: "Nike Alphafly 3",
@@ -111,7 +137,21 @@ export function ShoeWizard({ onClose }: { onClose: () => void }) {
             pros: ["ยึดเกาะดีเยี่ยม", "ซัพพอร์ตดี"],
             cons: ["หน้ารัดเล็กน้อย"]
           }
-        ].slice(0, 3));
+        ].slice(0, 3);
+        setRecommendations(fallback);
+
+        fallback.forEach(rec => {
+          useComparisonStore.getState().addItem({
+            name: rec.name,
+            brand: rec.brand,
+            image: rec.image_url,
+            rating: rec.rating,
+            price: rec.price,
+            slug: rec.slug,
+            weight: rec.weight,
+            drop: rec.drop
+          });
+        });
       }
     } catch (err) {
       console.error(err);
