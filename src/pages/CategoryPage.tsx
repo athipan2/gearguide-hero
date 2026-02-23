@@ -4,7 +4,7 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { SEOHead } from "@/components/SEOHead";
 import { ProductCard } from "@/components/ProductCard";
-import { supabase } from "@/integrations/supabase/client";
+import { useReviews } from "@/hooks/useReviews";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -182,8 +182,21 @@ export default function CategoryPage() {
   const { category } = useParams<{ category: string }>();
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const [reviews, setReviews] = useState<ReviewItem[]>([]);
-  const [loading, setLoading] = useState(true);
+  const decodedCategory = useMemo(() => category ? decodeURIComponent(category) : undefined, [category]);
+  const { data, isLoading: loading } = useReviews({ category: decodedCategory, published: true });
+
+  const reviews = useMemo(() => {
+    let items = (data as unknown as ReviewItem[]) || [];
+    if (items.length === 0) {
+      if (!decodedCategory) {
+        items = fallbackReviews;
+      } else {
+        items = fallbackReviews.filter(r => r.category === decodedCategory);
+      }
+    }
+    return items;
+  }, [data, decodedCategory]);
+
   const [allBrands, setAllBrands] = useState<string[]>([]);
   const [allCategories, setAllCategories] = useState<string[]>([]);
 
@@ -205,52 +218,20 @@ export default function CategoryPage() {
   const [sortBy, setSortBy] = useState<SortOption>("newest");
   const [showFilters, setShowFilters] = useState(false);
 
-  // Fetch all published reviews (optionally filtered by category param)
   useEffect(() => {
-    const fetch = async () => {
-      setLoading(true);
-      let query = supabase
-        .from("reviews")
-        .select("name, brand, image_url, overall_rating, price, badge, pros, cons, slug, affiliate_url, category, created_at")
-        .eq("published", true);
-
-      if (category) {
-        // Decode category slug back to actual value
-        const decoded = decodeURIComponent(category);
-        query = query.eq("category", decoded);
-      }
-
-      const { data, error } = await query.order("created_at", { ascending: false });
-
-      let items = (data as unknown as ReviewItem[]) || [];
-
-      if ((error || items.length === 0) && !category) {
-        items = fallbackReviews;
-      } else if (category) {
-        // If specific category requested and no data, filter fallback
-        const decoded = decodeURIComponent(category);
-        items = items.length > 0 ? items : fallbackReviews.filter(r => r.category === decoded);
-      }
-
-      setReviews(items);
-
-      // Extract unique brands & categories
-      const brands = [...new Set(items.map((r) => r.brand))].sort();
+    if (reviews.length > 0) {
+      const brands = [...new Set(reviews.map((r) => r.brand))].sort();
       setAllBrands(brands);
 
-      const cats = [...new Set(items.map((r) => r.category))].sort();
+      const cats = [...new Set(reviews.map((r) => r.category))].sort();
       setAllCategories(cats);
 
-      // Calculate max price
-      const prices = items.map((r) => parsePriceNum(r.price));
+      const prices = reviews.map((r) => parsePriceNum(r.price));
       const mp = Math.max(...prices, 50000);
       setMaxPrice(mp);
       setPriceRange([0, mp]);
-
-      setLoading(false);
-    };
-    fetch();
-  }, [category]);
+    }
+  }, [reviews]);
 
   const toggleBrand = (brand: string) => {
     setSelectedBrands((prev) =>

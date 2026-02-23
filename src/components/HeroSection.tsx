@@ -6,7 +6,7 @@ import { SearchBar } from "./SearchBar";
 export function HeroSection() {
   return (
     <section className="relative min-h-[85vh] flex items-center overflow-hidden">
-      <div className="absolute inset-0">
+      <div className="absolute inset-0 overflow-hidden">
         <img
           src={heroBanner}
           alt="Trail runner at golden hour in mountains"

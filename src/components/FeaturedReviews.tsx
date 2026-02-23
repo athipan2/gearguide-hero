@@ -1,8 +1,8 @@
-import { useEffect, useState } from "react";
+import { useReviews } from "@/hooks/useReviews";
 import { ProductCard } from "@/components/ProductCard";
-import { supabase } from "@/integrations/supabase/client";
 import { FastFilters } from "./FastFilters";
 import { ProductCardSkeleton } from "./ReviewSkeleton";
+import { useMemo } from "react";
 
 const fallbackProducts = [
   {
@@ -64,51 +64,27 @@ interface MappedProduct {
 }
 
 export function FeaturedReviews() {
-  const [products, setProducts] = useState<MappedProduct[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { data, isLoading } = useReviews({ limit: 8, published: true });
 
-  useEffect(() => {
-    const fetchReviews = async () => {
-      try {
-        const { data, error } = await supabase
-          .from("reviews")
-          .select("name, brand, image_url, overall_rating, price, badge, pros, cons, specs, slug, affiliate_url, created_at")
-          .eq("published", true)
-          .order("created_at", { ascending: false })
-          .limit(8);
-
-        if (error) throw error;
-
-        if (data && data.length > 0) {
-          setProducts(
-            (data as unknown as ReviewData[]).map((r) => ({
-              name: r.name,
-              brand: r.brand,
-              image: r.image_url || "",
-              rating: Number(r.overall_rating),
-              price: r.price,
-              badge: r.badge || undefined,
-              pros: Array.isArray(r.pros) ? (r.pros as string[]) : [],
-              cons: Array.isArray(r.cons) ? (r.cons as string[]) : [],
-              specs: Array.isArray(r.specs) ? (r.specs as { label: string; value: string }[]) : [],
-              slug: r.slug,
-              affiliateUrl: r.affiliate_url || undefined,
-              createdAt: r.created_at,
-            }))
-          );
-        } else {
-          // If no data in DB, use fallback
-          setProducts(fallbackProducts as MappedProduct[]);
-        }
-      } catch (error) {
-        console.error("Error fetching reviews:", error);
-        setProducts(fallbackProducts);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchReviews();
-  }, []);
+  const products = useMemo(() => {
+    if (!data || data.length === 0) {
+      return fallbackProducts as MappedProduct[];
+    }
+    return data.map((r) => ({
+      name: r.name,
+      brand: r.brand,
+      image: r.image_url || "",
+      rating: Number(r.overall_rating),
+      price: r.price,
+      badge: r.badge || undefined,
+      pros: Array.isArray(r.pros) ? (r.pros as string[]) : [],
+      cons: Array.isArray(r.cons) ? (r.cons as string[]) : [],
+      specs: Array.isArray(r.specs) ? (r.specs as { label: string; value: string }[]) : [],
+      slug: r.slug,
+      affiliateUrl: r.affiliate_url || undefined,
+      createdAt: r.created_at,
+    }));
+  }, [data]);
 
   return (
     <section className="container mx-auto px-4 py-16">
@@ -125,7 +101,7 @@ export function FeaturedReviews() {
       <FastFilters />
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-        {loading
+        {isLoading
           ? Array.from({ length: 4 }).map((_, i) => <ProductCardSkeleton key={i} />)
           : products.map((p) => (
               <ProductCard key={p.slug || p.name} {...p} />

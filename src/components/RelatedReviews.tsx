@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { useMemo } from "react";
+import { useReviews } from "@/hooks/useReviews";
 import { ProductCard } from "./ProductCard";
 
 interface RelatedReview {
@@ -38,70 +38,44 @@ const parsePrice = (priceStr: string): number => {
 };
 
 export function RelatedReviews({ currentReview }: RelatedReviewsProps) {
-  const [related, setRelated] = useState<RelatedReview[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { data, isLoading } = useReviews({ published: true });
 
-  useEffect(() => {
-    const fetchRelated = async () => {
-      setLoading(true);
-      try {
-        const { data, error } = await supabase
-          .from("reviews")
-          .select("*")
-          .eq("published", true)
-          .neq("slug", currentReview.slug || "");
+  const related = useMemo(() => {
+    if (!data || !currentReview.slug) return [];
 
-        if (error) throw error;
+    const currentPrice = parsePrice(currentReview.price);
+    const filtered = (data as unknown as RelatedReview[]).filter(r => r.slug !== currentReview.slug);
 
-        if (data) {
-          const currentPrice = parsePrice(currentReview.price);
+    const scored = filtered.map((rev) => {
+      let score = 0;
 
-          const scored = (data as RelatedReview[]).map((rev) => {
-            let score = 0;
-
-            // 1. Same category (+10 points)
-            if (rev.category === currentReview.category) {
-              score += 10;
-            }
-
-            // 2. Rating proximity (up to 10 points)
-            // Score = 10 - (diff * 2), min 0
-            const ratingDiff = Math.abs(Number(rev.overall_rating) - currentReview.overall_rating);
-            score += Math.max(0, 10 - ratingDiff * 2);
-
-            // 3. Price proximity (up to 10 points)
-            // Score = 10 - (diff_ratio * 10), min 0
-            const revPrice = parsePrice(rev.price);
-            if (currentPrice > 0) {
-              const priceDiffRatio = Math.abs(revPrice - currentPrice) / currentPrice;
-              score += Math.max(0, 10 - priceDiffRatio * 10);
-            } else {
-              score += 5; // Neutral score if current price is unavailable
-            }
-
-            return { ...rev, score };
-          });
-
-          // Sort by score descending and take the top 3
-          const sorted = scored
-            .sort((a, b) => (b.score || 0) - (a.score || 0))
-            .slice(0, 3);
-
-          setRelated(sorted as RelatedReview[]);
-        }
-      } catch (err) {
-        console.error("Error fetching related reviews:", err);
-      } finally {
-        setLoading(false);
+      // 1. Same category (+10 points)
+      if (rev.category === currentReview.category) {
+        score += 10;
       }
-    };
 
-    if (currentReview.slug) {
-      fetchRelated();
-    }
-  }, [currentReview]);
+      // 2. Rating proximity (up to 10 points)
+      const ratingDiff = Math.abs(Number(rev.overall_rating) - currentReview.overall_rating);
+      score += Math.max(0, 10 - ratingDiff * 2);
 
-  if (loading || related.length === 0) return null;
+      // 3. Price proximity (up to 10 points)
+      const revPrice = parsePrice(rev.price);
+      if (currentPrice > 0) {
+        const priceDiffRatio = Math.abs(revPrice - currentPrice) / currentPrice;
+        score += Math.max(0, 10 - priceDiffRatio * 10);
+      } else {
+        score += 5;
+      }
+
+      return { ...rev, score };
+    });
+
+    return scored
+      .sort((a, b) => (b.score || 0) - (a.score || 0))
+      .slice(0, 3);
+  }, [data, currentReview]);
+
+  if (isLoading || related.length === 0) return null;
 
   return (
     <section className="container mx-auto px-4 py-16 border-t">

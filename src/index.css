@@ -92,6 +92,7 @@
 @layer base {
   html {
     scroll-behavior: smooth;
+    scroll-padding-top: 5rem;
   }
 
   * {
@@ -103,6 +104,8 @@
     font-family: var(--font-body);
     min-height: 100vh;
     min-height: 100dvh;
+    position: relative;
+    width: 100%;
   }
 
   h1, h2, h3, h4, h5, h6 {

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useMemo } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
@@ -6,16 +6,17 @@ import { RatingStars } from "@/components/RatingStars";
 import { ImageGallery } from "@/components/ImageGallery";
 import { SEOHead } from "@/components/SEOHead";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { supabase } from "@/integrations/supabase/client";
-import { CommentSection } from "@/components/CommentSection";
-import { RelatedReviews } from "@/components/RelatedReviews";
+import { AffiliateCTA } from "@/components/AffiliateCTA";
+import { useReview } from "@/hooks/useReviews";
+import { lazy, Suspense } from "react";
+const CommentSection = lazy(() => import("@/components/CommentSection").then(m => ({ default: m.CommentSection })));
+const RelatedReviews = lazy(() => import("@/components/RelatedReviews").then(m => ({ default: m.RelatedReviews })));
 import { useComparisonStore } from "@/lib/comparison-store";
 import { toast } from "sonner";
 import { ReviewDetailSkeleton } from "@/components/ReviewSkeleton";
 import {
   ExternalLink, ArrowLeft, ThumbsUp, ThumbsDown, Award,
-  ChevronRight, Plus
+  ChevronRight, Plus, Share2
 } from "lucide-react";
 
 interface ReviewData {
@@ -93,43 +94,30 @@ function RatingBar({ label, score }: { label: string; score: number }) {
 
 export default function ReviewDetail() {
   const { slug } = useParams<{ slug: string }>();
-  const [review, setReview] = useState<ReviewData | undefined>(undefined);
-  const [loading, setLoading] = useState(true);
+  const { data, isLoading } = useReview(slug || "");
 
-  useEffect(() => {
-    if (!slug) { setLoading(false); return; }
+  const review = useMemo(() => {
+    if (data) {
+      return {
+        id: data.id,
+        name: data.name, brand: data.brand, category: data.category, price: data.price,
+        image_url: data.image_url, badge: data.badge, overall_rating: Number(data.overall_rating),
+        images: (data.images as unknown as string[]) || [],
+        ratings: (data.ratings as unknown as ReviewData["ratings"]) || [],
+        specs: (data.specs as unknown as ReviewData["specs"]) || [],
+        pros: (data.pros as unknown as string[]) || [],
+        cons: (data.cons as unknown as string[]) || [],
+        intro: data.intro, verdict: data.verdict,
+        sections: (data.sections as unknown as ReviewData["sections"]) || [],
+        affiliate_url: data.affiliate_url, cta_text: data.cta_text,
+      } as ReviewData;
+    } else if (slug && fallbackData[slug]) {
+      return fallbackData[slug];
+    }
+    return undefined;
+  }, [data, slug]);
 
-    const fetchReview = async () => {
-      const { data } = await supabase
-        .from("reviews")
-        .select("*")
-        .eq("slug", slug)
-        .eq("published", true)
-        .maybeSingle();
-
-      if (data) {
-        setReview({
-          id: data.id,
-          name: data.name, brand: data.brand, category: data.category, price: data.price,
-          image_url: data.image_url, badge: data.badge, overall_rating: Number(data.overall_rating),
-          images: (data.images as unknown as string[]) || [],
-          ratings: (data.ratings as unknown as ReviewData["ratings"]) || [],
-          specs: (data.specs as unknown as ReviewData["specs"]) || [],
-          pros: (data.pros as unknown as string[]) || [],
-          cons: (data.cons as unknown as string[]) || [],
-          intro: data.intro, verdict: data.verdict,
-          sections: (data.sections as unknown as ReviewData["sections"]) || [],
-          affiliate_url: data.affiliate_url, cta_text: data.cta_text,
-        });
-      } else if (fallbackData[slug]) {
-        setReview(fallbackData[slug]);
-      }
-      setLoading(false);
-    };
-    fetchReview();
-  }, [slug]);
-
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="min-h-screen bg-background">
         <Navbar />
@@ -153,28 +141,6 @@ export default function ReviewDetail() {
   }
 
   const ctaText = review.cta_text || "ดูราคาล่าสุด";
-  const ctaProps = review.affiliate_url
-    ? { href: review.affiliate_url, target: "_blank", rel: "noopener noreferrer nofollow" }
-    : {};
-
-  const CTAButton = ({ className, variant = "hero", size = "lg", isSidebar = false }: { className?: string, variant?: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link" | "cta" | "hero", size?: "default" | "sm" | "lg" | "icon", isSidebar?: boolean }) => {
-    const iconClass = isSidebar ? "h-4 w-4" : "h-5 w-5";
-    return (
-      <Button variant={variant} size={size} className={className} asChild={!!review.affiliate_url}>
-        {review.affiliate_url ? (
-          <a {...ctaProps}>
-            {ctaText}
-            <ExternalLink className={`ml-2 ${iconClass}`} />
-          </a>
-        ) : (
-          <div className="flex items-center">
-            {ctaText}
-            <ExternalLink className={`ml-2 ${iconClass}`} />
-          </div>
-        )}
-      </Button>
-    );
-  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -185,23 +151,44 @@ export default function ReviewDetail() {
         canonical={`https://gearguide-hero.lovable.app/review/${slug}`}
         jsonLd={{
           "@context": "https://schema.org",
-          "@type": "Product",
-          name: review.name,
-          brand: { "@type": "Brand", name: review.brand },
-          image: review.image_url,
-          description: review.intro,
-          review: {
-            "@type": "Review",
-            reviewRating: { "@type": "Rating", ratingValue: review.overall_rating, bestRating: 5 },
-            author: { "@type": "Organization", name: "GearTrail" },
-            reviewBody: review.verdict,
-          },
-          offers: {
-            "@type": "Offer",
-            price: review.price.replace(/[^\d]/g, ""),
-            priceCurrency: "THB",
-            availability: "https://schema.org/InStock",
-          },
+          "@graph": [
+            {
+              "@type": "Product",
+              name: review.name,
+              brand: { "@type": "Brand", name: review.brand },
+              image: review.image_url,
+              description: review.intro,
+              review: {
+                "@type": "Review",
+                reviewRating: { "@type": "Rating", ratingValue: review.overall_rating, bestRating: 5 },
+                author: { "@type": "Organization", name: "GearTrail" },
+                reviewBody: review.verdict,
+              },
+              offers: {
+                "@type": "Offer",
+                price: review.price.replace(/[^\d]/g, ""),
+                priceCurrency: "THB",
+                availability: "https://schema.org/InStock",
+                url: `https://gearguide-hero.lovable.app/review/${slug}`
+              },
+            },
+            {
+              "@type": "BreadcrumbList",
+              "itemListElement": [
+                { "@type": "ListItem", "position": 1, "name": "หน้าหลัก", "item": "https://gearguide-hero.lovable.app/" },
+                { "@type": "ListItem", "position": 2, "name": review.category, "item": `https://gearguide-hero.lovable.app/category/${encodeURIComponent(review.category)}` },
+                { "@type": "ListItem", "position": 3, "name": review.name, "item": `https://gearguide-hero.lovable.app/review/${slug}` }
+              ]
+            },
+            ...(review.sections && review.sections.length > 0 ? [{
+              "@type": "FAQPage",
+              "mainEntity": review.sections.map(s => ({
+                "@type": "Question",
+                "name": s.title,
+                "acceptedAnswer": { "@type": "Answer", "text": s.body }
+              }))
+            }] : [])
+          ]
         }}
       />
       <Navbar />
@@ -279,7 +266,33 @@ export default function ReviewDetail() {
             </div>
 
             <div className="flex flex-wrap gap-3 md:gap-4 pt-2 md:pt-4">
-              <CTAButton className="flex-1 md:flex-none rounded-full h-12 md:h-14 px-8 md:px-10 shadow-xl text-sm md:text-base" />
+              <Button
+                variant="outline"
+                size="icon"
+                className="rounded-full h-12 w-12 md:h-14 md:w-14 border-primary/20"
+                onClick={() => {
+                  if (navigator.share) {
+                    navigator.share({
+                      title: `${review.name} รีวิว — GearTrail`,
+                      text: review.intro || "",
+                      url: window.location.href,
+                    }).catch(console.error);
+                  } else {
+                    navigator.clipboard.writeText(window.location.href);
+                    toast.success("คัดลอกลิงก์แล้ว");
+                  }
+                }}
+              >
+                <Share2 className="h-5 w-5" />
+              </Button>
+              <AffiliateCTA
+                url={review.affiliate_url}
+                ctaText={ctaText}
+                productName={review.name}
+                variant="hero"
+                size="lg"
+                className="flex-1 md:flex-none rounded-full h-12 md:h-14 px-8 md:px-10 shadow-xl text-sm md:text-base"
+              />
               <Button
                 variant="outline"
                 size="lg"
@@ -367,7 +380,14 @@ export default function ReviewDetail() {
               <p className="text-primary-foreground/90 text-lg md:text-xl leading-relaxed font-medium mb-8 border-l-2 border-accent/50 pl-4 md:pl-6">
                 {review.verdict}
               </p>
-              <CTAButton variant="cta" className="h-12 md:h-14 px-8 md:px-10 rounded-full text-sm md:text-base w-full md:w-auto" />
+              <AffiliateCTA
+                url={review.affiliate_url}
+                ctaText={ctaText}
+                productName={review.name}
+                variant="cta"
+                size="lg"
+                className="h-12 md:h-14 px-8 md:px-10 rounded-full text-sm md:text-base w-full md:w-auto"
+              />
             </div>
           </div>
 
@@ -392,25 +412,41 @@ export default function ReviewDetail() {
             </div>
             <div className="bg-cta/10 rounded-xl border border-cta/30 p-5 text-center sticky top-[26rem]">
               <p className="font-heading font-bold text-foreground text-lg mb-1">{review.price}</p>
-              <CTAButton className="w-full" isSidebar />
+              <AffiliateCTA
+                url={review.affiliate_url}
+                ctaText={ctaText}
+                productName={review.name}
+                className="w-full"
+                variant="hero"
+                size="sm"
+              >
+                {ctaText}
+                <ExternalLink className="ml-2 h-4 w-4" />
+              </AffiliateCTA>
             </div>
           </aside>
         </div>
         {/* Comments Section */}
-        {review.id && <CommentSection reviewId={review.id} />}
+        {review.id && (
+          <Suspense fallback={<div className="h-32 flex items-center justify-center text-muted-foreground">กำลังโหลดความคิดเห็น...</div>}>
+            <CommentSection reviewId={review.id} />
+          </Suspense>
+        )}
       </article>
 
       {/* Related Reviews */}
-      <RelatedReviews currentReview={{
-        id: review.id,
-        category: review.category,
-        overall_rating: review.overall_rating,
-        price: review.price,
-        slug: slug
-      }} />
+      <Suspense fallback={<div className="container mx-auto px-4 py-16 h-64 flex items-center justify-center text-muted-foreground">กำลังโหลดสินค้าที่เกี่ยวข้อง...</div>}>
+        <RelatedReviews currentReview={{
+          id: review.id,
+          category: review.category,
+          overall_rating: review.overall_rating,
+          price: review.price,
+          slug: slug
+        }} />
+      </Suspense>
 
       {/* Mobile sticky CTA */}
-      <div className="lg:hidden fixed bottom-0 inset-x-0 bg-card/95 backdrop-blur-md border-t p-3 z-50 pb-safe">
+      <div className="lg:hidden fixed bottom-0 inset-x-0 bg-card/80 backdrop-blur-xl border-t p-4 z-50 pb-safe shadow-[0_-10px_40px_rgba(0,0,0,0.1)]">
         <div className="flex items-center gap-4">
           <div className="flex-1 min-w-0">
             <p className="text-[10px] font-black text-muted-foreground uppercase truncate mb-1 opacity-70">{review.name}</p>
@@ -421,7 +457,17 @@ export default function ReviewDetail() {
               </div>
             </div>
           </div>
-          <CTAButton variant="cta" className="flex-1 h-11 rounded-full shadow-lg shadow-primary/20" isSidebar />
+          <AffiliateCTA
+            url={review.affiliate_url}
+            ctaText={ctaText}
+            productName={review.name}
+            variant="cta"
+            className="flex-1 h-11 rounded-full shadow-lg shadow-primary/20"
+            size="sm"
+          >
+            {ctaText}
+            <ExternalLink className="ml-2 h-4 w-4" />
+          </AffiliateCTA>
         </div>
       </div>
 

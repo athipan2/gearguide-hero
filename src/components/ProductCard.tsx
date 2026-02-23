@@ -1,5 +1,6 @@
 import { RatingStars } from "@/components/RatingStars";
 import { Button } from "@/components/ui/button";
+import { AffiliateCTA } from "@/components/AffiliateCTA";
 import { ExternalLink, ThumbsUp, ThumbsDown, Plus } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useComparisonStore } from "@/lib/comparison-store";
@@ -63,8 +64,8 @@ export function ProductCard({ name, brand, image, rating, price, badge, pros, co
           <span className="font-heading font-bold text-lg text-foreground">{price}</span>
         </div>
 
-        {/* Pros / Cons */}
-        <div className="grid grid-cols-2 gap-3 text-[11px] py-1">
+        {/* Pros / Cons - Hidden on small mobile for better density */}
+        <div className="hidden sm:grid grid-cols-2 gap-3 text-[11px] py-1">
           <div className="space-y-1.5">
             {pros.slice(0, 2).map((p) => (
               <div key={p} className="flex items-start gap-1.5 text-badge-recommended/80">
@@ -106,19 +107,17 @@ export function ProductCard({ name, brand, image, rating, price, badge, pros, co
             <Button variant="outline" size="sm" className="w-full md:flex-1 text-xs h-9">รีวิวเต็ม</Button>
           )}
 
-          <Button variant="cta" size="sm" className="col-span-2 md:flex-1 text-xs h-9" asChild={!!affiliateUrl}>
-            {affiliateUrl ? (
-              <a href={affiliateUrl} target="_blank" rel="noopener noreferrer nofollow">
-                ดูราคา
-                <ExternalLink className="ml-1 h-3.5 w-3.5" />
-              </a>
-            ) : (
-              <div className="flex items-center justify-center">
-                ดูราคา
-                <ExternalLink className="ml-1 h-3.5 w-3.5" />
-              </div>
-            )}
-          </Button>
+          <AffiliateCTA
+            url={affiliateUrl}
+            productName={name}
+            ctaText="ดูราคา"
+            variant="cta"
+            size="sm"
+            className="col-span-2 md:flex-1 text-xs h-9"
+          >
+            ดูราคา
+            <ExternalLink className="ml-1 h-3.5 w-3.5" />
+          </AffiliateCTA>
         </div>
       </div>
     </div>

@@ -26,13 +26,20 @@ export function SEOHead({ title, description, image, canonical, jsonLd }: SEOHea
     setMeta("description", description);
     setMeta("og:title", title, true);
     setMeta("og:description", description, true);
+    setMeta("og:type", "website", true);
+    setMeta("og:site_name", "GearTrail", true);
 
     const ogImage = image || "https://gearguide-hero.lovable.app/og-image.png";
     setMeta("og:image", ogImage, true);
+
+    setMeta("twitter:card", "summary_large_image");
+    setMeta("twitter:title", title);
+    setMeta("twitter:description", description);
     setMeta("twitter:image", ogImage);
 
     if (canonical) {
       setMeta("og:url", canonical, true);
+      setMeta("twitter:url", canonical);
       let link = document.querySelector('link[rel="canonical"]') as HTMLLinkElement | null;
       if (!link) {
         link = document.createElement("link");
