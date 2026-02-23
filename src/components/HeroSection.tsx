@@ -1,9 +1,13 @@
 import heroBanner from "@/assets/hero-banner.jpg";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, TrendingUp } from "lucide-react";
+import { ArrowRight, TrendingUp, Sparkles } from "lucide-react";
 import { SearchBar } from "./SearchBar";
 
-export function HeroSection() {
+interface HeroSectionProps {
+  onShowWizard?: () => void;
+}
+
+export function HeroSection({ onShowWizard }: HeroSectionProps) {
   return (
     <section className="relative min-h-[85vh] flex items-center overflow-hidden">
       <div className="absolute inset-0">
@@ -45,8 +49,10 @@ export function HeroSection() {
                 variant="outline"
                 size="lg"
                 className="rounded-full bg-white/10 text-white border-white/20 hover:bg-white/20 backdrop-blur-md px-10 w-full sm:w-auto"
+                onClick={onShowWizard}
               >
-                เปรียบเทียบอุปกรณ์
+                <Sparkles className="mr-2 h-5 w-5 text-accent" />
+                ช่วยเลือกจากเป้าหมาย
               </Button>
             </div>
           </div>
