@@ -3,14 +3,16 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { MessageSquare, Send, User } from "lucide-react";
+import { MessageSquare, Send, User, Star } from "lucide-react";
 import { toast } from "sonner";
+import { RatingStars } from "./RatingStars";
 
 interface Comment {
   id: string;
   content: string;
   user_name: string | null;
   created_at: string;
+  rating: number | null;
 }
 
 interface CommentSectionProps {
@@ -22,6 +24,8 @@ export function CommentSection({ reviewId, articleId }: CommentSectionProps) {
   const { user } = useAuth();
   const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState("");
+  const [rating, setRating] = useState<number>(0);
+  const [hoveredRating, setHoveredRating] = useState<number>(0);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
 
@@ -33,7 +37,7 @@ export function CommentSection({ reviewId, articleId }: CommentSectionProps) {
     setLoading(true);
     let query = supabase
       .from("comments")
-      .select("id, content, user_name, created_at")
+      .select("id, content, user_name, created_at, rating")
       .order("created_at", { ascending: false });
 
     if (reviewId) query = query.eq("review_id", reviewId);
@@ -66,12 +70,14 @@ export function CommentSection({ reviewId, articleId }: CommentSectionProps) {
       user_name: user.email?.split("@")[0] || "ผู้ใช้งาน",
       review_id: reviewId,
       article_id: articleId,
+      rating: rating > 0 ? rating : null,
     });
 
     if (error) {
       toast.error("เกิดข้อผิดพลาดในการส่งข้อความ");
     } else {
       setNewComment("");
+      setRating(0);
       toast.success("ส่งข้อความแล้ว");
       fetchComments();
     }
@@ -91,6 +97,34 @@ export function CommentSection({ reviewId, articleId }: CommentSectionProps) {
           {user ? `ร่วมแบ่งปันประสบการณ์ในฐานะ ${user.email?.split("@")[0]}` : "ร่วมพูดคุยกับเรา"}
         </h3>
         <form onSubmit={handleSubmit} className="space-y-4">
+          {reviewId && (
+            <div className="flex flex-col gap-2 mb-2">
+              <span className="text-sm font-medium text-muted-foreground">ให้คะแนนรองเท้าคู่นี้:</span>
+              <div className="flex gap-1">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <button
+                    key={star}
+                    type="button"
+                    onClick={() => setRating(star)}
+                    onMouseEnter={() => setHoveredRating(star)}
+                    onMouseLeave={() => setHoveredRating(0)}
+                    className="focus:outline-none transition-transform active:scale-90"
+                  >
+                    <Star
+                      className={`h-6 w-6 ${
+                        (hoveredRating || rating) >= star
+                          ? "fill-rating text-rating"
+                          : "text-muted-foreground/30"
+                      }`}
+                    />
+                  </button>
+                ))}
+                {rating > 0 && (
+                  <span className="ml-2 text-sm font-bold text-primary">{rating}.0 / 5.0</span>
+                )}
+              </div>
+            </div>
+          )}
           <Textarea
             placeholder={user ? "เขียนคำถามหรือความคิดเห็นของคุณที่นี่..." : "กรุณาเข้าสู่ระบบเพื่อร่วมแสดงความคิดเห็น"}
             value={newComment}
@@ -126,6 +160,11 @@ export function CommentSection({ reviewId, articleId }: CommentSectionProps) {
                   <span className="font-bold text-sm text-foreground">
                     {comment.user_name}
                   </span>
+                  {comment.rating && (
+                    <div className="ml-2 flex items-center">
+                      <RatingStars rating={comment.rating} />
+                    </div>
+                  )}
                   <span className="text-xs text-muted-foreground">
                     {new Date(comment.created_at).toLocaleDateString("th-TH", {
                       year: "numeric",

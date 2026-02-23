@@ -94,6 +94,7 @@ function RatingBar({ label, score }: { label: string; score: number }) {
 export default function ReviewDetail() {
   const { slug } = useParams<{ slug: string }>();
   const [review, setReview] = useState<ReviewData | undefined>(undefined);
+  const [userRating, setUserRating] = useState<{ average: number; count: number } | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -121,6 +122,21 @@ export default function ReviewDetail() {
           sections: (data.sections as unknown as ReviewData["sections"]) || [],
           affiliate_url: data.affiliate_url, cta_text: data.cta_text,
         });
+
+        // Fetch aggregate rating from comments
+        const { data: ratingData } = await supabase
+          .from("comments")
+          .select("rating")
+          .eq("review_id", data.id)
+          .not("rating", "is", null);
+
+        if (ratingData && ratingData.length > 0) {
+          const sum = ratingData.reduce((acc, curr) => acc + (curr.rating || 0), 0);
+          setUserRating({
+            average: sum / ratingData.length,
+            count: ratingData.length
+          });
+        }
       } else if (fallbackData[slug]) {
         setReview(fallbackData[slug]);
       }
@@ -245,6 +261,19 @@ export default function ReviewDetail() {
                   <p className="text-[8px] md:text-[10px] font-bold uppercase tracking-widest opacity-60 mt-0.5">Overall Performance</p>
                 </div>
               </div>
+
+              {userRating && (
+                <div className="flex items-center gap-3 md:gap-4 bg-card border-2 border-primary/10 rounded-2xl px-3 py-1.5 md:px-6 md:py-4 w-fit">
+                  <span className="font-heading text-xl md:text-3xl font-black text-primary">{userRating.average.toFixed(1)}</span>
+                  <div>
+                    <div className="scale-75 md:scale-90 origin-left">
+                      <RatingStars rating={userRating.average} />
+                    </div>
+                    <p className="text-[8px] md:text-[10px] font-bold uppercase tracking-widest text-muted-foreground mt-0.5">Real Runner Rating ({userRating.count})</p>
+                  </div>
+                </div>
+              )}
+
               <div className="space-y-0 md:space-y-1">
                 <p className="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-muted-foreground">Price Estimate</p>
                 <span className="font-heading text-xl md:text-3xl font-black text-primary">{review.price}</span>
