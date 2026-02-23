@@ -55,8 +55,8 @@ export function ImageGallery({ mainImage, images, alt, badge, badgeClassName, ba
   return (
     <div className="space-y-3">
       {/* Main carousel */}
-      <div className="relative rounded-[2rem] overflow-hidden bg-muted shadow-2xl aspect-[4/3] group">
-        <div className="overflow-hidden h-full" ref={emblaRef}>
+      <div className="relative rounded-[2rem] overflow-hidden bg-muted shadow-2xl aspect-[4/3] group w-full">
+        <div className="overflow-hidden h-full w-full" ref={emblaRef}>
           <div className="flex h-full">
             {allImages.map((img, i) => (
               <div key={i} className="flex-[0_0_100%] min-w-0 relative h-full">

@@ -4,7 +4,7 @@ import { Mail } from "lucide-react";
 export function NewsletterCTA() {
   return (
     <section className="container mx-auto px-4 py-16">
-      <div className="bg-gradient-to-br from-primary via-[#1a3324] to-black rounded-3xl p-8 md:p-16 text-center shadow-2xl relative overflow-hidden group">
+      <div className="bg-gradient-to-br from-primary via-[#1a3324] to-black rounded-3xl p-8 md:p-16 text-center shadow-2xl relative overflow-hidden group isolate">
         <div className="absolute top-0 right-0 -mt-10 -mr-10 w-60 h-60 bg-cta/20 rounded-full blur-[100px] group-hover:bg-cta/30 transition-colors duration-700" />
         <div className="absolute bottom-0 left-0 -mb-10 -ml-10 w-60 h-60 bg-accent/20 rounded-full blur-[100px] group-hover:bg-accent/30 transition-colors duration-700" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,rgba(231,111,81,0.15),transparent)] pointer-events-none" />

@@ -58,7 +58,7 @@ export function ProductCard({ name, brand, image, rating, price, badge, pros, co
           <h3 className="font-heading font-semibold text-lg text-card-foreground mt-0.5 line-clamp-2">{name}</h3>
         </div>
 
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 sm:gap-0">
           <RatingStars rating={rating} />
           <span className="font-heading font-bold text-lg text-foreground">{price}</span>
         </div>
