@@ -69,8 +69,8 @@ export default function AdminReviewForm() {
     setSaving(true);
     const payload = {
       ...form,
-      overall_rating: form.overall_rating,
-      ratings: JSON.parse(JSON.stringify(ratings.filter((r) => r.label))),
+      overall_rating: Math.round(form.overall_rating * 10) / 10,
+      ratings: JSON.parse(JSON.stringify(ratings.filter((r) => r.label).map(r => ({ ...r, score: Math.round(r.score * 10) / 10 })))),
       specs: JSON.parse(JSON.stringify(specs.filter((s) => s.label))),
       pros: JSON.parse(JSON.stringify(pros.filter(Boolean))),
       cons: JSON.parse(JSON.stringify(cons.filter(Boolean))),
@@ -97,8 +97,25 @@ export default function AdminReviewForm() {
     }
   };
 
-  const updateField = (key: string, value: string | number | boolean) =>
-    setForm((f) => ({ ...f, [key]: value }));
+  const generateSlug = (name: string) => {
+    return name
+      .toLowerCase()
+      .trim()
+      .replace(/[^\w\s-]/g, '') // Remove non-word characters (except spaces and dashes)
+      .replace(/[\s_]+/g, '-')  // Replace spaces and underscores with dashes
+      .replace(/^-+|-+$/g, ''); // Remove leading and trailing dashes
+  };
+
+  const updateField = (key: string, value: string | number | boolean) => {
+    setForm((f) => {
+      const next = { ...f, [key]: value };
+      // Auto-generate slug if name changes and it's a new review
+      if (key === 'name' && !isEdit && !f.slug) {
+        next.slug = generateSlug(value as string);
+      }
+      return next;
+    });
+  };
 
   return (
     <AdminLayout>
@@ -123,7 +140,18 @@ export default function AdminReviewForm() {
                 <Input value={form.name} onChange={(e) => updateField("name", e.target.value)} />
               </div>
               <div className="space-y-2">
-                <Label>Slug *</Label>
+                <div className="flex items-center justify-between">
+                  <Label>Slug *</Label>
+                  {!isEdit && (
+                    <button
+                      type="button"
+                      onClick={() => updateField("slug", generateSlug(form.name))}
+                      className="text-[10px] text-primary hover:underline"
+                    >
+                      รีเฟรช Slug
+                    </button>
+                  )}
+                </div>
                 <Input value={form.slug} onChange={(e) => updateField("slug", e.target.value)} placeholder="nike-vaporfly-3" />
               </div>
               <div className="space-y-2">
