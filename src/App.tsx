@@ -17,6 +17,7 @@ import AdminMedia from "./pages/AdminMedia";
 import CategoryPage from "./pages/CategoryPage";
 import GuidesPage from "./pages/GuidesPage";
 import ArticleDetail from "./pages/ArticleDetail";
+import ComparePage from "./pages/Compare";
 
 const queryClient = new QueryClient();
 
@@ -41,6 +42,7 @@ const App = () => (
             <Route path="/admin/media" element={<AdminMedia />} />
             <Route path="/guides" element={<GuidesPage />} />
             <Route path="/guides/:slug" element={<ArticleDetail />} />
+            <Route path="/compare" element={<ComparePage />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

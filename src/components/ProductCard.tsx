@@ -15,6 +15,7 @@ interface ProductCardProps {
   pros: string[];
   cons: string[];
   specs?: { label: string; value: string }[];
+  ratings?: { label: string; score: number }[];
   slug?: string;
   affiliateUrl?: string | null;
   createdAt?: string;
@@ -26,7 +27,7 @@ const badgeColors: Record<string, string> = {
   "Top Pick": "bg-badge-top-pick text-accent-foreground",
 };
 
-export function ProductCard({ name, brand, image, rating, price, badge, pros, cons, specs, slug, affiliateUrl, createdAt }: ProductCardProps) {
+export function ProductCard({ name, brand, image, rating, price, badge, pros, cons, specs, ratings, slug, affiliateUrl, createdAt }: ProductCardProps) {
   const isNew = createdAt ? (new Date().getTime() - new Date(createdAt).getTime()) < (30 * 24 * 60 * 60 * 1000) : false;
 
   const weight = specs?.find(s => s.label.toLowerCase().includes('weight') || s.label.includes('น้ำหนัก'))?.value;
@@ -90,7 +91,10 @@ export function ProductCard({ name, brand, image, rating, price, badge, pros, co
             size="sm"
             className="w-full md:flex-1 border-primary/20 hover:bg-primary/5 text-xs h-9"
             onClick={() => {
-              useComparisonStore.getState().addItem({ name, brand, image, rating, price, slug, weight, drop });
+              useComparisonStore.getState().addItem({
+                name, brand, image, rating, price, slug, weight, drop,
+                aspectRatings: ratings
+              });
               toast.success(`เพิ่ม ${name} เข้าสู่การเปรียบเทียบ`);
             }}
           >

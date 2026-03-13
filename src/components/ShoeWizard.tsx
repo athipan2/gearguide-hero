@@ -25,6 +25,7 @@ interface Recommendation {
   drop?: string;
   pros?: string[];
   cons?: string[];
+  ratings?: { label: string; score: number }[];
 }
 
 interface Criteria {
@@ -91,7 +92,8 @@ export function ShoeWizard({ onClose }: { onClose: () => void }) {
           weight: item.specs?.find((s: Spec) => s.label === "น้ำหนัก")?.value,
           drop: item.specs?.find((s: Spec) => s.label === "Drop")?.value,
           pros: item.pros,
-          cons: item.cons
+          cons: item.cons,
+          ratings: item.ratings
         }));
         setRecommendations(results);
 
@@ -105,7 +107,8 @@ export function ShoeWizard({ onClose }: { onClose: () => void }) {
             price: rec.price,
             slug: rec.slug,
             weight: rec.weight,
-            drop: rec.drop
+            drop: rec.drop,
+            aspectRatings: rec.ratings
           });
         });
       } else {
@@ -171,7 +174,8 @@ export function ShoeWizard({ onClose }: { onClose: () => void }) {
       price: rec.price,
       slug: rec.slug,
       weight: rec.weight,
-      drop: rec.drop
+      drop: rec.drop,
+      aspectRatings: rec.ratings
     });
     toast.success(`เพิ่ม ${rec.name} ในตารางเปรียบเทียบแล้ว`);
   };

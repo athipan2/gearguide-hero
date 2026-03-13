@@ -128,6 +128,7 @@ interface ReviewItem {
   badge: string | null;
   pros: unknown;
   cons: unknown;
+  ratings?: { label: string; score: number }[];
   slug: string;
   affiliate_url: string | null;
   category: string;
@@ -211,7 +212,7 @@ export default function CategoryPage() {
       setLoading(true);
       let query = supabase
         .from("reviews")
-        .select("name, brand, image_url, overall_rating, price, badge, pros, cons, slug, affiliate_url, category, created_at")
+        .select("name, brand, image_url, overall_rating, price, badge, pros, cons, ratings, slug, affiliate_url, category, created_at")
         .eq("published", true);
 
       if (category) {
@@ -454,6 +455,7 @@ export default function CategoryPage() {
                       cons={Array.isArray(r.cons) ? (r.cons as string[]) : []}
                       slug={r.slug}
                       affiliateUrl={r.affiliate_url}
+                      ratings={r.ratings}
                     />
                   ))}
                 </div>

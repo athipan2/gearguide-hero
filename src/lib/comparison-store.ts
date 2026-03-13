@@ -10,6 +10,7 @@ interface Product {
   weight?: string;
   drop?: string;
   slug?: string;
+  aspectRatings?: { label: string; score: number }[];
 }
 
 interface ComparisonState {
