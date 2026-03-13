@@ -7,7 +7,7 @@ export function ComparisonTable() {
   const { selectedItems, removeItem, clear } = useComparisonStore();
 
   return (
-    <section className="bg-primary/5 py-12 md:py-24 scroll-mt-20" id="compare">
+    <section className="bg-primary/5 py-8 md:py-24 scroll-mt-20" id="compare">
       <div className="container mx-auto px-4">
         <div className="flex flex-col md:flex-row items-start md:items-end justify-between gap-4 mb-8 md:mb-12">
           <div className="space-y-2">
@@ -19,7 +19,7 @@ export function ComparisonTable() {
               เปรียบเทียบสเปค
             </h2>
             <p className="text-muted-foreground max-w-lg">
-              เลือกสินค้าที่คุณสนใจจากรายการด้านบน (สูงสุด 3 ชิ้น) เพื่อนำมาเปรียบเทียบข้อมูลเชิงลึก
+              เลือกสินค้าที่คุณสนใจจากรายการ (สูงสุด 3 ชิ้น) เพื่อนำมาเปรียบเทียบข้อมูลเชิงลึก
             </p>
           </div>
           {selectedItems.length > 0 && (
@@ -30,7 +30,7 @@ export function ComparisonTable() {
         </div>
 
         {selectedItems.length === 0 ? (
-          <div className="bg-card/50 border-2 border-dashed border-primary/10 rounded-3xl p-20 text-center space-y-4">
+          <div className="bg-card/50 border-2 border-dashed border-primary/10 rounded-3xl p-12 md:p-20 text-center space-y-4">
             <div className="inline-flex items-center justify-center h-16 w-16 rounded-full bg-primary/5 text-primary/40">
               <Scale className="h-8 w-8" />
             </div>
@@ -40,70 +40,25 @@ export function ComparisonTable() {
             </div>
           </div>
         ) : (
-          <>
-            {/* Mobile cards */}
-            <div className="md:hidden space-y-4">
-              {selectedItems.map((item) => (
-                <div key={item.name} className="bg-card rounded-2xl border shadow-sm p-5 relative overflow-hidden group">
-                  <button
-                    onClick={() => removeItem(item.name)}
-                    className="absolute top-4 right-4 p-1 hover:bg-destructive/10 hover:text-destructive rounded-full transition-colors"
-                  >
-                    <X className="h-4 w-4" />
-                  </button>
-
-                  <div className="flex gap-4 items-start mb-4">
-                    <img src={item.image} alt={item.name} className="w-20 h-20 object-cover rounded-xl" />
-                    <div>
-                      <p className="text-[10px] font-bold uppercase tracking-widest text-accent">{item.brand}</p>
-                      <h3 className="font-heading font-bold text-primary leading-tight line-clamp-2">{item.name}</h3>
-                      <div className="flex items-center gap-2 mt-1">
-                        <RatingStars rating={item.rating} />
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-3 gap-2 py-4 border-t border-b border-primary/5 mb-4 text-center">
-                    <div>
-                      <p className="text-[10px] uppercase text-muted-foreground font-bold">Weight</p>
-                      <p className="font-bold text-sm">{item.weight || "-"}</p>
-                    </div>
-                    <div>
-                      <p className="text-[10px] uppercase text-muted-foreground font-bold">Drop</p>
-                      <p className="font-bold text-sm">{item.drop || "-"}</p>
-                    </div>
-                    <div>
-                      <p className="text-[10px] uppercase text-muted-foreground font-bold">Price</p>
-                      <p className="font-bold text-sm text-accent">{item.price}</p>
-                    </div>
-                  </div>
-
-                  <Button variant="cta" size="sm" className="w-full">
-                    ดูราคา <ExternalLink className="ml-1 h-3.5 w-3.5" />
-                  </Button>
-                </div>
-              ))}
-            </div>
-
-            {/* Desktop table */}
-            <div className="hidden md:block bg-card rounded-[2rem] border shadow-xl overflow-hidden">
-              <table className="w-full border-collapse">
+          <div className="bg-card rounded-[1.5rem] md:rounded-[2rem] border shadow-xl overflow-hidden">
+            <div className="overflow-x-auto scrollbar-none">
+              <table className="w-full border-collapse min-w-[600px] md:min-w-full">
                 <thead>
                   <tr className="bg-primary text-primary-foreground">
-                    <th className="text-left p-8 text-xs font-black uppercase tracking-widest opacity-60">รุ่นที่เลือก</th>
+                    <th className="sticky left-0 z-20 bg-primary text-left p-4 md:p-8 text-[10px] md:text-xs font-black uppercase tracking-widest opacity-60 min-w-[120px] md:min-w-[200px]">รุ่นที่เลือก</th>
                     {selectedItems.map((item) => (
-                      <th key={item.name} className="p-8 relative min-w-[250px]">
+                      <th key={item.name} className="p-4 md:p-8 relative min-w-[160px] md:min-w-[250px]">
                         <button
                           onClick={() => removeItem(item.name)}
-                          className="absolute top-4 right-4 p-1.5 hover:bg-white/10 rounded-full transition-colors"
+                          className="absolute top-2 right-2 md:top-4 md:right-4 p-1 md:p-1.5 hover:bg-white/10 rounded-full transition-colors"
                         >
-                          <X className="h-4 w-4" />
+                          <X className="h-3.5 w-3.5 md:h-4 md:w-4" />
                         </button>
                         <div className="space-y-2 text-center">
-                          <img src={item.image} alt={item.name} className="w-32 h-24 mx-auto object-cover rounded-xl shadow-lg border-2 border-white/20" />
+                          <img src={item.image} alt={item.name} className="w-20 h-16 md:w-32 md:h-24 mx-auto object-cover rounded-lg md:rounded-xl shadow-lg border-2 border-white/20" />
                           <div>
-                            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-accent">{item.brand}</p>
-                            <h3 className="font-heading font-extrabold text-sm leading-tight line-clamp-2 uppercase tracking-tight">{item.name}</h3>
+                            <p className="text-[8px] md:text-[10px] font-black uppercase tracking-[0.2em] text-accent">{item.brand}</p>
+                            <h3 className="font-heading font-extrabold text-[10px] md:text-sm leading-tight line-clamp-2 uppercase tracking-tight">{item.name}</h3>
                           </div>
                         </div>
                       </th>
@@ -112,40 +67,40 @@ export function ComparisonTable() {
                 </thead>
                 <tbody className="divide-y divide-primary/5">
                   <tr>
-                    <td className="p-6 pl-8 text-xs font-bold uppercase tracking-widest text-muted-foreground bg-primary/5">คะแนน</td>
+                    <td className="sticky left-0 z-10 p-4 md:p-6 md:pl-8 text-[10px] md:text-xs font-bold uppercase tracking-widest text-muted-foreground bg-primary/5 backdrop-blur-sm">คะแนน</td>
                     {selectedItems.map((item) => (
-                      <td key={item.name} className="p-6 text-center">
-                        <div className="flex justify-center">
+                      <td key={item.name} className="p-4 md:p-6 text-center">
+                        <div className="flex justify-center scale-75 md:scale-100">
                           <RatingStars rating={item.rating} />
                         </div>
-                        <span className="text-sm font-bold mt-1 block">{item.rating}/5.0</span>
+                        <span className="text-xs md:text-sm font-bold mt-1 block">{item.rating}/5.0</span>
                       </td>
                     ))}
                   </tr>
                   <tr>
-                    <td className="p-6 pl-8 text-xs font-bold uppercase tracking-widest text-muted-foreground bg-primary/5">น้ำหนัก</td>
+                    <td className="sticky left-0 z-10 p-4 md:p-6 md:pl-8 text-[10px] md:text-xs font-bold uppercase tracking-widest text-muted-foreground bg-primary/5 backdrop-blur-sm">น้ำหนัก</td>
                     {selectedItems.map((item) => (
-                      <td key={item.name} className="p-6 text-center font-bold text-lg">{item.weight || "N/A"}</td>
+                      <td key={item.name} className="p-4 md:p-6 text-center font-bold text-sm md:text-lg">{item.weight || "N/A"}</td>
                     ))}
                   </tr>
                   <tr>
-                    <td className="p-6 pl-8 text-xs font-bold uppercase tracking-widest text-muted-foreground bg-primary/5">Drop</td>
+                    <td className="sticky left-0 z-10 p-4 md:p-6 md:pl-8 text-[10px] md:text-xs font-bold uppercase tracking-widest text-muted-foreground bg-primary/5 backdrop-blur-sm">Drop</td>
                     {selectedItems.map((item) => (
-                      <td key={item.name} className="p-6 text-center font-bold text-lg">{item.drop || "N/A"}</td>
+                      <td key={item.name} className="p-4 md:p-6 text-center font-bold text-sm md:text-lg">{item.drop || "N/A"}</td>
                     ))}
                   </tr>
                   <tr>
-                    <td className="p-6 pl-8 text-xs font-bold uppercase tracking-widest text-muted-foreground bg-primary/5">ราคา</td>
+                    <td className="sticky left-0 z-10 p-4 md:p-6 md:pl-8 text-[10px] md:text-xs font-bold uppercase tracking-widest text-muted-foreground bg-primary/5 backdrop-blur-sm">ราคา</td>
                     {selectedItems.map((item) => (
-                      <td key={item.name} className="p-6 text-center font-black text-2xl text-accent">{item.price}</td>
+                      <td key={item.name} className="p-4 md:p-6 text-center font-black text-lg md:text-2xl text-accent">{item.price}</td>
                     ))}
                   </tr>
                   <tr>
-                    <td className="p-8 pl-8 bg-primary/5"></td>
+                    <td className="sticky left-0 z-10 p-4 md:p-8 md:pl-8 bg-primary/5 backdrop-blur-sm"></td>
                     {selectedItems.map((item) => (
-                      <td key={item.name} className="p-8 text-center">
-                        <Button variant="cta" className="w-full rounded-full h-12">
-                          เช็คราคาล่าสุด <ExternalLink className="ml-2 h-4 w-4" />
+                      <td key={item.name} className="p-4 md:p-8 text-center">
+                        <Button variant="cta" className="w-full rounded-full h-10 md:h-12 text-[10px] md:text-base px-2 md:px-4">
+                          เช็คราคาล่าสุด <ExternalLink className="ml-1 md:ml-2 h-3 w-3 md:h-4 md:w-4" />
                         </Button>
                       </td>
                     ))}
@@ -153,7 +108,10 @@ export function ComparisonTable() {
                 </tbody>
               </table>
             </div>
-          </>
+            <div className="md:hidden bg-primary/5 p-3 text-[10px] text-center text-muted-foreground font-medium border-t border-primary/5">
+              ← เลื่อนในแนวนอนเพื่อดูสินค้าชิ้นอื่น →
+            </div>
+          </div>
         )}
       </div>
     </section>

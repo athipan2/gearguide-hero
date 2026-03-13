@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
-import { Menu, Search, Mountain } from "lucide-react";
+import { Menu, Search, Mountain, Scale } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useComparisonStore } from "@/lib/comparison-store";
 import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { SearchDialog } from "./SearchDialog";
@@ -24,6 +25,7 @@ const navLinks = [
 export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const selectedCount = useComparisonStore((state) => state.selectedItems.length);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -61,7 +63,7 @@ export function Navbar() {
           ))}
         </div>
 
-        <div className="hidden md:flex items-center gap-4">
+        <div className="hidden md:flex items-center gap-2 lg:gap-4">
           <Button
             variant="ghost"
             size="icon"
@@ -70,6 +72,23 @@ export function Navbar() {
           >
             <Search className="h-5 w-5" />
           </Button>
+
+          <Link to="/compare">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="relative text-primary hover:bg-primary/5 font-bold uppercase tracking-widest text-xs h-10 px-3"
+            >
+              <Scale className="h-5 w-5 mr-2" />
+              <span>เปรียบเทียบ</span>
+              {selectedCount > 0 && (
+                <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-accent text-[10px] text-accent-foreground font-black">
+                  {selectedCount}
+                </span>
+              )}
+            </Button>
+          </Link>
+
           <Button variant="cta" size="sm" className="hidden lg:flex">
             ส่งรีวิว
           </Button>
@@ -113,6 +132,25 @@ export function Navbar() {
                       ค้นหา
                     </Button>
                   </SheetClose>
+
+                  <SheetClose asChild>
+                    <Link to="/compare" className="block w-full">
+                      <Button
+                        variant="ghost"
+                        className="w-full justify-start text-lg font-bold uppercase tracking-widest relative"
+                        size="lg"
+                      >
+                        <Scale className="h-5 w-5 mr-3" />
+                        เปรียบเทียบ
+                        {selectedCount > 0 && (
+                          <span className="ml-2 flex h-6 w-6 items-center justify-center rounded-full bg-accent text-xs text-accent-foreground font-black">
+                            {selectedCount}
+                          </span>
+                        )}
+                      </Button>
+                    </Link>
+                  </SheetClose>
+
                   <Button variant="cta" className="w-full text-lg font-bold uppercase tracking-widest" size="lg">
                     ส่งรีวิว
                   </Button>
