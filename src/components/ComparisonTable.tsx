@@ -6,6 +6,14 @@ import { useComparisonStore } from "@/lib/comparison-store";
 export function ComparisonTable() {
   const { selectedItems, removeItem, clear } = useComparisonStore();
 
+  const allRatingLabels = Array.from(
+    new Set(
+      selectedItems.flatMap(item =>
+        (item.aspectRatings || []).map(r => r.label)
+      )
+    )
+  );
+
   return (
     <section className="bg-primary/5 py-8 md:py-24 scroll-mt-20" id="compare">
       <div className="container mx-auto px-4">
@@ -67,7 +75,7 @@ export function ComparisonTable() {
                 </thead>
                 <tbody className="divide-y divide-primary/5">
                   <tr>
-                    <td className="sticky left-0 z-10 p-4 md:p-6 md:pl-8 text-[10px] md:text-xs font-bold uppercase tracking-widest text-muted-foreground bg-primary/5 backdrop-blur-sm">คะแนน</td>
+                    <td className="sticky left-0 z-10 p-4 md:p-6 md:pl-8 text-[10px] md:text-xs font-bold uppercase tracking-widest text-muted-foreground bg-primary/5 backdrop-blur-sm">คะแนนรวม</td>
                     {selectedItems.map((item) => (
                       <td key={item.name} className="p-4 md:p-6 text-center">
                         <div className="flex justify-center scale-75 md:scale-100">
@@ -77,6 +85,28 @@ export function ComparisonTable() {
                       </td>
                     ))}
                   </tr>
+                  {allRatingLabels.map((label) => (
+                    <tr key={label}>
+                      <td className="sticky left-0 z-10 p-4 md:p-6 md:pl-8 text-[10px] md:text-xs font-bold uppercase tracking-widest text-muted-foreground bg-primary/5 backdrop-blur-sm">{label}</td>
+                      {selectedItems.map((item) => {
+                        const rating = item.aspectRatings?.find(r => r.label === label);
+                        return (
+                          <td key={item.name} className="p-4 md:p-6 text-center">
+                            {rating ? (
+                              <div className="space-y-1">
+                                <div className="flex justify-center scale-75 md:scale-90">
+                                  <RatingStars rating={rating.score} />
+                                </div>
+                                <span className="text-[10px] md:text-xs font-bold">{rating.score.toFixed(1)}</span>
+                              </div>
+                            ) : (
+                              <span className="text-muted-foreground text-xs italic">N/A</span>
+                            )}
+                          </td>
+                        );
+                      })}
+                    </tr>
+                  ))}
                   <tr>
                     <td className="sticky left-0 z-10 p-4 md:p-6 md:pl-8 text-[10px] md:text-xs font-bold uppercase tracking-widest text-muted-foreground bg-primary/5 backdrop-blur-sm">น้ำหนัก</td>
                     {selectedItems.map((item) => (
