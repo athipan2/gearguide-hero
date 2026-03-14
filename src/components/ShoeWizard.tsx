@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import {
   X, ChevronRight, ChevronLeft, Search, Check,
   Target, Footprints, Zap, Sparkles, ShoppingCart,
-  ArrowRight, Scale
+  ArrowRight, Scale, Mountain, Tent, Watch
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,7 +11,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 
-type Step = "entry" | "express_brand" | "express_details" | "consult_goal" | "consult_feeling" | "consult_foot" | "result";
+type Step = "category_select" | "entry" | "express_brand" | "express_details" | "consult_goal" | "consult_feeling" | "consult_foot" | "result";
 
 interface Recommendation {
   id: string;
@@ -40,7 +40,7 @@ interface Spec {
 }
 
 export function ShoeWizard({ onClose }: { onClose: () => void }) {
-  const [step, setStep] = useState<Step>("entry");
+  const [step, setStep] = useState<Step>("category_select");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -201,7 +201,7 @@ export function ShoeWizard({ onClose }: { onClose: () => void }) {
               <div className="h-[2px] w-8 bg-accent"></div>
             </div>
             <h2 className="font-heading text-2xl md:text-4xl font-black uppercase tracking-tighter">
-              Find Your Perfect Pair
+              Find Your Perfect Gear
             </h2>
           </div>
         </div>
@@ -209,11 +209,49 @@ export function ShoeWizard({ onClose }: { onClose: () => void }) {
         {/* Content */}
         <div className="flex-1 overflow-y-auto p-6 md:p-10">
 
-          {/* STEP 1: ENTRY */}
-          {step === "entry" && (
+          {/* STEP 0: CATEGORY SELECT */}
+          {step === "category_select" && (
             <div className="space-y-8 animate-in slide-in-from-bottom-4">
               <div className="text-center space-y-2">
-                <p className="text-lg text-muted-foreground">สวัสดีครับ มีรองเท้าคู่ใจที่เล็งไว้ในใจหรือยังครับ?</p>
+                <p className="text-lg text-muted-foreground">สวัสดีครับ วันนี้คุณกำลังมองหาอุปกรณ์ประเภทไหนครับ?</p>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                {[
+                  { id: "shoes", label: "รองเท้าวิ่ง", icon: <Footprints className="h-6 w-6" />, color: "bg-primary/10 text-primary" },
+                  { id: "trail", label: "อุปกรณ์เทรล", icon: <Mountain className="h-6 w-6" />, color: "bg-accent/10 text-accent", slug: "อุปกรณ์วิ่งเทรล" },
+                  { id: "camping", label: "Camping", icon: <Tent className="h-6 w-6" />, color: "bg-green-500/10 text-green-600", slug: "camping-gear" },
+                  { id: "watch", label: "นาฬิกา GPS", icon: <Watch className="h-6 w-6" />, color: "bg-blue-500/10 text-blue-600", slug: "นาฬิกา-gps" }
+                ].map((cat) => (
+                  <button
+                    key={cat.id}
+                    onClick={() => {
+                      if (cat.id === "shoes") {
+                        setStep("entry");
+                      } else {
+                        navigate(`/category/${encodeURIComponent(cat.slug || "")}`);
+                        onClose();
+                      }
+                    }}
+                    className="group relative p-6 rounded-3xl border-2 border-primary/5 hover:border-primary/20 bg-card hover:bg-primary/5 transition-all text-center flex flex-col items-center"
+                  >
+                    <div className={`h-14 w-14 rounded-2xl ${cat.color} flex items-center justify-center mb-3 group-hover:scale-110 transition-transform`}>
+                      {cat.icon}
+                    </div>
+                    <h3 className="font-bold text-lg">{cat.label}</h3>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* STEP 1: ENTRY */}
+          {step === "entry" && (
+            <div className="space-y-8 animate-in slide-in-from-right-4">
+              <button onClick={() => setStep("category_select")} className="flex items-center gap-1 text-sm text-muted-foreground hover:text-primary">
+                <ChevronLeft className="h-4 w-4" /> ย้อนกลับ
+              </button>
+              <div className="text-center space-y-2">
+                <p className="text-lg text-muted-foreground">เยี่ยมเลยครับ มีรองเท้าคู่ใจที่เล็งไว้ในใจหรือยังครับ?</p>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <button
