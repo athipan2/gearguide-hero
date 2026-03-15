@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import {
   ExternalLink, Award, X, Scale,
   Info, Zap, Shield, Heart, BarChart3,
-  Ruler, Weight, Star
+  Ruler, Weight, Star, LucideIcon
 } from "lucide-react";
 import { useComparisonStore } from "@/lib/comparison-store";
 import { cn } from "@/lib/utils";
@@ -48,7 +48,7 @@ export function ComparisonTable() {
       }, null as string[] | null) || []
     : [];
 
-  const SectionHeader = ({ title, icon: Icon }: { title: string; icon: any }) => (
+  const SectionHeader = ({ title, icon: Icon }: { title: string; icon: LucideIcon }) => (
     <tr className="bg-primary/10">
       <td colSpan={selectedItems.length + 1} className="py-3 px-4 md:px-8">
         <div className="flex items-center gap-2 text-primary font-bold uppercase tracking-widest text-[10px] md:text-xs">
