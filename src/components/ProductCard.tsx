@@ -93,6 +93,7 @@ export function ProductCard({ name, brand, image, rating, price, badge, pros, co
             onClick={() => {
               useComparisonStore.getState().addItem({
                 name, brand, image, rating, price, slug, weight, drop,
+                specs,
                 aspectRatings: ratings
               });
               toast.success(`เพิ่ม ${name} เข้าสู่การเปรียบเทียบ`);

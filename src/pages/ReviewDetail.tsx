@@ -325,6 +325,7 @@ export default function ReviewDetail() {
                     slug: slug,
                     weight,
                     drop,
+                    specs: review.specs,
                     aspectRatings: review.ratings
                   });
                   toast.success(`เพิ่ม ${review.name} เข้าสู่การเปรียบเทียบ`);
