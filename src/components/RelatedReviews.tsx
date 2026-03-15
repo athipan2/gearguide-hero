@@ -14,6 +14,7 @@ interface RelatedReview {
   pros: unknown;
   cons: unknown;
   specs: unknown;
+  ratings: unknown;
   badge: string | null;
   affiliate_url: string | null;
   created_at: string;
@@ -122,6 +123,7 @@ export function RelatedReviews({ currentReview }: RelatedReviewsProps) {
             pros={Array.isArray(rev.pros) ? (rev.pros as string[]) : []}
             cons={Array.isArray(rev.cons) ? (rev.cons as string[]) : []}
             specs={Array.isArray(rev.specs) ? (rev.specs as { label: string; value: string }[]) : []}
+            ratings={Array.isArray(rev.ratings) ? (rev.ratings as { label: string; score: number }[]) : []}
             slug={rev.slug}
             affiliateUrl={rev.affiliate_url}
             createdAt={rev.created_at}
