@@ -43,7 +43,7 @@ const fallbackData: Record<string, ReviewData> = {
     ],
     badge: "Top Pick", overall_rating: 4.8,
     ratings: [{ label: "ความเบา", score: 4.9 }, { label: "แรงคืนตัว", score: 5.0 }, { label: "ความทนทาน", score: 3.8 }, { label: "ความคุ้มค่า", score: 3.5 }, { label: "ความสบาย", score: 4.7 }],
-    specs: [{ label: "น้ำหนัก", value: "196g (US 9)" }, { label: "Drop", value: "8mm" }, { label: "พื้นรองเท้า", value: "ZoomX + Carbon Plate" }, { label: "พื้นนอก", value: "Rubber Waffle" }, { label: "เหมาะกับ", value: "Race / Tempo Run" }, { label: "ระยะทาง", value: "10K – Marathon" }],
+    specs: [{ label: "น้ำหนัก", value: "ชาย ~232 กรัม (US 9) / หญิง ~190 กรัม (US 8)" }, { label: "Drop", value: "8mm" }, { label: "พื้นรองเท้า", value: "ZoomX" }, { label: "พื้นนอก", value: "Rubber Waffle" }, { label: "เหมาะกับ", value: "Race / Tempo Run" }, { label: "ระยะทาง", value: "10K – Marathon" }],
     pros: ["เบาที่สุดในกลุ่ม Racing Shoes", "ZoomX foam ให้แรงคืนตัวชั้นนำ", "Carbon plate ช่วย propulsion ดีเยี่ยม", "ทรงเท้ากว้างขึ้นจากรุ่นเดิม"],
     cons: ["ราคาสูงกว่าคู่แข่ง", "ทนทานได้ราว 300-400 กม.", "ไม่เหมาะกับวิ่งซ้อมทั่วไป"],
     intro: "Nike Vaporfly 3 ยังคงเป็นมาตรฐานของรองเท้าแข่งวิ่งระดับ Elite ด้วยชุดพื้น ZoomX ที่ให้แรงคืนตัวสูงสุดในตลาด ผสานกับแผ่น Carbon Plate ที่ช่วยส่งแรงไปข้างหน้าอย่างมีประสิทธิภาพ",
@@ -83,9 +83,9 @@ const badgeColors: Record<string, string> = {
 function RatingBar({ label, score }: { label: string; score: number }) {
   return (
     <div className="space-y-1.5 md:space-y-2.5 group">
-      <div className="flex justify-between items-end">
-        <span className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 group-hover:text-primary transition-colors">{label}</span>
-        <span className="text-xs md:text-sm font-black text-primary tabular-nums">{score.toFixed(1)}</span>
+      <div className="flex justify-between items-end gap-2">
+        <span className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 group-hover:text-primary transition-colors break-words">{label}</span>
+        <span className="text-xs md:text-sm font-black text-primary tabular-nums shrink-0">{score.toFixed(1)}</span>
       </div>
       <div className="h-2 md:h-2.5 w-full bg-slate-100 rounded-full overflow-hidden border border-slate-200/50 relative">
         <div
@@ -303,7 +303,7 @@ export default function ReviewDetail() {
                   <div className="w-1 h-3 bg-accent rounded-full" />
                   คะแนนแต่ละด้าน (RATINGS)
                 </h3>
-                <div className="grid grid-cols-2 gap-x-4 gap-y-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4">
                   {review.ratings.map((r) => (
                     <RatingBar key={r.label} label={r.label} score={r.score} />
                   ))}
@@ -323,13 +323,13 @@ export default function ReviewDetail() {
                     { icon: Target, label: "เหมาะกับ", value: review.specs?.find(s => s.label.toLowerCase().includes('suitable') || s.label.includes('เหมาะกับ'))?.value || '-' },
                     { icon: Route, label: "ระยะทาง", value: review.specs?.find(s => s.label.toLowerCase().includes('distance') || s.label.includes('ระยะทาง'))?.value || '-' },
                   ].map((spec, i) => (
-                    <div key={i} className="flex items-center gap-3 p-3 rounded-xl bg-slate-50 border border-slate-200/60 transition-all duration-300">
-                      <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center text-primary shrink-0 border border-slate-200 shadow-sm">
+                    <div key={i} className="flex items-start gap-3 p-3 rounded-xl bg-slate-50 border border-slate-200/60 transition-all duration-300">
+                      <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center text-primary shrink-0 border border-slate-200 shadow-sm mt-0.5">
                         <spec.icon className="w-4 h-4" />
                       </div>
                       <div className="flex flex-col min-w-0">
                         <span className="text-[8px] uppercase font-black text-slate-400 tracking-widest leading-none mb-1">{spec.label}</span>
-                        <span className="font-bold text-[12px] truncate text-slate-800 leading-tight tracking-tight">{spec.value}</span>
+                        <span className="font-bold text-[12px] text-slate-800 leading-tight tracking-tight break-words">{spec.value}</span>
                       </div>
                     </div>
                   ))}
