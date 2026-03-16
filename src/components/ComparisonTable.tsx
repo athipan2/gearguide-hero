@@ -3,242 +3,293 @@ import { Button } from "@/components/ui/button";
 import {
   ExternalLink, Award, X, Scale,
   Info, Zap, Shield, Heart, BarChart3,
-  Ruler, Weight, Star, LucideIcon
+  Ruler, Weight, Star, LucideIcon, Plus
 } from "lucide-react";
 import { useComparisonStore } from "@/lib/comparison-store";
 import { cn } from "@/lib/utils";
+import { Link } from "react-router-dom";
 
 const getSpecIcon = (label: string) => {
   const l = label.toLowerCase();
-  if (l.includes('weight') || l.includes('น้ำหนัก')) return <Weight className="h-3.5 w-3.5 md:h-4 md:w-4" />;
-  if (l.includes('drop')) return <Ruler className="h-3.5 w-3.5 md:h-4 md:w-4" />;
-  if (l.includes('เหมาะกับ') || l.includes('suitable')) return <Heart className="h-3.5 w-3.5 md:h-4 md:w-4" />;
-  if (l.includes('พื้น') || l.includes('sole')) return <Shield className="h-3.5 w-3.5 md:h-4 md:w-4" />;
-  if (l.includes('ระยะ') || l.includes('distance')) return <BarChart3 className="h-3.5 w-3.5 md:h-4 md:w-4" />;
-  return <Info className="h-3.5 w-3.5 md:h-4 md:w-4" />;
+  if (l.includes('weight') || l.includes('น้ำหนัก')) return <Weight className="h-4 w-4" />;
+  if (l.includes('drop')) return <Ruler className="h-4 w-4" />;
+  if (l.includes('เหมาะกับ') || l.includes('suitable')) return <Heart className="h-4 w-4" />;
+  if (l.includes('พื้น') || l.includes('sole')) return <Shield className="h-4 w-4" />;
+  if (l.includes('ระยะ') || l.includes('distance')) return <BarChart3 className="h-4 w-4" />;
+  return <Info className="h-4 w-4" />;
 };
 
 const getRatingIcon = (label: string) => {
   const l = label.toLowerCase();
-  if (l.includes('คืนตัว') || l.includes('energy') || l.includes('bounce')) return <Zap className="h-3.5 w-3.5 md:h-4 md:w-4" />;
-  if (l.includes('ทนทาน') || l.includes('durability')) return <Shield className="h-3.5 w-3.5 md:h-4 md:w-4" />;
-  if (l.includes('สบาย') || l.includes('comfort')) return <Heart className="h-3.5 w-3.5 md:h-4 md:w-4" />;
-  if (l.includes('เบา') || l.includes('lightweight')) return <Weight className="h-3.5 w-3.5 md:h-4 md:w-4" />;
-  return <Star className="h-3.5 w-3.5 md:h-4 md:w-4" />;
+  if (l.includes('คืนตัว') || l.includes('energy') || l.includes('bounce')) return <Zap className="h-4 w-4" />;
+  if (l.includes('ทนทาน') || l.includes('durability')) return <Shield className="h-4 w-4" />;
+  if (l.includes('สบาย') || l.includes('comfort')) return <Heart className="h-4 w-4" />;
+  if (l.includes('เบา') || l.includes('lightweight')) return <Weight className="h-4 w-4" />;
+  return <Star className="h-4 w-4" />;
 };
 
 export function ComparisonTable() {
   const { selectedItems, removeItem, clear } = useComparisonStore();
 
-  // Find common rating labels
-  const commonRatingLabels = selectedItems.length > 0
-    ? selectedItems.reduce((acc, item) => {
-        const itemLabels = (item.aspectRatings || []).map(r => r.label);
-        if (acc === null) return itemLabels;
-        return acc.filter(label => itemLabels.includes(label));
-      }, null as string[] | null) || []
-    : [];
+  const item1 = selectedItems[0];
+  const item2 = selectedItems[1];
 
-  // Find common spec labels
-  const commonSpecLabels = selectedItems.length > 0
-    ? selectedItems.reduce((acc, item) => {
-        const itemLabels = (item.specs || []).map(s => s.label);
-        if (acc === null) return itemLabels;
-        return acc.filter(label => itemLabels.includes(label));
-      }, null as string[] | null) || []
-    : [];
+  // Find unique labels from both items
+  const allRatingLabels = Array.from(new Set([
+    ...(item1?.aspectRatings?.map(r => r.label) || []),
+    ...(item2?.aspectRatings?.map(r => r.label) || [])
+  ]));
 
-  const SectionHeader = ({ title, icon: Icon }: { title: string; icon: LucideIcon }) => (
-    <tr className="bg-primary/10">
-      <td colSpan={selectedItems.length + 1} className="py-3 px-4 md:px-8">
-        <div className="flex items-center gap-2 text-primary font-bold uppercase tracking-widest text-[10px] md:text-xs">
-          <Icon className="h-4 w-4" />
-          {title}
-        </div>
-      </td>
-    </tr>
-  );
+  const allSpecLabels = Array.from(new Set([
+    ...(item1?.specs?.map(s => s.label) || []),
+    ...(item2?.specs?.map(s => s.label) || [])
+  ]));
 
-  const LabelCell = ({ children, className }: { children: React.ReactNode; className?: string }) => (
-    <td className={cn(
-      "sticky left-0 z-10 p-4 md:p-6 md:pl-8 text-[10px] md:text-xs font-bold uppercase tracking-widest text-muted-foreground bg-white/80 backdrop-blur-md border-r border-primary/5",
-      className
-    )}>
-      {children}
-    </td>
-  );
+  const ComparisonRow = ({
+    label,
+    value1,
+    value2,
+    icon,
+    isRating = false
+  }: {
+    label: string;
+    value1: string | number | null | undefined;
+    value2: string | number | null | undefined;
+    icon: React.ReactNode;
+    isRating?: boolean;
+  }) => {
+    const num1 = typeof value1 === 'string' ? parseFloat(value1) : (value1 || 0);
+    const num2 = typeof value2 === 'string' ? parseFloat(value2) : (value2 || 0);
 
-  return (
-    <section className="bg-transparent py-8 md:py-20 scroll-mt-20" id="compare">
-      <div className="container mx-auto px-4">
-        <div className="flex flex-col md:flex-row items-start md:items-end justify-between gap-4 mb-8 md:mb-12">
-          <div className="space-y-2">
-            <div className="inline-flex items-center gap-2 text-accent font-bold uppercase tracking-[0.2em] text-xs md:text-sm">
-              <Scale className="h-4 w-4" />
-              Compare Gear
+    return (
+      <div className="group relative">
+        <div className="grid grid-cols-2 md:grid-cols-[1fr_200px_1fr] items-center border-b border-primary/5 py-3 md:py-6 hover:bg-primary/[0.02] transition-colors rounded-xl px-2">
+          {/* Value 1 */}
+          <div className="text-center pr-1 md:pr-8">
+            {isRating ? (
+              <div className="flex flex-col items-center gap-0.5 md:gap-1">
+                <span className="text-base md:text-2xl font-black text-primary">{value1 ?? '-'}</span>
+                <div className="w-full max-w-[60px] md:max-w-[80px] h-1 bg-muted rounded-full overflow-hidden hidden sm:block">
+                  <div
+                    className="h-full bg-primary"
+                    style={{ width: `${(Math.min(5, Math.max(0, num1)) / 5) * 100}%` }}
+                  />
+                </div>
+              </div>
+            ) : (
+              <span className="text-[10px] md:text-base font-bold text-foreground leading-tight">{value1 ?? '-'}</span>
+            )}
+          </div>
+
+          {/* Label */}
+          <div className="col-span-2 md:col-span-1 order-first md:order-none mb-1 md:mb-0">
+            <div className="flex flex-col items-center justify-center gap-0.5 md:gap-1">
+              <div className="p-1 md:p-1.5 rounded-full bg-primary/5 text-primary">
+                {icon}
+              </div>
+              <span className="text-[9px] md:text-xs font-black uppercase tracking-widest text-muted-foreground text-center">
+                {label}
+              </span>
             </div>
-            <h2 className="font-heading text-3xl md:text-5xl font-black text-primary tracking-tighter uppercase">
-              เปรียบเทียบเชิงลึก
-            </h2>
-            <p className="text-muted-foreground max-w-lg">
-              วิเคราะห์ข้อมูลสเปคและคะแนนทดสอบจริง เพื่อช่วยให้คุณตัดสินใจเลือกอุปกรณ์ที่ใช่ที่สุด
+          </div>
+
+          {/* Value 2 */}
+          <div className="text-center pl-1 md:pl-8">
+            {isRating ? (
+              <div className="flex flex-col items-center gap-0.5 md:gap-1">
+                <span className="text-base md:text-2xl font-black text-accent">{value2 ?? '-'}</span>
+                <div className="w-full max-w-[60px] md:max-w-[80px] h-1 bg-muted rounded-full overflow-hidden hidden sm:block">
+                  <div
+                    className="h-full bg-accent"
+                    style={{ width: `${(Math.min(5, Math.max(0, num2)) / 5) * 100}%` }}
+                  />
+                </div>
+              </div>
+            ) : (
+              <span className="text-[10px] md:text-base font-bold text-foreground leading-tight">{value2 ?? '-'}</span>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  if (selectedItems.length === 0) {
+    return (
+      <div className="container mx-auto px-4 py-12 md:py-24">
+        <div className="bg-card/50 border-2 border-dashed border-primary/10 rounded-[2rem] p-8 md:p-24 text-center space-y-6">
+          <div className="inline-flex items-center justify-center h-20 w-20 rounded-full bg-primary/5 text-primary/40">
+            <Scale className="h-10 w-10" />
+          </div>
+          <div className="space-y-2">
+            <p className="text-2xl font-black text-primary/60 uppercase tracking-tight">ยังไม่มีสินค้าที่เลือก</p>
+            <p className="text-muted-foreground max-w-xs mx-auto">
+              กดปุ่ม "เทียบ" ที่หน้าสินค้าเพื่อเริ่มการเปรียบเทียบ (เลือกได้สูงสุด 2 รุ่น)
             </p>
           </div>
-          {selectedItems.length > 0 && (
-            <Button variant="ghost" size="sm" onClick={clear} className="text-muted-foreground hover:text-destructive transition-colors rounded-full px-4">
-              ล้างทั้งหมด
-            </Button>
+          <Button variant="cta" className="rounded-full" asChild>
+            <Link to="/">ไปเลือกสินค้า</Link>
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <section className="bg-transparent pb-20">
+      <div className="container mx-auto px-4">
+        {/* Header Section with VS */}
+        <div className="relative grid grid-cols-2 md:grid-cols-[1fr_auto_1fr] items-stretch gap-3 md:gap-8 mb-8 md:mb-12">
+          {/* Product 1 */}
+          <div className="relative group bg-white rounded-2xl md:rounded-3xl p-3 md:p-8 shadow-xl border border-primary/5 text-center flex flex-col justify-between">
+            <button
+              onClick={() => removeItem(item1.name)}
+              className="absolute -top-2 -right-2 p-1.5 md:p-2 bg-destructive text-white rounded-full shadow-lg hover:scale-110 transition-transform z-30"
+            >
+              <X className="h-3 w-3 md:h-4 md:w-4" />
+            </button>
+            <div>
+              <div className="relative mb-3 md:mb-4">
+                <img
+                  src={item1.image}
+                  alt={item1.name}
+                  className="w-full aspect-[4/3] object-cover rounded-xl md:rounded-2xl shadow-inner group-hover:scale-105 transition-transform duration-500"
+                />
+              </div>
+              <div className="space-y-0.5 md:space-y-1">
+                <p className="text-[8px] md:text-[10px] font-black uppercase tracking-widest text-accent">{item1.brand}</p>
+                <h3 className="font-heading font-black text-[10px] md:text-xl uppercase tracking-tighter line-clamp-2 md:line-clamp-1 h-6 md:h-auto">{item1.name}</h3>
+              </div>
+            </div>
+            <p className="text-sm md:text-2xl font-black text-primary mt-2">{item1.price}</p>
+          </div>
+
+          {/* VS Divider */}
+          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 md:relative md:left-auto md:top-auto md:translate-x-0 md:translate-y-0 z-20 pointer-events-none">
+            <div className="w-10 h-10 md:w-20 md:h-20 rounded-full bg-primary flex items-center justify-center text-white font-black text-sm md:text-3xl shadow-[0_0_20px_rgba(31,61,43,0.3)] border-2 md:border-4 border-background">
+              VS
+            </div>
+          </div>
+
+          {/* Product 2 / Add Slot */}
+          {item2 ? (
+            <div className="relative group bg-white rounded-2xl md:rounded-3xl p-3 md:p-8 shadow-xl border border-primary/5 text-center flex flex-col justify-between">
+              <button
+                onClick={() => removeItem(item2.name)}
+                className="absolute -top-2 -right-2 p-1.5 md:p-2 bg-destructive text-white rounded-full shadow-lg hover:scale-110 transition-transform z-30"
+              >
+                <X className="h-3 w-3 md:h-4 md:w-4" />
+              </button>
+              <div>
+                <div className="relative mb-3 md:mb-4">
+                  <img
+                    src={item2.image}
+                    alt={item2.name}
+                    className="w-full aspect-[4/3] object-cover rounded-xl md:rounded-2xl shadow-inner group-hover:scale-105 transition-transform duration-500"
+                  />
+                </div>
+                <div className="space-y-0.5 md:space-y-1">
+                  <p className="text-[8px] md:text-[10px] font-black uppercase tracking-widest text-accent">{item2.brand}</p>
+                  <h3 className="font-heading font-black text-[10px] md:text-xl uppercase tracking-tighter line-clamp-2 md:line-clamp-1 h-6 md:h-auto">{item2.name}</h3>
+                </div>
+              </div>
+              <p className="text-sm md:text-2xl font-black text-primary mt-2">{item2.price}</p>
+            </div>
+          ) : (
+            <Link
+              to="/"
+              className="relative group bg-primary/5 border-2 border-dashed border-primary/20 rounded-2xl md:rounded-3xl p-3 md:p-8 flex flex-col items-center justify-center gap-2 md:gap-4 hover:bg-primary/10 transition-colors h-full min-h-[120px] md:min-h-[200px]"
+            >
+              <div className="w-8 h-8 md:w-16 md:h-16 rounded-full bg-white flex items-center justify-center text-primary shadow-sm">
+                <Plus className="h-4 w-4 md:h-8 md:w-8" />
+              </div>
+              <div className="text-center">
+                <p className="font-black uppercase tracking-widest text-primary text-[9px] md:text-sm">เพิ่มอีกรุ่น</p>
+                <p className="text-[8px] md:text-xs text-muted-foreground mt-0.5 hidden md:block">เพื่อเปรียบเทียบให้เห็นภาพ</p>
+              </div>
+            </Link>
           )}
         </div>
 
-        {selectedItems.length === 0 ? (
-          <div className="bg-card/50 border-2 border-dashed border-primary/10 rounded-[2rem] p-12 md:p-24 text-center space-y-6">
-            <div className="inline-flex items-center justify-center h-20 w-20 rounded-full bg-primary/5 text-primary/40">
-              <Scale className="h-10 w-10" />
+        {/* Comparison Data */}
+        <div className="bg-white rounded-[1.5rem] md:rounded-[2.5rem] p-3 md:p-12 shadow-2xl border border-primary/5 overflow-hidden">
+          {/* Summary Section */}
+          <div className="mb-8 md:mb-12">
+            <div className="flex items-center gap-2 md:gap-3 mb-6 md:mb-8">
+              <div className="h-px flex-1 bg-primary/10" />
+              <div className="flex items-center gap-1.5 md:gap-2 text-primary font-black uppercase tracking-[0.15em] md:tracking-[0.2em] text-[10px] md:text-xs">
+                <Award className="h-3.5 w-3.5 md:h-4 md:w-4" /> คะแนนทดสอบ
+              </div>
+              <div className="h-px flex-1 bg-primary/10" />
             </div>
-            <div className="space-y-2">
-              <p className="text-2xl font-black text-primary/60 uppercase tracking-tight">ยังไม่มีสินค้าที่เลือก</p>
-              <p className="text-muted-foreground max-w-xs mx-auto">
-                กดปุ่ม "เทียบ" ที่หน้าสินค้าเพื่อนำมาเปรียบเทียบข้อมูลที่นี่
-              </p>
+
+            <ComparisonRow
+              label="คะแนนรวม"
+              value1={item1.rating?.toFixed(1)}
+              value2={item2?.rating?.toFixed(1)}
+              icon={<Star className="h-4 w-4" />}
+              isRating
+            />
+
+            {allRatingLabels.map(label => (
+              <ComparisonRow
+                key={label}
+                label={label}
+                value1={item1.aspectRatings?.find(r => r.label === label)?.score}
+                value2={item2?.aspectRatings?.find(r => r.label === label)?.score}
+                icon={getRatingIcon(label)}
+                isRating
+              />
+            ))}
+          </div>
+
+          {/* Specs Section */}
+          <div className="mb-8 md:mb-12">
+            <div className="flex items-center gap-2 md:gap-3 mb-6 md:mb-8">
+              <div className="h-px flex-1 bg-primary/10" />
+              <div className="flex items-center gap-1.5 md:gap-2 text-primary font-black uppercase tracking-[0.15em] md:tracking-[0.2em] text-[10px] md:text-xs">
+                <Info className="h-3.5 w-3.5 md:h-4 md:w-4" /> ข้อมูลสเปค
+              </div>
+              <div className="h-px flex-1 bg-primary/10" />
             </div>
-            <Button variant="cta" className="rounded-full" asChild>
-              <a href="/">ไปเลือกสินค้า</a>
+
+            {allSpecLabels.map(label => (
+              <ComparisonRow
+                key={label}
+                label={label}
+                value1={item1.specs?.find(s => s.label === label)?.value}
+                value2={item2?.specs?.find(s => s.label === label)?.value}
+                icon={getSpecIcon(label)}
+              />
+            ))}
+          </div>
+
+          {/* Actions */}
+          <div className="grid grid-cols-2 gap-3 md:gap-8 mt-8 md:mt-12 pt-8 md:pt-12 border-t border-primary/10">
+            <div className="space-y-4">
+              <Button variant="cta" className="w-full rounded-xl md:rounded-2xl h-10 md:h-16 text-[10px] md:text-lg shadow-xl hover:scale-[1.02] transition-transform" asChild>
+                <Link to={item1.slug ? `/review/${item1.slug}` : '#'}>
+                  <span className="hidden md:inline">อ่านรีวิว</span> {item1.name.split(' ')[0]} <ExternalLink className="ml-1 md:ml-2 h-3 w-3 md:h-4 md:w-4" />
+                </Link>
+              </Button>
+            </div>
+            {item2 && (
+              <div className="space-y-4">
+                <Button variant="cta" className="w-full rounded-xl md:rounded-2xl h-10 md:h-16 text-[10px] md:text-lg shadow-xl hover:scale-[1.02] transition-transform" asChild>
+                  <Link to={item2.slug ? `/review/${item2.slug}` : '#'}>
+                    <span className="hidden md:inline">อ่านรีวิว</span> {item2.name.split(' ')[0]} <ExternalLink className="ml-1 md:ml-2 h-3 w-3 md:h-4 md:w-4" />
+                  </Link>
+                </Button>
+              </div>
+            )}
+          </div>
+
+          <div className="mt-8 text-center">
+            <Button variant="ghost" size="sm" onClick={clear} className="text-muted-foreground hover:text-destructive transition-colors rounded-full text-[10px] md:text-xs">
+              ล้างข้อมูลทั้งหมด
             </Button>
           </div>
-        ) : (
-          <div className="bg-card rounded-[2rem] border shadow-2xl overflow-hidden border-primary/5">
-            <div className="overflow-x-auto scrollbar-none">
-              <table className="w-full border-collapse min-w-[600px] md:min-w-full">
-                <thead>
-                  <tr className="bg-primary text-primary-foreground">
-                    <th className="sticky left-0 z-20 bg-primary text-left p-6 md:p-10 text-[10px] md:text-xs font-black uppercase tracking-widest opacity-60 min-w-[140px] md:min-w-[240px]">
-                      รุ่นที่เปรียบเทียบ
-                    </th>
-                    {selectedItems.map((item) => (
-                      <th key={item.name} className="p-6 md:p-10 relative min-w-[200px] md:min-w-[300px] group">
-                        <button
-                          onClick={() => removeItem(item.name)}
-                          className="absolute top-4 right-4 p-2 bg-white/10 hover:bg-white/20 rounded-full transition-all duration-300 opacity-0 group-hover:opacity-100 scale-75 group-hover:scale-100"
-                        >
-                          <X className="h-4 w-4" />
-                        </button>
-                        <div className="space-y-4 text-center">
-                          <div className="relative inline-block">
-                            <img
-                              src={item.image}
-                              alt={item.name}
-                              className="w-24 h-20 md:w-48 md:h-36 mx-auto object-cover rounded-2xl shadow-2xl border-4 border-white/10 group-hover:scale-105 transition-transform duration-500"
-                            />
-                            <div className="absolute inset-0 rounded-2xl ring-1 ring-inset ring-black/10" />
-                          </div>
-                          <div>
-                            <p className="text-[9px] md:text-[11px] font-black uppercase tracking-[0.2em] text-accent mb-1">{item.brand}</p>
-                            <h3 className="font-heading font-black text-xs md:text-lg leading-tight line-clamp-2 uppercase tracking-tight px-2">{item.name}</h3>
-                          </div>
-                        </div>
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-primary/5">
-                  {/* Performance Section */}
-                  <SectionHeader title="Performance / คะแนนทดสอบ" icon={Award} />
-                  <tr>
-                    <LabelCell>คะแนนรวม (Overall)</LabelCell>
-                    {selectedItems.map((item) => (
-                      <td key={item.name} className="p-6 md:p-8 text-center">
-                        <div className="flex flex-col items-center gap-2">
-                          <div className="text-2xl md:text-4xl font-black text-primary">{item.rating.toFixed(1)}</div>
-                          <div className="scale-90 md:scale-110">
-                            <RatingStars rating={item.rating} />
-                          </div>
-                          <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">จาก 5.0 คะแนน</span>
-                        </div>
-                      </td>
-                    ))}
-                  </tr>
-                  {commonRatingLabels.map((label) => (
-                    <tr key={label} className="hover:bg-primary/[0.02] transition-colors">
-                      <LabelCell>
-                        <div className="flex items-center gap-2">
-                          <div className="p-1.5 rounded-lg bg-primary/5 text-primary">
-                            {getRatingIcon(label)}
-                          </div>
-                          {label}
-                        </div>
-                      </LabelCell>
-                      {selectedItems.map((item) => {
-                        const rating = item.aspectRatings?.find(r => r.label === label);
-                        return (
-                          <td key={item.name} className="p-6 md:p-8 text-center">
-                            {rating ? (
-                              <div className="space-y-3">
-                                <div className="text-base md:text-xl font-bold text-foreground">{rating.score.toFixed(1)}</div>
-                                <div className="w-full max-w-[120px] mx-auto h-1.5 bg-muted rounded-full overflow-hidden">
-                                  <div
-                                    className="h-full bg-gradient-to-r from-primary to-accent rounded-full"
-                                    style={{ width: `${(rating.score / 5) * 100}%` }}
-                                  />
-                                </div>
-                              </div>
-                            ) : (
-                              <span className="text-muted-foreground text-xs italic">N/A</span>
-                            )}
-                          </td>
-                        );
-                      })}
-                    </tr>
-                  ))}
-
-                  {/* Specs Section */}
-                  <SectionHeader title="Specifications / สเปคสินค้า" icon={Info} />
-                  {commonSpecLabels.map((label) => (
-                    <tr key={label} className="hover:bg-primary/[0.02] transition-colors">
-                      <LabelCell>
-                        <div className="flex items-center gap-2">
-                          <div className="p-1.5 rounded-lg bg-primary/5 text-primary">
-                            {getSpecIcon(label)}
-                          </div>
-                          {label}
-                        </div>
-                      </LabelCell>
-                      {selectedItems.map((item) => {
-                        const spec = item.specs?.find(s => s.label === label);
-                        return (
-                          <td key={item.name} className="p-6 md:p-8 text-center">
-                            <span className="font-bold text-sm md:text-base text-primary/80">
-                              {spec?.value || "N/A"}
-                            </span>
-                          </td>
-                        );
-                      })}
-                    </tr>
-                  ))}
-
-                  {/* Pricing Section */}
-                  <SectionHeader title="Pricing / การสั่งซื้อ" icon={Zap} />
-                  <tr>
-                    <LabelCell>ราคาประมาณการ</LabelCell>
-                    {selectedItems.map((item) => (
-                      <td key={item.name} className="p-6 md:p-10 text-center">
-                        <div className="space-y-4">
-                          <span className="font-heading font-black text-xl md:text-3xl text-accent block">{item.price}</span>
-                          <Button variant="cta" className="w-full rounded-full h-10 md:h-14 text-[10px] md:text-base px-4 shadow-xl hover:scale-105 transition-transform duration-300">
-                            เช็คราคาล่าสุด <ExternalLink className="ml-2 h-4 w-4" />
-                          </Button>
-                        </div>
-                      </td>
-                    ))}
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-            <div className="md:hidden bg-primary text-primary-foreground p-3 text-[10px] text-center font-black uppercase tracking-[0.2em]">
-              ← เลื่อนซ้าย-ขวาเพื่อดูข้อมูลรุ่นอื่น →
-            </div>
-          </div>
-        )}
+        </div>
       </div>
     </section>
   );
