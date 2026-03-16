@@ -82,16 +82,18 @@ const badgeColors: Record<string, string> = {
 
 function RatingBar({ label, score }: { label: string; score: number }) {
   return (
-    <div className="space-y-2">
-      <div className="flex justify-between items-center text-[11px] font-black uppercase tracking-[0.1em]">
-        <span className="text-muted-foreground/70">{label}</span>
-        <span className="text-primary font-bold">{score.toFixed(1)} / 5.0</span>
+    <div className="space-y-2.5 group">
+      <div className="flex justify-between items-end">
+        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 group-hover:text-primary transition-colors">{label}</span>
+        <span className="text-sm font-black text-primary tabular-nums">{score.toFixed(1)}</span>
       </div>
-      <div className="h-2 w-full bg-muted/50 rounded-full overflow-hidden border border-border/10">
+      <div className="h-2.5 w-full bg-slate-100 rounded-full overflow-hidden border border-slate-200/50 relative">
         <div
-          className="h-full bg-primary rounded-full transition-all duration-1000 ease-out shadow-[0_0_8px_rgba(31,61,43,0.2)]"
+          className="h-full bg-gradient-to-r from-primary to-primary/70 rounded-full transition-all duration-1000 ease-out shadow-[0_0_12px_rgba(31,61,43,0.15)] relative z-10 overflow-hidden"
           style={{ width: `${(score / 5) * 100}%` }}
-        />
+        >
+          <div className="absolute inset-0 bg-[linear-gradient(45deg,rgba(255,255,255,0.15)_25%,transparent_25%,transparent_50%,rgba(255,255,255,0.15)_50%,rgba(255,255,255,0.15)_75%,transparent_75%,transparent)] bg-[length:1rem_1rem] animate-[shimmer_2s_linear_infinite]" />
+        </div>
       </div>
     </div>
   );
@@ -254,61 +256,65 @@ export default function ReviewDetail() {
           <div className="flex flex-col justify-center space-y-4 md:space-y-8">
             <div className="space-y-1 md:space-y-2">
               <p className="text-[9px] md:text-sm font-black text-accent uppercase tracking-[0.3em]">{review.brand} // {review.category}</p>
-              <h1 className="font-heading text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-primary leading-[0.9] tracking-tighter uppercase">{review.name}</h1>
+              <h1 className="font-heading text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-black text-primary leading-[0.95] tracking-tighter uppercase break-words overflow-hidden">{review.name}</h1>
             </div>
 
-            <div className="flex flex-col sm:flex-row sm:items-center gap-4 md:gap-6">
-              <div className="flex items-center gap-3 md:gap-4 bg-primary text-primary-foreground rounded-2xl px-3 py-1.5 md:px-6 md:py-4 shadow-lg w-fit">
-                <span className="font-heading text-2xl md:text-5xl font-black">{review.overall_rating}</span>
-                <div>
-                  <div className="scale-90 md:scale-100 origin-left">
+            <div className="flex flex-wrap items-center gap-3 md:gap-6">
+              <div className="flex items-center gap-3 md:gap-4 bg-gradient-to-br from-primary to-primary/80 text-primary-foreground rounded-3xl px-4 py-2 md:px-8 md:py-6 shadow-2xl shadow-primary/20 w-fit relative overflow-hidden group">
+                <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+                <span className="font-heading text-3xl md:text-6xl font-black tracking-tighter">{review.overall_rating}</span>
+                <div className="relative z-10">
+                  <div className="scale-90 md:scale-110 origin-left">
                     <RatingStars rating={review.overall_rating} />
                   </div>
-                  <p className="text-[8px] md:text-[10px] font-bold uppercase tracking-widest opacity-60 mt-0.5">Overall Performance</p>
+                  <p className="text-[8px] md:text-[10px] font-black uppercase tracking-[0.2em] opacity-70 mt-1">Overall Performance</p>
                 </div>
               </div>
 
               {userRating && (
-                <div className="flex items-center gap-3 md:gap-4 bg-card border-2 border-primary/10 rounded-2xl px-3 py-1.5 md:px-6 md:py-4 w-fit">
-                  <span className="font-heading text-xl md:text-3xl font-black text-primary">{userRating.average.toFixed(1)}</span>
+                <div className="flex items-center gap-3 md:gap-4 bg-white border border-border/40 rounded-3xl px-4 py-2 md:px-8 md:py-6 w-fit shadow-xl shadow-black/[0.02]">
+                  <span className="font-heading text-2xl md:text-4xl font-black text-primary tracking-tighter">{userRating.average.toFixed(1)}</span>
                   <div>
-                    <div className="scale-75 md:scale-90 origin-left">
+                    <div className="scale-75 md:scale-100 origin-left">
                       <RatingStars rating={userRating.average} />
                     </div>
-                    <p className="text-[8px] md:text-[10px] font-bold uppercase tracking-widest text-muted-foreground mt-0.5">Real Runner Rating ({userRating.count})</p>
+                    <p className="text-[8px] md:text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/60 mt-1">User Rating ({userRating.count})</p>
                   </div>
                 </div>
               )}
 
-              <div className="space-y-0 md:space-y-1">
-                <p className="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-muted-foreground">Price Estimate</p>
-                <span className="font-heading text-xl md:text-3xl font-black text-primary">{review.price}</span>
+              <div className="bg-accent/5 border border-accent/10 rounded-3xl px-4 py-2 md:px-8 md:py-6">
+                <p className="text-[8px] md:text-[10px] font-black uppercase tracking-[0.2em] text-accent/70 mb-1">Price Estimate</p>
+                <span className="font-heading text-xl md:text-3xl font-black text-accent tracking-tight">{review.price}</span>
               </div>
             </div>
 
-            <p className="text-muted-foreground text-sm md:text-lg leading-relaxed border-l-4 border-accent pl-4 md:pl-6 py-1 md:py-2 italic font-medium">
-              "{review.intro}"
-            </p>
+            <div className="relative">
+              <Quote className="absolute -top-4 -left-2 h-8 w-8 text-accent/10 -z-10" />
+              <p className="text-muted-foreground text-sm md:text-xl leading-relaxed pl-4 md:pl-6 border-l-2 border-accent/30 font-medium max-w-2xl">
+                {review.intro}
+              </p>
+            </div>
 
             {/* Mobile Ratings & Specs */}
-            <div className="lg:hidden grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 pb-2">
-              <div className="bg-card rounded-2xl border border-border/60 p-5 space-y-5 shadow-sm">
-                <h3 className="font-heading font-black text-primary text-xs uppercase tracking-widest flex items-center gap-2">
-                  <div className="w-1 h-4 bg-accent rounded-full" />
-                  คะแนนแต่ละด้าน
+            <div className="lg:hidden grid grid-cols-1 gap-4 pt-4 pb-2">
+              <div className="bg-card rounded-2xl border border-border/60 p-5 space-y-5 shadow-sm overflow-hidden">
+                <h3 className="font-heading font-black text-primary text-[10px] uppercase tracking-[0.2em] flex items-center gap-2">
+                  <div className="w-1 h-3.5 bg-accent rounded-full" />
+                  คะแนนแต่ละด้าน (RATINGS)
                 </h3>
-                <div className="space-y-5">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-5">
                   {review.ratings.map((r) => (
                     <RatingBar key={r.label} label={r.label} score={r.score} />
                   ))}
                 </div>
               </div>
-              <div className="bg-card rounded-2xl border border-border/60 p-5 shadow-sm">
-                <h3 className="font-heading font-black text-primary text-xs uppercase tracking-widest flex items-center gap-2 mb-5">
-                  <div className="w-1 h-4 bg-accent rounded-full" />
-                  สเปคทางเทคนิค
+              <div className="bg-card rounded-2xl border border-border/60 p-5 shadow-sm overflow-hidden">
+                <h3 className="font-heading font-black text-primary text-[10px] uppercase tracking-[0.2em] flex items-center gap-2 mb-5">
+                  <div className="w-1 h-3.5 bg-accent rounded-full" />
+                  สเปคทางเทคนิค (SPECS)
                 </h3>
-                <div className="grid grid-cols-2 sm:grid-cols-1 gap-3">
+                <div className="grid grid-cols-2 gap-3">
                   {[
                     { icon: Scale, label: "น้ำหนัก", value: review.specs?.find(s => s.label.toLowerCase().includes('weight') || s.label.includes('น้ำหนัก'))?.value || '-' },
                     { icon: ArrowDown, label: "Drop", value: review.specs?.find(s => s.label.toLowerCase().includes('drop'))?.value || '-' },
@@ -317,13 +323,13 @@ export default function ReviewDetail() {
                     { icon: Target, label: "เหมาะกับ", value: review.specs?.find(s => s.label.toLowerCase().includes('suitable') || s.label.includes('เหมาะกับ'))?.value || '-' },
                     { icon: Route, label: "ระยะทาง", value: review.specs?.find(s => s.label.toLowerCase().includes('distance') || s.label.includes('ระยะทาง'))?.value || '-' },
                   ].map((spec, i) => (
-                    <div key={i} className="flex items-center gap-2 md:gap-3 p-2.5 md:p-3 rounded-xl bg-muted/30 border border-border/20">
-                      <div className="w-7 h-7 md:w-8 md:h-8 rounded-lg bg-background flex items-center justify-center text-primary shrink-0 border border-border/10">
-                        <spec.icon className="w-3.5 h-3.5 md:w-4 md:h-4" />
+                    <div key={i} className="flex items-center gap-3 p-4 rounded-2xl bg-slate-50 border border-slate-200/60 hover:border-primary/20 hover:bg-white hover:shadow-lg hover:shadow-black/5 transition-all duration-300">
+                      <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center text-primary shrink-0 border border-slate-200 shadow-sm">
+                        <spec.icon className="w-5 h-5" />
                       </div>
                       <div className="flex flex-col min-w-0">
-                        <span className="text-[8px] md:text-[9px] uppercase font-bold text-muted-foreground/70 tracking-wider leading-none mb-1">{spec.label}</span>
-                        <span className="font-bold text-[11px] md:text-xs truncate text-foreground leading-tight">{spec.value}</span>
+                        <span className="text-[9px] uppercase font-black text-slate-400 tracking-widest leading-none mb-1.5">{spec.label}</span>
+                        <span className="font-bold text-[11px] truncate text-slate-800 leading-tight tracking-tight">{spec.value}</span>
                       </div>
                     </div>
                   ))}
@@ -365,31 +371,44 @@ export default function ReviewDetail() {
         <div className="grid lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-6">
             {/* Pros / Cons */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="bg-card border border-border/60 rounded-2xl p-6 shadow-sm hover:shadow-md transition-all duration-300">
-                <h3 className="font-heading font-black text-badge-recommended flex items-center gap-2 mb-6 uppercase tracking-widest text-xs">
-                  <ThumbsUp className="h-5 w-5" /> PROS / จุดเด่น
-                </h3>
-                <ul className="space-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
+              <div className="bg-gradient-to-br from-emerald-50/50 to-white border border-emerald-100 rounded-[2rem] p-6 md:p-8 shadow-sm hover:shadow-xl hover:shadow-emerald-500/5 transition-all duration-500 group">
+                <div className="flex items-center justify-between mb-8">
+                  <h3 className="font-heading font-black text-emerald-700 flex items-center gap-3 uppercase tracking-[0.2em] text-[10px] md:text-xs">
+                    <div className="h-8 w-8 rounded-xl bg-emerald-100 flex items-center justify-center">
+                      <ThumbsUp className="h-4 w-4" />
+                    </div>
+                    PROS / จุดเด่น
+                  </h3>
+                  <div className="h-px flex-1 bg-emerald-100 ml-4 hidden md:block" />
+                </div>
+                <ul className="space-y-5">
                   {review.pros.map((p) => (
-                    <li key={p} className="flex items-start gap-3 text-sm font-semibold text-muted-foreground hover:text-foreground transition-colors leading-snug">
-                      <div className="h-5 w-5 rounded-full bg-badge-recommended/10 flex items-center justify-center shrink-0 mt-0.5">
-                        <Check className="h-3 w-3 text-badge-recommended" />
+                    <li key={p} className="flex items-start gap-4 text-sm md:text-base font-bold text-slate-700 leading-snug group/item">
+                      <div className="h-5 w-5 rounded-full bg-emerald-500 flex items-center justify-center shrink-0 mt-0.5 shadow-lg shadow-emerald-500/20 group-hover/item:scale-110 transition-transform">
+                        <Check className="h-3 w-3 text-white" />
                       </div>
                       {p}
                     </li>
                   ))}
                 </ul>
               </div>
-              <div className="bg-card border border-border/60 rounded-2xl p-6 shadow-sm hover:shadow-md transition-all duration-300">
-                <h3 className="font-heading font-black text-destructive flex items-center gap-2 mb-6 uppercase tracking-widest text-xs">
-                  <ThumbsDown className="h-5 w-5" /> CONS / จุดด้อย
-                </h3>
-                <ul className="space-y-4">
+
+              <div className="bg-gradient-to-br from-rose-50/50 to-white border border-rose-100 rounded-[2rem] p-6 md:p-8 shadow-sm hover:shadow-xl hover:shadow-rose-500/5 transition-all duration-500 group">
+                <div className="flex items-center justify-between mb-8">
+                  <h3 className="font-heading font-black text-rose-700 flex items-center gap-3 uppercase tracking-[0.2em] text-[10px] md:text-xs">
+                    <div className="h-8 w-8 rounded-xl bg-rose-100 flex items-center justify-center">
+                      <ThumbsDown className="h-4 w-4" />
+                    </div>
+                    CONS / จุดด้อย
+                  </h3>
+                  <div className="h-px flex-1 bg-rose-100 ml-4 hidden md:block" />
+                </div>
+                <ul className="space-y-5">
                   {review.cons.map((c) => (
-                    <li key={c} className="flex items-start gap-3 text-sm font-semibold text-muted-foreground hover:text-foreground transition-colors leading-snug">
-                      <div className="h-5 w-5 rounded-full bg-destructive/10 flex items-center justify-center shrink-0 mt-0.5">
-                        <X className="h-3 w-3 text-destructive" />
+                    <li key={c} className="flex items-start gap-4 text-sm md:text-base font-bold text-slate-700 leading-snug group/item">
+                      <div className="h-5 w-5 rounded-full bg-rose-500 flex items-center justify-center shrink-0 mt-0.5 shadow-lg shadow-rose-500/20 group-hover/item:scale-110 transition-transform">
+                        <X className="h-3 w-3 text-white" />
                       </div>
                       {c}
                     </li>
@@ -412,19 +431,31 @@ export default function ReviewDetail() {
             </div>
 
             {/* Verdict */}
-            <div className="bg-card border-2 border-primary/20 rounded-[2.5rem] p-8 md:p-12 shadow-2xl relative overflow-hidden group text-center">
-              <div className="absolute -top-24 -right-24 w-64 h-64 bg-primary/5 rounded-full blur-3xl group-hover:bg-primary/10 transition-colors" />
-              <div className="absolute -bottom-24 -left-24 w-64 h-64 bg-primary/5 rounded-full blur-3xl group-hover:bg-primary/10 transition-colors" />
+            <div className="bg-gradient-to-br from-primary via-primary/95 to-primary/90 rounded-[3rem] p-10 md:p-20 shadow-[0_30px_60px_-15px_rgba(31,61,43,0.3)] relative overflow-hidden group text-center border-t border-white/10">
+              <div className="absolute top-0 right-0 w-96 h-96 bg-accent opacity-10 blur-[100px] -translate-y-1/2 translate-x-1/2 pointer-events-none" />
+              <div className="absolute bottom-0 left-0 w-96 h-96 bg-emerald-400 opacity-5 blur-[100px] translate-y-1/2 -translate-x-1/2 pointer-events-none" />
 
-              <div className="relative z-10">
-                <div className="inline-flex items-center gap-2 px-6 py-2 bg-black text-white rounded-full text-[10px] md:text-xs font-black uppercase tracking-[0.2em] mb-10 shadow-xl">
-                  <Zap className="h-4 w-4 fill-primary text-primary" />
+              <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-[0.03] pointer-events-none" />
+
+              <div className="relative z-10 max-w-4xl mx-auto">
+                <div className="inline-flex items-center gap-3 px-8 py-3 bg-white/10 backdrop-blur-md border border-white/10 text-white rounded-full text-[10px] md:text-xs font-black uppercase tracking-[0.4em] mb-12 shadow-2xl">
+                  <Zap className="h-4 w-4 fill-accent text-accent animate-pulse" />
                   GEARTRAIL VERDICT
                 </div>
-                <h2 className="font-heading text-2xl md:text-5xl lg:text-6xl font-black text-foreground mb-12 leading-[1.1] tracking-tighter italic">
+
+                <h2 className="font-heading text-3xl md:text-6xl lg:text-7xl font-black text-white mb-16 leading-[1.1] tracking-tighter italic">
                   "{review.verdict}"
                 </h2>
-                <CTAButton variant="hero" className="h-16 md:h-20 px-12 md:px-20 rounded-full text-lg md:text-2xl w-full md:w-auto shadow-2xl shadow-primary/30 hover:scale-105 transition-all duration-300" />
+
+                <div className="flex flex-col md:flex-row items-center justify-center gap-6">
+                  <CTAButton variant="hero" className="h-16 md:h-20 px-12 md:px-20 rounded-full text-lg md:text-2xl w-full md:w-auto shadow-2xl shadow-accent/20 hover:scale-105 active:scale-95 transition-all duration-300 bg-accent text-white border-none" />
+
+                  <div className="flex items-center gap-4 text-white/60 text-xs font-black uppercase tracking-widest">
+                    <div className="h-px w-8 bg-white/20" />
+                    Trusted by Runners
+                    <div className="h-px w-8 bg-white/20" />
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -432,31 +463,41 @@ export default function ReviewDetail() {
           {/* Sidebar */}
           <aside className="space-y-8">
             <div className="hidden lg:block bg-card rounded-2xl border border-border/60 p-8 space-y-8 sticky top-24 shadow-sm">
-              <div>
-                <h3 className="font-heading font-black text-primary text-xs uppercase tracking-widest flex items-center gap-2 mb-6">
-                  <div className="w-1 h-4 bg-accent rounded-full" />
-                  คะแนนแต่ละด้าน
+              <div className="p-2">
+                <h3 className="font-heading font-black text-primary text-[10px] uppercase tracking-[0.2em] flex items-center gap-2 mb-8">
+                  <div className="w-1 h-3.5 bg-accent rounded-full" />
+                  คะแนนแต่ละด้าน (RATINGS)
                 </h3>
-                <div className="space-y-5">
+                <div className="space-y-6">
                   {review.ratings.map((r) => (
                     <RatingBar key={r.label} label={r.label} score={r.score} />
                   ))}
                 </div>
               </div>
 
-              <div className="pt-8 border-t border-border/40">
-                <h3 className="font-heading font-black text-primary text-xs uppercase tracking-widest flex items-center gap-2 mb-6">
-                  <div className="w-1 h-4 bg-accent rounded-full" />
-                  สเปคทางเทคนิค
+              <div className="pt-10 border-t border-slate-100 p-2">
+                <h3 className="font-heading font-black text-primary text-[10px] uppercase tracking-[0.2em] flex items-center gap-2 mb-8">
+                  <div className="w-1 h-3.5 bg-accent rounded-full" />
+                  สเปคทางเทคนิค (SPECS)
                 </h3>
-                <dl className="space-y-4">
-                  {review.specs.map((s) => (
-                    <div key={s.label} className="flex justify-between items-center text-sm border-b border-border/40 pb-3 last:border-0 last:pb-0">
-                      <dt className="text-muted-foreground font-medium">{s.label}</dt>
-                      <dd className="font-black text-foreground">{s.value}</dd>
+                <div className="grid grid-cols-1 gap-4">
+                  {[
+                    { icon: Scale, label: "น้ำหนัก (WEIGHT)", value: review.specs?.find(s => s.label.toLowerCase().includes('weight') || s.label.includes('น้ำหนัก'))?.value || '-' },
+                    { icon: ArrowDown, label: "DROP", value: review.specs?.find(s => s.label.toLowerCase().includes('drop'))?.value || '-' },
+                    { icon: Layers, label: "พื้นรองเท้า (MIDSOLE)", value: review.specs?.find(s => s.label.toLowerCase().includes('midsole') || s.label.includes('พื้นรองเท้า'))?.value || '-' },
+                    { icon: Footprints, label: "พื้นนอก (OUTSOLE)", value: review.specs?.find(s => s.label.toLowerCase().includes('outsole') || s.label.includes('พื้นนอก'))?.value || '-' },
+                  ].map((spec, i) => (
+                    <div key={i} className="flex items-center gap-4 group">
+                      <div className="h-10 w-10 rounded-xl bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-primary group-hover:text-white transition-all">
+                        <spec.icon className="h-5 w-5" />
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="text-[8px] font-black text-slate-400 tracking-widest">{spec.label}</span>
+                        <span className="font-bold text-sm text-slate-700">{spec.value}</span>
+                      </div>
                     </div>
                   ))}
-                </dl>
+                </div>
               </div>
 
               <div className="pt-4">

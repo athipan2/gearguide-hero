@@ -102,13 +102,15 @@ export function ImageGallery({ mainImage, images, alt, badge, badgeClassName, ba
       </div>
 
       {/* Thumbnails */}
-      <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+      <div className="flex gap-3 overflow-x-auto pb-2 px-1 scrollbar-hide snap-x snap-mandatory">
         {allImages.map((img, i) => (
           <button
             key={i}
             onClick={() => scrollTo(i)}
-            className={`shrink-0 w-12 h-12 md:w-16 md:h-16 rounded-lg overflow-hidden border-2 transition-all ${
-              i === selectedIndex ? "border-primary ring-2 ring-primary/20" : "border-transparent opacity-60 hover:opacity-100"
+            className={`shrink-0 w-16 h-16 md:w-20 md:h-20 rounded-2xl overflow-hidden border-2 transition-all snap-start ${
+              i === selectedIndex
+                ? "border-primary ring-4 ring-primary/10 scale-95 shadow-lg"
+                : "border-transparent opacity-40 hover:opacity-100 hover:scale-105"
             }`}
           >
             <img src={img} alt={`${alt} thumbnail ${i + 1}`} className="w-full h-full object-cover" />
