@@ -27,7 +27,14 @@ export const useComparisonStore = create<ComparisonState>()(
       selectedItems: [],
       addItem: (item) => set((state) => {
         if (state.selectedItems.find(i => i.name === item.name)) return state;
-        if (state.selectedItems.length >= 3) return state; // Limit to 3
+
+        // If we already have 2 items, replace the second one (the "latest" one added)
+        if (state.selectedItems.length >= 2) {
+          const newItems = [...state.selectedItems];
+          newItems[1] = item;
+          return { selectedItems: newItems };
+        }
+
         return { selectedItems: [...state.selectedItems, item] };
       }),
       removeItem: (itemName) => set((state) => ({
