@@ -1,7 +1,8 @@
 import { useState, useEffect, useCallback } from "react";
 import useEmblaCarousel from "embla-carousel-react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, ZoomIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogTrigger, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 
 interface ImageGalleryProps {
   mainImage: string;
@@ -40,15 +41,29 @@ export function ImageGallery({ mainImage, images, alt, badge, badgeClassName, ba
 
   if (allImages.length <= 1) {
     return (
-      <div className="relative rounded-[2rem] overflow-hidden bg-muted shadow-2xl aspect-[4/3]">
-        <img src={allImages[0] || ""} alt={alt} className="w-full h-full object-cover hover:scale-105 transition-transform duration-700" />
-        {badge && (
-          <div className={`absolute top-4 left-4 md:top-6 md:left-6 px-4 py-1.5 md:px-5 md:py-2 rounded-full text-[10px] md:text-xs font-black uppercase tracking-widest flex items-center gap-2 shadow-xl ${badgeClassName || "bg-primary text-primary-foreground"}`}>
-            {badgeIcon}
-            {badge}
+      <Dialog>
+        <DialogTrigger asChild>
+          <div className="relative rounded-[2rem] overflow-hidden bg-muted shadow-2xl aspect-[4/3] cursor-zoom-in group">
+            <img src={allImages[0] || ""} alt={alt} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center">
+              <ZoomIn className="text-white opacity-0 group-hover:opacity-100 transition-opacity w-8 h-8" />
+            </div>
+            {badge && (
+              <div className={`absolute top-4 left-4 md:top-6 md:left-6 px-4 py-1.5 md:px-5 md:py-2 rounded-full text-[10px] md:text-xs font-black uppercase tracking-widest flex items-center gap-2 shadow-xl ${badgeClassName || "bg-primary text-primary-foreground"}`}>
+                {badgeIcon}
+                {badge}
+              </div>
+            )}
           </div>
-        )}
-      </div>
+        </DialogTrigger>
+        <DialogContent className="max-w-[95vw] max-h-[95vh] p-0 border-none bg-transparent shadow-none">
+          <DialogTitle className="sr-only">{alt}</DialogTitle>
+          <DialogDescription className="sr-only">รูปขยายของ {alt}</DialogDescription>
+          <div className="relative w-full h-full flex items-center justify-center">
+            <img src={allImages[0]} alt={alt} className="max-w-full max-h-[90vh] object-contain rounded-lg" />
+          </div>
+        </DialogContent>
+      </Dialog>
     );
   }
 
@@ -60,11 +75,24 @@ export function ImageGallery({ mainImage, images, alt, badge, badgeClassName, ba
           <div className="flex h-full">
             {allImages.map((img, i) => (
               <div key={i} className="flex-[0_0_100%] min-w-0 relative h-full">
-                <img
-                  src={img}
-                  alt={`${alt} - ${i + 1}`}
-                  className="w-full h-full object-cover"
-                />
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <div className="w-full h-full cursor-zoom-in">
+                      <img
+                        src={img}
+                        alt={`${alt} - ${i + 1}`}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-[95vw] max-h-[95vh] p-0 border-none bg-transparent shadow-none">
+                    <DialogTitle className="sr-only">{alt} - รูปที่ {i + 1}</DialogTitle>
+                    <DialogDescription className="sr-only">รูปขยายของ {alt} รูปที่ {i + 1}</DialogDescription>
+                    <div className="relative w-full h-full flex items-center justify-center">
+                      <img src={img} alt={`${alt} - ${i + 1}`} className="max-w-full max-h-[90vh] object-contain rounded-lg" />
+                    </div>
+                  </DialogContent>
+                </Dialog>
               </div>
             ))}
           </div>
@@ -102,14 +130,14 @@ export function ImageGallery({ mainImage, images, alt, badge, badgeClassName, ba
       </div>
 
       {/* Thumbnails */}
-      <div className="flex gap-3 overflow-x-auto pb-2 px-1 scrollbar-hide snap-x snap-mandatory">
+      <div className="flex gap-2 md:gap-3 overflow-x-auto pb-2 px-1 scrollbar-hide snap-x snap-mandatory">
         {allImages.map((img, i) => (
           <button
             key={i}
             onClick={() => scrollTo(i)}
-            className={`shrink-0 w-16 h-16 md:w-20 md:h-20 rounded-2xl overflow-hidden border-2 transition-all snap-start ${
+            className={`shrink-0 w-12 h-12 md:w-20 md:h-20 rounded-xl md:rounded-2xl overflow-hidden border-2 transition-all snap-start ${
               i === selectedIndex
-                ? "border-primary ring-4 ring-primary/10 scale-95 shadow-lg"
+                ? "border-primary ring-2 md:ring-4 ring-primary/10 scale-95 shadow-lg"
                 : "border-transparent opacity-40 hover:opacity-100 hover:scale-105"
             }`}
           >
