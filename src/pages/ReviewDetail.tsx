@@ -82,12 +82,12 @@ const badgeColors: Record<string, string> = {
 
 function RatingBar({ label, score }: { label: string; score: number }) {
   return (
-    <div className="space-y-1.5 md:space-y-2.5 group">
+    <div className="space-y-1 md:space-y-2.5 group">
       <div className="flex justify-between items-end gap-2">
-        <span className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 group-hover:text-primary transition-colors break-words">{label}</span>
-        <span className="text-xs md:text-sm font-black text-primary tabular-nums shrink-0">{score.toFixed(1)}</span>
+        <span className="text-[8px] md:text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 group-hover:text-primary transition-colors break-words">{label}</span>
+        <span className="text-[10px] md:text-sm font-black text-primary tabular-nums shrink-0">{score.toFixed(1)}</span>
       </div>
-      <div className="h-2 md:h-2.5 w-full bg-slate-100 rounded-full overflow-hidden border border-slate-200/50 relative">
+      <div className="h-1.5 md:h-2.5 w-full bg-slate-100 rounded-full overflow-hidden border border-slate-200/50 relative">
         <div
           className="h-full bg-gradient-to-r from-primary to-primary/70 rounded-full transition-all duration-1000 ease-out shadow-[0_0_12px_rgba(31,61,43,0.15)] relative z-10 overflow-hidden"
           style={{ width: `${(score / 5) * 100}%` }}
@@ -298,12 +298,12 @@ export default function ReviewDetail() {
 
             {/* Mobile Ratings & Specs */}
             <div className="lg:hidden grid grid-cols-1 gap-4 pt-4 pb-2">
-              <div className="bg-card rounded-2xl border border-border/60 p-4 space-y-4 shadow-sm overflow-hidden">
+              <div className="bg-card rounded-2xl border border-border/60 p-4 space-y-3 shadow-sm overflow-hidden">
                 <h3 className="font-heading font-black text-primary text-[10px] uppercase tracking-[0.2em] flex items-center gap-2">
                   <div className="w-1 h-3 bg-accent rounded-full" />
                   คะแนนแต่ละด้าน (RATINGS)
                 </h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4">
+                <div className="grid grid-cols-1 gap-y-2.5">
                   {review.ratings.map((r) => (
                     <RatingBar key={r.label} label={r.label} score={r.score} />
                   ))}
