@@ -84,8 +84,8 @@ function RatingBar({ label, score }: { label: string; score: number }) {
   return (
     <div className="space-y-1 md:space-y-2.5 group">
       <div className="flex justify-between items-end gap-2">
-        <span className="text-[8px] md:text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 group-hover:text-primary transition-colors break-words">{label}</span>
-        <span className="text-[10px] md:text-sm font-black text-primary tabular-nums shrink-0">{score.toFixed(1)}</span>
+        <span className="text-[8px] md:text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-500 group-hover:text-primary transition-colors break-words">{label}</span>
+        <span className="text-[10px] md:text-sm font-semibold text-primary tabular-nums shrink-0">{score.toFixed(1)}</span>
       </div>
       <div className="h-1.5 md:h-2.5 w-full bg-slate-100 rounded-full overflow-hidden border border-slate-200/50 relative">
         <div
@@ -107,12 +107,10 @@ export default function ReviewDetail() {
 
   useEffect(() => {
     // Enable horizontal movement specifically for this page
-    // We target the style directly because overflow-x-hidden might be applied via @apply in CSS
     const originalOverflowX = document.body.style.overflowX;
     document.body.style.overflowX = 'auto';
 
     return () => {
-      // Re-enable overflow-x-hidden when leaving the page to maintain global stability
       document.body.style.overflowX = originalOverflowX;
     };
   }, []);
@@ -180,7 +178,7 @@ export default function ReviewDetail() {
       <div className="min-h-screen bg-background">
         <Navbar />
         <div className="container mx-auto px-4 py-20 text-center">
-          <h1 className="font-heading text-3xl font-bold mb-4">ไม่พบรีวิว</h1>
+          <h1 className="font-heading text-3xl font-semibold mb-4">ไม่พบรีวิว</h1>
           <Link to="/"><Button variant="cta">กลับหน้าหลัก</Button></Link>
         </div>
         <Footer />
@@ -254,52 +252,50 @@ export default function ReviewDetail() {
       </div>
 
       <article className="container mx-auto px-4 pb-16 md:pb-24 pt-2 md:pt-0 overflow-x-auto scrollbar-hide">
-        {/* Upper Moveable Area */}
-        <div className="min-w-[102%] md:min-w-full -mx-[1%] px-[1%] md:mx-0 md:px-0 transition-transform duration-500">
-          {/* Header */}
+        <div className="min-w-[102%] md:min-w-full -mx-[1%] px-[1%] md:mx-0 md:px-0">
           <div className="grid md:grid-cols-2 gap-3 md:gap-12 mb-4 md:mb-16 items-center">
-            <ImageGallery
-              mainImage={review.image_url || ""}
-              images={review.images}
-              alt={review.name}
-              badge={review.badge}
-              badgeClassName={badgeColors[review.badge || ""] || "bg-primary text-primary-foreground"}
-              badgeIcon={<Award className="h-4 w-4" />}
-            />
+            <div className="relative">
+              <div className="absolute inset-0 bg-grid opacity-20 pointer-events-none" />
+              <ImageGallery
+                mainImage={review.image_url || ""}
+                images={review.images}
+                alt={review.name}
+                badge={review.badge}
+                badgeClassName={badgeColors[review.badge || ""] || "bg-primary text-primary-foreground"}
+                badgeIcon={<Award className="h-4 w-4" />}
+              />
+            </div>
 
             <div className="flex flex-col justify-center space-y-4 md:space-y-8">
               <div className="space-y-1 md:space-y-2">
-                <p className="text-[9px] md:text-sm font-black text-accent uppercase tracking-[0.3em]">{review.brand} // {review.category}</p>
-                <h1 className="font-heading text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-black text-primary leading-[0.95] tracking-tighter uppercase break-words overflow-hidden">{review.name}</h1>
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-1 bg-accent" />
+                  <p className="text-[9px] md:text-sm font-semibold text-slate-400 uppercase tracking-[0.3em]">{review.brand} // {review.category}</p>
+                </div>
+                <h1 className="font-heading text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-semibold text-primary leading-[0.9] tracking-tighter uppercase break-words overflow-hidden">
+                  {review.name.split(' ').map((word, i) => (
+                    <span key={i} className={i % 2 === 0 ? "" : "text-transparent bg-clip-text bg-gradient-to-r from-accent to-orange-500"}>
+                      {word}{" "}
+                    </span>
+                  ))}
+                </h1>
               </div>
 
-              <div className="flex flex-wrap items-center gap-3 md:gap-6">
-                <div className="flex items-center gap-3 md:gap-4 bg-gradient-to-br from-primary to-primary/80 text-primary-foreground rounded-3xl px-4 py-2 md:px-8 md:py-6 shadow-2xl shadow-primary/20 w-fit relative overflow-hidden group">
-                  <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity" />
-                  <span className="font-heading text-3xl md:text-6xl font-black tracking-tighter">{review.overall_rating}</span>
+              <div className="flex flex-wrap items-center gap-3 md:gap-4">
+                <div className="flex items-center gap-3 md:gap-4 bg-primary text-primary-foreground rounded-2xl px-6 py-4 md:px-10 md:py-8 shadow-2xl relative overflow-hidden group">
+                  <div className="absolute inset-0 bg-grid opacity-10" />
+                  <span className="font-heading text-4xl md:text-7xl font-semibold tracking-tighter">{review.overall_rating}</span>
                   <div className="relative z-10">
-                    <div className="scale-90 md:scale-110 origin-left">
+                    <div className="scale-90 md:scale-125 origin-left">
                       <RatingStars rating={review.overall_rating} />
                     </div>
-                    <p className="text-[8px] md:text-[10px] font-black uppercase tracking-[0.2em] opacity-70 mt-1">Overall Performance</p>
+                    <p className="text-[8px] md:text-[10px] font-semibold uppercase tracking-[0.2em] text-white/40 mt-1">CORE SCORE</p>
                   </div>
                 </div>
 
-                {userRating && (
-                  <div className="flex items-center gap-3 md:gap-4 bg-white border border-border/40 rounded-3xl px-4 py-2 md:px-8 md:py-6 w-fit shadow-xl shadow-black/[0.02]">
-                    <span className="font-heading text-2xl md:text-4xl font-black text-primary tracking-tighter">{userRating.average.toFixed(1)}</span>
-                    <div>
-                      <div className="scale-75 md:scale-100 origin-left">
-                        <RatingStars rating={userRating.average} />
-                      </div>
-                      <p className="text-[8px] md:text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/60 mt-1">User Rating ({userRating.count})</p>
-                    </div>
-                  </div>
-                )}
-
-                <div className="bg-accent/5 border border-accent/10 rounded-3xl px-4 py-2 md:px-8 md:py-6">
-                  <p className="text-[8px] md:text-[10px] font-black uppercase tracking-[0.2em] text-accent/70 mb-1">Price Estimate</p>
-                  <span className="font-heading text-xl md:text-3xl font-black text-accent tracking-tight">{review.price}</span>
+                <div className="bg-slate-50 border-2 border-slate-100 rounded-2xl px-6 py-4 md:px-10 md:py-8">
+                  <p className="text-[8px] md:text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-400 mb-1">MSRP / PRICE</p>
+                  <span className="font-heading text-2xl md:text-4xl font-semibold text-primary tracking-tight">{review.price}</span>
                 </div>
               </div>
 
@@ -313,7 +309,7 @@ export default function ReviewDetail() {
               {/* Mobile Ratings & Specs */}
               <div className="lg:hidden space-y-4 pt-4">
                 <div className="bg-card rounded-2xl border border-border/60 p-5 space-y-4 shadow-sm">
-                  <h3 className="font-heading font-black text-primary text-xs uppercase tracking-[0.2em] flex items-center gap-2">
+                  <h3 className="font-heading font-semibold text-primary text-xs uppercase tracking-[0.2em] flex items-center gap-2">
                     <div className="w-1 h-3.5 bg-accent rounded-full" />
                     คะแนนแต่ละด้าน (RATINGS)
                   </h3>
@@ -325,7 +321,7 @@ export default function ReviewDetail() {
                 </div>
 
                 <div className="bg-card rounded-2xl border border-border/60 p-5 shadow-sm">
-                  <h3 className="font-heading font-black text-primary text-xs uppercase tracking-[0.2em] flex items-center gap-2 mb-6">
+                  <h3 className="font-heading font-semibold text-primary text-xs uppercase tracking-[0.2em] flex items-center gap-2 mb-6">
                     <div className="w-1 h-3.5 bg-accent rounded-full" />
                     สเปคทางเทคนิค (SPECS)
                   </h3>
@@ -341,8 +337,8 @@ export default function ReviewDetail() {
                           <spec.icon className="h-5 w-5" />
                         </div>
                         <div className="flex flex-col">
-                          <span className="text-[8px] font-black text-slate-400 tracking-widest">{spec.label}</span>
-                          <span className="font-bold text-sm text-slate-700">{spec.value}</span>
+                          <span className="text-[8px] font-semibold text-slate-400 tracking-widest">{spec.label}</span>
+                          <span className="font-semibold text-sm text-slate-700">{spec.value}</span>
                         </div>
                       </div>
                     ))}
@@ -388,7 +384,7 @@ export default function ReviewDetail() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
               <div className="bg-gradient-to-br from-emerald-50/50 to-white border border-emerald-100 rounded-[2rem] p-5 md:p-8 shadow-sm hover:shadow-xl hover:shadow-emerald-500/5 transition-all duration-500 group">
                 <div className="flex items-center justify-between mb-5 md:mb-8">
-                  <h3 className="font-heading font-black text-emerald-700 flex items-center gap-3 uppercase tracking-[0.2em] text-[10px] md:text-xs">
+                  <h3 className="font-heading font-semibold text-emerald-700 flex items-center gap-3 uppercase tracking-[0.2em] text-[10px] md:text-xs">
                     <div className="h-8 w-8 rounded-xl bg-emerald-100 flex items-center justify-center">
                       <ThumbsUp className="h-4 w-4" />
                     </div>
@@ -398,7 +394,7 @@ export default function ReviewDetail() {
                 </div>
                 <ul className="space-y-3 md:space-y-5">
                   {review.pros.map((p) => (
-                    <li key={p} className="flex items-start gap-4 text-[13px] md:text-base font-bold text-slate-700 leading-snug group/item">
+                    <li key={p} className="flex items-start gap-4 text-[13px] md:text-base font-semibold text-slate-700 leading-snug group/item">
                       <div className="h-5 w-5 rounded-full bg-emerald-500 flex items-center justify-center shrink-0 mt-0.5 shadow-lg shadow-emerald-500/20 group-hover/item:scale-110 transition-transform">
                         <Check className="h-3 w-3 text-white" />
                       </div>
@@ -410,7 +406,7 @@ export default function ReviewDetail() {
 
               <div className="bg-gradient-to-br from-rose-50/50 to-white border border-rose-100 rounded-[2rem] p-5 md:p-8 shadow-sm hover:shadow-xl hover:shadow-rose-500/5 transition-all duration-500 group">
                 <div className="flex items-center justify-between mb-5 md:mb-8">
-                  <h3 className="font-heading font-black text-rose-700 flex items-center gap-3 uppercase tracking-[0.2em] text-[10px] md:text-xs">
+                  <h3 className="font-heading font-semibold text-rose-700 flex items-center gap-3 uppercase tracking-[0.2em] text-[10px] md:text-xs">
                     <div className="h-8 w-8 rounded-xl bg-rose-100 flex items-center justify-center">
                       <ThumbsDown className="h-4 w-4" />
                     </div>
@@ -420,7 +416,7 @@ export default function ReviewDetail() {
                 </div>
                 <ul className="space-y-3 md:space-y-5">
                   {review.cons.map((c) => (
-                    <li key={c} className="flex items-start gap-4 text-[13px] md:text-base font-bold text-slate-700 leading-snug group/item">
+                    <li key={c} className="flex items-start gap-4 text-[13px] md:text-base font-semibold text-slate-700 leading-snug group/item">
                       <div className="h-5 w-5 rounded-full bg-rose-500 flex items-center justify-center shrink-0 mt-0.5 shadow-lg shadow-rose-500/20 group-hover/item:scale-110 transition-transform">
                         <X className="h-3 w-3 text-white" />
                       </div>
@@ -435,7 +431,7 @@ export default function ReviewDetail() {
             <div className="space-y-4 md:space-y-10 pt-2 md:pt-4">
               {review.sections.map((s) => (
                 <div key={s.title} className="bg-card border border-border/60 rounded-2xl md:rounded-3xl p-5 md:p-10 shadow-sm hover:shadow-md transition-all duration-300">
-                  <h2 className="font-heading text-lg md:text-4xl font-black text-primary uppercase tracking-tight flex items-center gap-3 mb-5 md:mb-8 leading-none">
+                  <h2 className="font-heading text-lg md:text-4xl font-semibold text-primary uppercase tracking-tight flex items-center gap-3 mb-5 md:mb-8 leading-none">
                     <span className="h-6 md:h-10 w-1.5 bg-accent rounded-full" />
                     {s.title}
                   </h2>
@@ -445,26 +441,27 @@ export default function ReviewDetail() {
             </div>
 
             {/* Verdict */}
-            <div className="bg-gradient-to-br from-primary via-primary/95 to-primary/90 rounded-[2rem] md:rounded-[3rem] p-8 md:p-20 shadow-[0_30px_60px_-15px_rgba(31,61,43,0.3)] relative overflow-hidden group text-center border-t border-white/10">
+              <div className="bg-primary rounded-[2rem] md:rounded-[3rem] p-8 md:p-20 shadow-2xl relative overflow-hidden group text-center border-4 border-accent/20">
+                <div className="absolute inset-0 bg-grid opacity-10" />
               <div className="absolute top-0 right-0 w-96 h-96 bg-accent opacity-10 blur-[100px] -translate-y-1/2 translate-x-1/2 pointer-events-none" />
               <div className="absolute bottom-0 left-0 w-96 h-96 bg-emerald-400 opacity-5 blur-[100px] translate-y-1/2 -translate-x-1/2 pointer-events-none" />
 
               <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-[0.03] pointer-events-none" />
 
               <div className="relative z-10 max-w-4xl mx-auto">
-                <div className="inline-flex items-center gap-2 md:gap-3 px-6 py-2 md:px-8 md:py-3 bg-white/10 backdrop-blur-md border border-white/10 text-white rounded-full text-[9px] md:text-xs font-black uppercase tracking-[0.4em] mb-8 md:mb-12 shadow-2xl">
+                <div className="inline-flex items-center gap-2 md:gap-3 px-6 py-2 md:px-8 md:py-3 bg-white/10 backdrop-blur-md border border-white/10 text-white rounded-full text-[9px] md:text-xs font-semibold uppercase tracking-[0.4em] mb-8 md:mb-12 shadow-2xl">
                   <Zap className="h-3.5 w-3.5 md:h-4 md:w-4 fill-accent text-accent animate-pulse" />
                   GEARTRAIL VERDICT
                 </div>
 
-                <h2 className="font-heading text-2xl md:text-6xl lg:text-7xl font-black text-white mb-10 md:mb-16 leading-[1.1] tracking-tighter italic">
+                <h2 className="font-heading text-2xl md:text-6xl lg:text-7xl font-semibold text-white mb-10 md:mb-16 leading-[1.1] tracking-tighter">
                   "{review.verdict}"
                 </h2>
 
                 <div className="flex flex-col md:flex-row items-center justify-center gap-6">
                   <CTAButton variant="hero" className="h-14 md:h-20 px-10 md:px-20 rounded-full text-base md:text-2xl w-full md:w-auto shadow-2xl shadow-accent/20 hover:scale-105 active:scale-95 transition-all duration-300 bg-accent text-white border-none" />
 
-                  <div className="flex items-center gap-4 text-white/60 text-xs font-black uppercase tracking-widest">
+                  <div className="flex items-center gap-4 text-white/60 text-xs font-semibold uppercase tracking-widest">
                     <div className="h-px w-8 bg-white/20" />
                     Trusted by Runners
                     <div className="h-px w-8 bg-white/20" />
@@ -478,7 +475,7 @@ export default function ReviewDetail() {
           <aside className="space-y-8">
             <div className="hidden lg:block bg-card rounded-2xl border border-border/60 p-8 space-y-8 sticky top-24 shadow-sm">
               <div className="p-2">
-                <h3 className="font-heading font-black text-primary text-[10px] uppercase tracking-[0.2em] flex items-center gap-2 mb-8">
+                <h3 className="font-heading font-semibold text-primary text-[10px] uppercase tracking-[0.2em] flex items-center gap-2 mb-8">
                   <div className="w-1 h-3.5 bg-accent rounded-full" />
                   คะแนนแต่ละด้าน (RATINGS)
                 </h3>
@@ -490,7 +487,7 @@ export default function ReviewDetail() {
               </div>
 
               <div className="pt-10 border-t border-slate-100 p-2">
-                <h3 className="font-heading font-black text-primary text-[10px] uppercase tracking-[0.2em] flex items-center gap-2 mb-8">
+                <h3 className="font-heading font-semibold text-primary text-[10px] uppercase tracking-[0.2em] flex items-center gap-2 mb-8">
                   <div className="w-1 h-3.5 bg-accent rounded-full" />
                   สเปคทางเทคนิค (SPECS)
                 </h3>
@@ -506,8 +503,8 @@ export default function ReviewDetail() {
                         <spec.icon className="h-5 w-5" />
                       </div>
                       <div className="flex flex-col">
-                        <span className="text-[8px] font-black text-slate-400 tracking-widest">{spec.label}</span>
-                        <span className="font-bold text-sm text-slate-700">{spec.value}</span>
+                        <span className="text-[8px] font-semibold text-slate-400 tracking-widest">{spec.label}</span>
+                        <span className="font-semibold text-sm text-slate-700">{spec.value}</span>
                       </div>
                     </div>
                   ))}
@@ -516,8 +513,8 @@ export default function ReviewDetail() {
 
               <div className="pt-4">
                 <div className="bg-accent/5 rounded-2xl border border-accent/10 p-5 text-center mb-4">
-                  <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-1">Price Estimate</p>
-                  <p className="font-heading font-black text-primary text-2xl">{review.price}</p>
+                  <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-widest mb-1">Price Estimate</p>
+                  <p className="font-heading font-semibold text-primary text-2xl">{review.price}</p>
                 </div>
                 <CTAButton className="w-full h-14 rounded-2xl shadow-lg shadow-accent/10" isSidebar />
               </div>
@@ -526,9 +523,9 @@ export default function ReviewDetail() {
             {/* Additional Sidebar Block (Newsletter) */}
             <div className="bg-primary rounded-3xl p-8 text-primary-foreground relative overflow-hidden shadow-xl shadow-primary/20">
               <div className="relative z-10 space-y-4">
-                <h4 className="font-heading font-black text-2xl leading-tight">ติดตามรีวิวใหม่ล่าสุด</h4>
+                <h4 className="font-heading font-semibold text-2xl leading-tight">ติดตามรีวิวใหม่ล่าสุด</h4>
                 <p className="text-primary-foreground/70 text-sm font-medium">ไม่พลาดทุกการอัปเดตอุปกรณ์วิ่งและโปรโมชั่นเด็ด</p>
-                <Button variant="secondary" className="w-full rounded-xl font-bold py-6 h-auto text-primary">สมัครรับข่าวสาร</Button>
+                <Button variant="secondary" className="w-full rounded-xl font-semibold py-6 h-auto text-primary">สมัครรับข่าวสาร</Button>
               </div>
               <div className="absolute -bottom-6 -right-6 opacity-10 rotate-12">
                 <Zap className="h-32 w-32" />
@@ -599,7 +596,7 @@ export default function ReviewDetail() {
             <Plus className="w-5 h-5 text-slate-600" />
           </Button>
 
-          <CTAButton variant="hero" className="flex-1 h-12 rounded-2xl font-black text-xs uppercase tracking-wider shadow-xl shadow-primary/20" isSidebar />
+          <CTAButton variant="hero" className="flex-1 h-12 rounded-2xl font-semibold text-xs uppercase tracking-wider shadow-xl shadow-primary/20" isSidebar />
         </div>
       </div>
 

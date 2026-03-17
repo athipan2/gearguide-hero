@@ -87,7 +87,7 @@ export function CommentSection({ reviewId, articleId }: CommentSectionProps) {
   return (
     <section className="mt-20 md:mt-32 border-t border-slate-100 pt-16 md:pt-24">
       <div className="mb-10 md:mb-16">
-        <h2 className="font-heading text-2xl md:text-4xl font-black text-primary tracking-tighter uppercase flex items-center gap-3">
+        <h2 className="font-heading text-2xl md:text-4xl font-semibold text-primary tracking-tighter uppercase flex items-center gap-3">
           <span className="h-8 md:h-10 w-1.5 bg-accent rounded-full" />
           ถาม-ตอบ & ความคิดเห็น
         </h2>
@@ -102,7 +102,7 @@ export function CommentSection({ reviewId, articleId }: CommentSectionProps) {
         <form onSubmit={handleSubmit} className="space-y-6">
           {reviewId && (
             <div className="flex flex-col gap-3 mb-4">
-              <span className="text-xs font-black uppercase tracking-widest text-muted-foreground/70">ให้คะแนนรองเท้าคู่นี้:</span>
+              <span className="text-xs font-semibold uppercase tracking-widest text-muted-foreground/70">ให้คะแนนรองเท้าคู่นี้:</span>
               <div className="flex gap-2">
                 {[1, 2, 3, 4, 5].map((star) => (
                   <button
@@ -123,7 +123,7 @@ export function CommentSection({ reviewId, articleId }: CommentSectionProps) {
                   </button>
                 ))}
                 {rating > 0 && (
-                  <span className="ml-2 text-sm font-bold text-primary">{rating}.0 / 5.0</span>
+                  <span className="ml-2 text-sm font-semibold text-primary">{rating}.0 / 5.0</span>
                 )}
               </div>
             </div>
@@ -140,7 +140,7 @@ export function CommentSection({ reviewId, articleId }: CommentSectionProps) {
               type="submit"
               disabled={!user || submitting || !newComment.trim()}
               variant="cta"
-              className="h-12 px-8 rounded-full font-bold shadow-lg shadow-primary/10 transition-all hover:scale-105"
+              className="h-12 px-8 rounded-full font-semibold shadow-lg shadow-primary/10 transition-all hover:scale-105"
             >
               {submitting ? "กำลังส่ง..." : "ส่งความเห็น"}
               <Send className="ml-2 h-4 w-4" />
@@ -165,7 +165,7 @@ export function CommentSection({ reviewId, articleId }: CommentSectionProps) {
               </div>
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-1">
-                  <span className="font-bold text-sm text-foreground">
+                  <span className="font-semibold text-sm text-foreground">
                     {comment.user_name}
                   </span>
                   {comment.rating && (

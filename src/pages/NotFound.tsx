@@ -24,18 +24,18 @@ const NotFound = () => {
             <div className="p-8 bg-primary/5 rounded-full border-2 border-primary/10 backdrop-blur-sm">
               <Mountain className="h-20 w-20 text-primary animate-pulse" />
             </div>
-            <div className="absolute -top-2 -right-2 bg-accent text-accent-foreground text-[10px] font-black px-2 py-1 rounded-sm rotate-12 shadow-lg">
+            <div className="absolute -top-2 -right-2 bg-accent text-accent-foreground text-[10px] font-semibold px-2 py-1 rounded-sm rotate-12 shadow-lg">
               LOST IN TRAIL
             </div>
           </div>
         </div>
 
         <div className="space-y-4">
-          <h1 className="text-8xl md:text-9xl font-black text-primary tracking-tighter leading-none">
+          <h1 className="text-8xl md:text-9xl font-semibold text-primary tracking-tighter leading-none">
             404
           </h1>
           <div className="h-1 w-20 bg-accent mx-auto rounded-full" />
-          <h2 className="text-3xl md:text-4xl font-black text-foreground uppercase tracking-tight">
+          <h2 className="text-3xl md:text-4xl font-semibold text-foreground uppercase tracking-tight">
             หลงทางเสียแล้ว...
           </h2>
           <p className="text-muted-foreground text-lg font-medium leading-relaxed">

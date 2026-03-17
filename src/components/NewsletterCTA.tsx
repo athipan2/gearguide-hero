@@ -13,7 +13,7 @@ export function NewsletterCTA() {
           <div className="bg-primary-foreground/5 w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6 backdrop-blur-sm border border-white/5">
             <Mail className="h-10 w-10 text-cta" />
           </div>
-          <h2 className="font-heading text-3xl md:text-4xl font-black text-primary-foreground mb-4 tracking-tight">
+          <h2 className="font-heading text-3xl md:text-4xl font-semibold text-primary-foreground mb-4 tracking-tight">
             ไม่พลาดรีวิวใหม่
           </h2>
           <p className="text-primary-foreground/70 mb-10 max-w-lg mx-auto text-lg leading-relaxed">

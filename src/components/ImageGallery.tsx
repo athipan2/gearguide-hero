@@ -49,7 +49,7 @@ export function ImageGallery({ mainImage, images, alt, badge, badgeClassName, ba
               <ZoomIn className="text-white opacity-0 group-hover:opacity-100 transition-opacity w-8 h-8" />
             </div>
             {badge && (
-              <div className={`absolute top-4 left-4 md:top-6 md:left-6 px-4 py-1.5 md:px-5 md:py-2 rounded-full text-[10px] md:text-xs font-black uppercase tracking-widest flex items-center gap-2 shadow-xl ${badgeClassName || "bg-primary text-primary-foreground"}`}>
+              <div className={`absolute top-4 left-4 md:top-6 md:left-6 px-4 py-1.5 md:px-5 md:py-2 rounded-full text-[10px] md:text-xs font-semibold uppercase tracking-widest flex items-center gap-2 shadow-xl ${badgeClassName || "bg-primary text-primary-foreground"}`}>
                 {badgeIcon}
                 {badge}
               </div>
@@ -99,7 +99,7 @@ export function ImageGallery({ mainImage, images, alt, badge, badgeClassName, ba
         </div>
 
         {badge && (
-          <div className={`absolute top-4 left-4 md:top-6 md:left-6 px-4 py-1.5 md:px-5 md:py-2 rounded-full text-[10px] md:text-xs font-black uppercase tracking-widest flex items-center gap-2 shadow-xl z-10 ${badgeClassName || "bg-primary text-primary-foreground"}`}>
+          <div className={`absolute top-4 left-4 md:top-6 md:left-6 px-4 py-1.5 md:px-5 md:py-2 rounded-full text-[10px] md:text-xs font-semibold uppercase tracking-widest flex items-center gap-2 shadow-xl z-10 ${badgeClassName || "bg-primary text-primary-foreground"}`}>
             {badgeIcon}
             {badge}
           </div>
@@ -124,7 +124,7 @@ export function ImageGallery({ mainImage, images, alt, badge, badgeClassName, ba
         </Button>
 
         {/* Counter */}
-        <div className="absolute bottom-4 right-4 bg-background/70 backdrop-blur-sm text-foreground text-[10px] md:text-xs font-bold px-3 py-1 rounded-full z-10">
+        <div className="absolute bottom-4 right-4 bg-background/70 backdrop-blur-sm text-foreground text-[10px] md:text-xs font-semibold px-3 py-1 rounded-full z-10">
           {selectedIndex + 1} / {allImages.length}
         </div>
       </div>
