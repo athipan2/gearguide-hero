@@ -29,7 +29,7 @@ export function Navbar() {
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
+      setIsScrolled(window.scrollY > 10);
     };
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
@@ -38,15 +38,18 @@ export function Navbar() {
   return (
     <nav
       className={cn(
-        "sticky top-0 z-50 w-full transition-all duration-300 border-b",
+        "sticky top-0 z-50 w-full transition-all duration-200 border-b",
         isScrolled
-          ? "bg-background/95 backdrop-blur-lg border-primary/10 shadow-sm h-16"
+          ? "bg-background/95 backdrop-blur-lg border-primary/10 shadow-lg h-16"
           : "bg-background/80 backdrop-blur-md border-transparent h-20"
       )}
     >
       <div className="container mx-auto flex items-center justify-between h-full px-4">
-        <Link to="/" className="flex items-center gap-2 font-heading font-extrabold text-2xl text-primary tracking-tight">
-          <Mountain className="h-8 w-8 text-accent" />
+        <Link to="/" className="flex items-center gap-2 font-heading font-semibold text-3xl text-primary tracking-tighter">
+          <div className="relative">
+            <Mountain className="h-8 w-8 text-accent" />
+            <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-primary rounded-full border-2 border-background" />
+          </div>
           <span>GEARTRAIL</span>
         </Link>
 
@@ -56,9 +59,10 @@ export function Navbar() {
             <Link
               key={l.label}
               to={l.href}
-              className="text-sm font-bold uppercase tracking-widest text-foreground/70 hover:text-primary transition-colors"
+              className="group relative text-[11px] font-semibold uppercase tracking-[0.2em] text-foreground/60 hover:text-primary transition-colors py-2"
             >
               {l.label}
+              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-accent transition-all duration-300 group-hover:w-full" />
             </Link>
           ))}
         </div>
@@ -77,12 +81,12 @@ export function Navbar() {
             <Button
               variant="ghost"
               size="sm"
-              className="relative text-primary hover:bg-primary/5 font-bold uppercase tracking-widest text-xs h-10 px-3"
+              className="relative text-primary hover:bg-primary/5 font-semibold uppercase tracking-widest text-xs h-10 px-3"
             >
               <Scale className="h-5 w-5 mr-2" />
               <span>เปรียบเทียบ</span>
               {selectedCount > 0 && (
-                <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-accent text-[10px] text-accent-foreground font-black">
+                <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-accent text-[10px] text-accent-foreground font-semibold">
                   {selectedCount}
                 </span>
               )}
@@ -114,7 +118,7 @@ export function Navbar() {
                   <SheetClose asChild key={l.label}>
                     <Link
                       to={l.href}
-                      className="px-6 py-4 text-lg font-bold uppercase tracking-widest text-foreground/70 hover:text-primary hover:bg-primary/5 transition-all"
+                      className="px-6 py-4 text-lg font-semibold uppercase tracking-widest text-foreground/70 hover:text-primary hover:bg-primary/5 transition-all"
                     >
                       {l.label}
                     </Link>
@@ -124,7 +128,7 @@ export function Navbar() {
                   <SheetClose asChild>
                     <Button
                       variant="ghost"
-                      className="w-full justify-start text-lg font-bold uppercase tracking-widest"
+                      className="w-full justify-start text-lg font-semibold uppercase tracking-widest"
                       size="lg"
                       onClick={() => setSearchOpen(true)}
                     >
@@ -137,13 +141,13 @@ export function Navbar() {
                     <Link to="/compare" className="block w-full">
                       <Button
                         variant="ghost"
-                        className="w-full justify-start text-lg font-bold uppercase tracking-widest relative"
+                        className="w-full justify-start text-lg font-semibold uppercase tracking-widest relative"
                         size="lg"
                       >
                         <Scale className="h-5 w-5 mr-3" />
                         เปรียบเทียบ
                         {selectedCount > 0 && (
-                          <span className="ml-2 flex h-6 w-6 items-center justify-center rounded-full bg-accent text-xs text-accent-foreground font-black">
+                          <span className="ml-2 flex h-6 w-6 items-center justify-center rounded-full bg-accent text-xs text-accent-foreground font-semibold">
                             {selectedCount}
                           </span>
                         )}
@@ -151,7 +155,7 @@ export function Navbar() {
                     </Link>
                   </SheetClose>
 
-                  <Button variant="cta" className="w-full text-lg font-bold uppercase tracking-widest" size="lg">
+                  <Button variant="cta" className="w-full text-lg font-semibold uppercase tracking-widest" size="lg">
                     ส่งรีวิว
                   </Button>
                 </div>

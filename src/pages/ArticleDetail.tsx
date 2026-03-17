@@ -103,7 +103,7 @@ export default function ArticleDetail() {
       <div className="min-h-screen bg-background">
         <Navbar />
         <div className="container mx-auto px-4 py-20 text-center">
-          <h1 className="text-2xl font-bold mb-4">ไม่พบบทความ</h1>
+          <h1 className="text-2xl font-semibold mb-4">ไม่พบบทความ</h1>
           <Link to="/guides"><Button>กลับไปหน้าคู่มือ</Button></Link>
         </div>
         <Footer />
@@ -128,14 +128,14 @@ export default function ArticleDetail() {
 
         <header className="mb-12">
           <div className="flex items-center gap-2 mb-6">
-            <span className="text-xs font-black text-accent uppercase tracking-[0.3em]">
+            <span className="text-xs font-semibold text-accent uppercase tracking-[0.3em]">
               {article.category}
             </span>
           </div>
-          <h1 className="font-heading text-3xl md:text-6xl font-black text-primary mb-8 leading-[0.9] tracking-tighter uppercase">
+          <h1 className="font-heading text-3xl md:text-6xl font-semibold text-primary mb-8 leading-[0.9] tracking-tighter uppercase">
             {article.title}
           </h1>
-          <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-8 text-[10px] sm:text-xs font-bold uppercase tracking-widest text-muted-foreground border-t border-b border-primary/5 py-4">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-8 text-[10px] sm:text-xs font-semibold uppercase tracking-widest text-muted-foreground border-t border-b border-primary/5 py-4">
             <div className="flex items-center gap-2">
               <User className="h-4 w-4 text-accent" />
               <span>ทีมงาน GearTrail</span>
@@ -162,7 +162,7 @@ export default function ArticleDetail() {
           </div>
         )}
 
-        <div className="prose prose-base md:prose-lg max-w-none prose-headings:font-heading prose-headings:font-bold prose-p:text-muted-foreground prose-p:leading-relaxed whitespace-pre-wrap">
+        <div className="prose prose-base md:prose-lg max-w-none prose-headings:font-heading prose-headings:font-semibold prose-p:text-muted-foreground prose-p:leading-relaxed whitespace-pre-wrap">
           {article.content}
         </div>
 

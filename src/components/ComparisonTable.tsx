@@ -68,7 +68,7 @@ export function ComparisonTable() {
           <div className="text-center pr-1 md:pr-8">
             {isRating ? (
               <div className="flex flex-col items-center gap-0.5 md:gap-1">
-                <span className="text-base md:text-2xl font-black text-primary">{value1 ?? '-'}</span>
+                <span className="text-base md:text-2xl font-semibold text-primary">{value1 ?? '-'}</span>
                 <div className="w-full max-w-[60px] md:max-w-[80px] h-1 bg-muted rounded-full overflow-hidden hidden sm:block">
                   <div
                     className="h-full bg-primary"
@@ -77,7 +77,7 @@ export function ComparisonTable() {
                 </div>
               </div>
             ) : (
-              <span className="text-[10px] md:text-base font-bold text-foreground leading-tight">{value1 ?? '-'}</span>
+              <span className="text-[10px] md:text-base font-semibold text-foreground leading-tight">{value1 ?? '-'}</span>
             )}
           </div>
 
@@ -87,7 +87,7 @@ export function ComparisonTable() {
               <div className="p-1 md:p-1.5 rounded-full bg-primary/5 text-primary">
                 {icon}
               </div>
-              <span className="text-[9px] md:text-xs font-black uppercase tracking-widest text-muted-foreground text-center">
+              <span className="text-[9px] md:text-xs font-semibold uppercase tracking-widest text-muted-foreground text-center">
                 {label}
               </span>
             </div>
@@ -97,7 +97,7 @@ export function ComparisonTable() {
           <div className="text-center pl-1 md:pl-8">
             {isRating ? (
               <div className="flex flex-col items-center gap-0.5 md:gap-1">
-                <span className="text-base md:text-2xl font-black text-accent">{value2 ?? '-'}</span>
+                <span className="text-base md:text-2xl font-semibold text-accent">{value2 ?? '-'}</span>
                 <div className="w-full max-w-[60px] md:max-w-[80px] h-1 bg-muted rounded-full overflow-hidden hidden sm:block">
                   <div
                     className="h-full bg-accent"
@@ -106,7 +106,7 @@ export function ComparisonTable() {
                 </div>
               </div>
             ) : (
-              <span className="text-[10px] md:text-base font-bold text-foreground leading-tight">{value2 ?? '-'}</span>
+              <span className="text-[10px] md:text-base font-semibold text-foreground leading-tight">{value2 ?? '-'}</span>
             )}
           </div>
         </div>
@@ -122,7 +122,7 @@ export function ComparisonTable() {
             <Scale className="h-10 w-10" />
           </div>
           <div className="space-y-2">
-            <p className="text-2xl font-black text-primary/60 uppercase tracking-tight">ยังไม่มีสินค้าที่เลือก</p>
+            <p className="text-2xl font-semibold text-primary/60 uppercase tracking-tight">ยังไม่มีสินค้าที่เลือก</p>
             <p className="text-muted-foreground max-w-xs mx-auto">
               กดปุ่ม "เทียบ" ที่หน้าสินค้าเพื่อเริ่มการเปรียบเทียบ (เลือกได้สูงสุด 2 รุ่น)
             </p>
@@ -157,16 +157,16 @@ export function ComparisonTable() {
                 />
               </div>
               <div className="space-y-0.5 md:space-y-1">
-                <p className="text-[8px] md:text-[10px] font-black uppercase tracking-widest text-accent">{item1.brand}</p>
-                <h3 className="font-heading font-black text-[10px] md:text-xl uppercase tracking-tighter line-clamp-2 md:line-clamp-1 h-6 md:h-auto">{item1.name}</h3>
+                <p className="text-[8px] md:text-[10px] font-semibold uppercase tracking-widest text-accent">{item1.brand}</p>
+                <h3 className="font-heading font-semibold text-[10px] md:text-xl uppercase tracking-tighter line-clamp-2 md:line-clamp-1 h-6 md:h-auto">{item1.name}</h3>
               </div>
             </div>
-            <p className="text-sm md:text-2xl font-black text-primary mt-2">{item1.price}</p>
+            <p className="text-sm md:text-2xl font-semibold text-primary mt-2">{item1.price}</p>
           </div>
 
           {/* VS Divider */}
           <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 md:relative md:left-auto md:top-auto md:translate-x-0 md:translate-y-0 z-20 pointer-events-none">
-            <div className="w-10 h-10 md:w-20 md:h-20 rounded-full bg-primary flex items-center justify-center text-white font-black text-sm md:text-3xl shadow-[0_0_20px_rgba(31,61,43,0.3)] border-2 md:border-4 border-background">
+            <div className="w-10 h-10 md:w-20 md:h-20 rounded-full bg-primary flex items-center justify-center text-white font-semibold text-sm md:text-3xl shadow-[0_0_20px_rgba(31,61,43,0.3)] border-2 md:border-4 border-background">
               VS
             </div>
           </div>
@@ -189,11 +189,11 @@ export function ComparisonTable() {
                   />
                 </div>
                 <div className="space-y-0.5 md:space-y-1">
-                  <p className="text-[8px] md:text-[10px] font-black uppercase tracking-widest text-accent">{item2.brand}</p>
-                  <h3 className="font-heading font-black text-[10px] md:text-xl uppercase tracking-tighter line-clamp-2 md:line-clamp-1 h-6 md:h-auto">{item2.name}</h3>
+                  <p className="text-[8px] md:text-[10px] font-semibold uppercase tracking-widest text-accent">{item2.brand}</p>
+                  <h3 className="font-heading font-semibold text-[10px] md:text-xl uppercase tracking-tighter line-clamp-2 md:line-clamp-1 h-6 md:h-auto">{item2.name}</h3>
                 </div>
               </div>
-              <p className="text-sm md:text-2xl font-black text-primary mt-2">{item2.price}</p>
+              <p className="text-sm md:text-2xl font-semibold text-primary mt-2">{item2.price}</p>
             </div>
           ) : (
             <Link
@@ -204,7 +204,7 @@ export function ComparisonTable() {
                 <Plus className="h-4 w-4 md:h-8 md:w-8" />
               </div>
               <div className="text-center">
-                <p className="font-black uppercase tracking-widest text-primary text-[9px] md:text-sm">เพิ่มอีกรุ่น</p>
+                <p className="font-semibold uppercase tracking-widest text-primary text-[9px] md:text-sm">เพิ่มอีกรุ่น</p>
                 <p className="text-[8px] md:text-xs text-muted-foreground mt-0.5 hidden md:block">เพื่อเปรียบเทียบให้เห็นภาพ</p>
               </div>
             </Link>
@@ -217,7 +217,7 @@ export function ComparisonTable() {
           <div className="mb-8 md:mb-12">
             <div className="flex items-center gap-2 md:gap-3 mb-6 md:mb-8">
               <div className="h-px flex-1 bg-primary/10" />
-              <div className="flex items-center gap-1.5 md:gap-2 text-primary font-black uppercase tracking-[0.15em] md:tracking-[0.2em] text-[10px] md:text-xs">
+              <div className="flex items-center gap-1.5 md:gap-2 text-primary font-semibold uppercase tracking-[0.15em] md:tracking-[0.2em] text-[10px] md:text-xs">
                 <Award className="h-3.5 w-3.5 md:h-4 md:w-4" /> คะแนนทดสอบ
               </div>
               <div className="h-px flex-1 bg-primary/10" />
@@ -247,7 +247,7 @@ export function ComparisonTable() {
           <div className="mb-8 md:mb-12">
             <div className="flex items-center gap-2 md:gap-3 mb-6 md:mb-8">
               <div className="h-px flex-1 bg-primary/10" />
-              <div className="flex items-center gap-1.5 md:gap-2 text-primary font-black uppercase tracking-[0.15em] md:tracking-[0.2em] text-[10px] md:text-xs">
+              <div className="flex items-center gap-1.5 md:gap-2 text-primary font-semibold uppercase tracking-[0.15em] md:tracking-[0.2em] text-[10px] md:text-xs">
                 <Info className="h-3.5 w-3.5 md:h-4 md:w-4" /> ข้อมูลสเปค
               </div>
               <div className="h-px flex-1 bg-primary/10" />

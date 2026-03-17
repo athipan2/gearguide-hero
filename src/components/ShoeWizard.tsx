@@ -197,10 +197,10 @@ export function ShoeWizard({ onClose }: { onClose: () => void }) {
           <div className="relative z-10 flex flex-col items-center">
             <div className="flex items-center gap-2 mb-2">
               <div className="h-[2px] w-8 bg-accent"></div>
-              <span className="text-[10px] font-black uppercase tracking-[0.3em] text-accent">GearTrail Assistant</span>
+              <span className="text-[10px] font-semibold uppercase tracking-[0.3em] text-accent">GearTrail Assistant</span>
               <div className="h-[2px] w-8 bg-accent"></div>
             </div>
-            <h2 className="font-heading text-2xl md:text-4xl font-black uppercase tracking-tighter">
+            <h2 className="font-heading text-2xl md:text-4xl font-semibold uppercase tracking-tighter">
               Find Your Perfect Gear
             </h2>
           </div>
@@ -237,7 +237,7 @@ export function ShoeWizard({ onClose }: { onClose: () => void }) {
                     <div className={`h-14 w-14 rounded-2xl ${cat.color} flex items-center justify-center mb-3 group-hover:scale-110 transition-transform`}>
                       {cat.icon}
                     </div>
-                    <h3 className="font-bold text-lg">{cat.label}</h3>
+                    <h3 className="font-semibold text-lg">{cat.label}</h3>
                   </button>
                 ))}
               </div>
@@ -261,7 +261,7 @@ export function ShoeWizard({ onClose }: { onClose: () => void }) {
                   <div className="h-12 w-12 rounded-2xl bg-primary/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                     <Zap className="h-6 w-6 text-primary" />
                   </div>
-                  <h3 className="font-bold text-xl mb-1">มีรุ่นที่สนใจแล้ว</h3>
+                  <h3 className="font-semibold text-xl mb-1">มีรุ่นที่สนใจแล้ว</h3>
                   <p className="text-sm text-muted-foreground">ระบุรุ่นเพื่อดูรีวิวและเช็คราคาได้ทันที</p>
                   <ChevronRight className="absolute bottom-8 right-8 h-6 w-6 text-muted-foreground opacity-0 group-hover:opacity-100 transition-all translate-x-2 group-hover:translate-x-0" />
                 </button>
@@ -273,7 +273,7 @@ export function ShoeWizard({ onClose }: { onClose: () => void }) {
                   <div className="h-12 w-12 rounded-2xl bg-accent/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                     <Target className="h-6 w-6 text-accent" />
                   </div>
-                  <h3 className="font-bold text-xl mb-1">อยากให้ช่วยแนะนำ</h3>
+                  <h3 className="font-semibold text-xl mb-1">อยากให้ช่วยแนะนำ</h3>
                   <p className="text-sm text-muted-foreground">ให้เราช่วยหารองเท้าที่เหมาะกับเป้าหมายและสรีระของคุณ</p>
                   <ChevronRight className="absolute bottom-8 right-8 h-6 w-6 text-muted-foreground opacity-0 group-hover:opacity-100 transition-all translate-x-2 group-hover:translate-x-0" />
                 </button>
@@ -288,7 +288,7 @@ export function ShoeWizard({ onClose }: { onClose: () => void }) {
                 <ChevronLeft className="h-4 w-4" /> ย้อนกลับ
               </button>
               <div className="space-y-4">
-                <h3 className="text-2xl font-bold">ระบุแบรนด์หรือรุ่นที่คุณมองหา</h3>
+                <h3 className="text-2xl font-semibold">ระบุแบรนด์หรือรุ่นที่คุณมองหา</h3>
                 <div className="relative">
                   <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                   <Input
@@ -315,12 +315,12 @@ export function ShoeWizard({ onClose }: { onClose: () => void }) {
               <button onClick={() => setStep("express_brand")} className="flex items-center gap-1 text-sm text-muted-foreground hover:text-primary">
                 <ChevronLeft className="h-4 w-4" /> ย้อนกลับ
               </button>
-              <h3 className="text-2xl font-bold">รายละเอียดเพิ่มเติม</h3>
+              <h3 className="text-2xl font-semibold">รายละเอียดเพิ่มเติม</h3>
 
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="text-sm font-bold text-muted-foreground mb-2 block uppercase">ไซส์ที่ต้องการ</label>
+                    <label className="text-sm font-semibold text-muted-foreground mb-2 block uppercase">ไซส์ที่ต้องการ</label>
                     <Input
                       placeholder="เช่น 10 US / 44 EU"
                       value={size}
@@ -329,7 +329,7 @@ export function ShoeWizard({ onClose }: { onClose: () => void }) {
                     />
                   </div>
                   <div>
-                    <label className="text-sm font-bold text-muted-foreground mb-2 block uppercase">สีที่ชอบ</label>
+                    <label className="text-sm font-semibold text-muted-foreground mb-2 block uppercase">สีที่ชอบ</label>
                     <Input
                       placeholder="เช่น สีส้ม, ขาว"
                       value={color}
@@ -340,17 +340,17 @@ export function ShoeWizard({ onClose }: { onClose: () => void }) {
                 </div>
 
                 <div>
-                  <label className="text-sm font-bold text-muted-foreground mb-2 block uppercase">ลักษณะการใช้งาน</label>
+                  <label className="text-sm font-semibold text-muted-foreground mb-2 block uppercase">ลักษณะการใช้งาน</label>
                   <div className="grid grid-cols-2 gap-3">
                     <button
                       onClick={() => setUsage("train")}
-                      className={`p-4 rounded-xl border-2 transition-all font-bold ${usage === "train" ? "border-primary bg-primary/5 text-primary" : "border-muted text-muted-foreground hover:border-primary/20"}`}
+                      className={`p-4 rounded-xl border-2 transition-all font-semibold ${usage === "train" ? "border-primary bg-primary/5 text-primary" : "border-muted text-muted-foreground hover:border-primary/20"}`}
                     >
                       ซ้อมทั่วไป
                     </button>
                     <button
                       onClick={() => setUsage("race")}
-                      className={`p-4 rounded-xl border-2 transition-all font-bold ${usage === "race" ? "border-primary bg-primary/5 text-primary" : "border-muted text-muted-foreground hover:border-primary/20"}`}
+                      className={`p-4 rounded-xl border-2 transition-all font-semibold ${usage === "race" ? "border-primary bg-primary/5 text-primary" : "border-muted text-muted-foreground hover:border-primary/20"}`}
                     >
                       ใส่ลงแข่ง
                     </button>
@@ -374,7 +374,7 @@ export function ShoeWizard({ onClose }: { onClose: () => void }) {
               <button onClick={() => setStep("entry")} className="flex items-center gap-1 text-sm text-muted-foreground hover:text-primary">
                 <ChevronLeft className="h-4 w-4" /> ย้อนกลับ
               </button>
-              <h3 className="text-2xl font-bold text-center">เป้าหมายหลักในการวิ่งคืออะไร?</h3>
+              <h3 className="text-2xl font-semibold text-center">เป้าหมายหลักในการวิ่งคืออะไร?</h3>
               <div className="grid grid-cols-1 gap-3">
                 {[
                   { id: "health", label: "วิ่งเพื่อสุขภาพ / ลดน้ำหนัก", icon: <Sparkles className="h-5 w-5" /> },
@@ -391,7 +391,7 @@ export function ShoeWizard({ onClose }: { onClose: () => void }) {
                     <div className="h-10 w-10 rounded-xl bg-muted group-hover:bg-primary/20 flex items-center justify-center transition-colors">
                       {item.icon}
                     </div>
-                    <span className="font-bold text-lg">{item.label}</span>
+                    <span className="font-semibold text-lg">{item.label}</span>
                     <ChevronRight className="ml-auto h-5 w-5 text-muted-foreground" />
                   </button>
                 ))}
@@ -405,7 +405,7 @@ export function ShoeWizard({ onClose }: { onClose: () => void }) {
               <button onClick={() => setStep("consult_goal")} className="flex items-center gap-1 text-sm text-muted-foreground hover:text-primary">
                 <ChevronLeft className="h-4 w-4" /> ย้อนกลับ
               </button>
-              <h3 className="text-2xl font-bold text-center">ชอบฟีลลิ่งรองเท้าแบบไหน?</h3>
+              <h3 className="text-2xl font-semibold text-center">ชอบฟีลลิ่งรองเท้าแบบไหน?</h3>
               <div className="grid grid-cols-2 gap-4">
                 <button
                   onClick={() => { setFeeling("soft"); setStep("consult_foot"); }}
@@ -414,7 +414,7 @@ export function ShoeWizard({ onClose }: { onClose: () => void }) {
                   <div className="h-16 w-16 mx-auto rounded-full bg-primary/10 flex items-center justify-center">
                     <span className="text-3xl">☁️</span>
                   </div>
-                  <h4 className="font-bold text-xl">นุ่มซัพพอร์ต</h4>
+                  <h4 className="font-semibold text-xl">นุ่มซัพพอร์ต</h4>
                   <p className="text-xs text-muted-foreground">ปกป้องเท้า ถนอมเข่า</p>
                 </button>
                 <button
@@ -424,7 +424,7 @@ export function ShoeWizard({ onClose }: { onClose: () => void }) {
                   <div className="h-16 w-16 mx-auto rounded-full bg-accent/10 flex items-center justify-center">
                     <span className="text-3xl">⚡</span>
                   </div>
-                  <h4 className="font-bold text-xl">เบาเด้งทำเวลา</h4>
+                  <h4 className="font-semibold text-xl">เบาเด้งทำเวลา</h4>
                   <p className="text-xs text-muted-foreground">เน้นความเร็ว ตอบสนองดี</p>
                 </button>
               </div>
@@ -437,7 +437,7 @@ export function ShoeWizard({ onClose }: { onClose: () => void }) {
               <button onClick={() => setStep("consult_feeling")} className="flex items-center gap-1 text-sm text-muted-foreground hover:text-primary">
                 <ChevronLeft className="h-4 w-4" /> ย้อนกลับ
               </button>
-              <h3 className="text-2xl font-bold text-center">สรีระเท้าของคุณเป็นอย่างไร?</h3>
+              <h3 className="text-2xl font-semibold text-center">สรีระเท้าของคุณเป็นอย่างไร?</h3>
               <div className="grid grid-cols-2 gap-4">
                 <button
                   onClick={() => {
@@ -449,7 +449,7 @@ export function ShoeWizard({ onClose }: { onClose: () => void }) {
                   <div className="h-16 w-16 mx-auto border-2 border-dashed border-primary/20 rounded-full flex items-center justify-center overflow-hidden p-2">
                     <img src="https://images.unsplash.com/photo-1560769629-975ec94e6a86?w=100" className="opacity-40 grayscale" alt="Normal Foot" />
                   </div>
-                  <h4 className="font-bold text-xl">อุ้งเท้าปกติ</h4>
+                  <h4 className="font-semibold text-xl">อุ้งเท้าปกติ</h4>
                 </button>
                 <button
                   onClick={() => {
@@ -461,7 +461,7 @@ export function ShoeWizard({ onClose }: { onClose: () => void }) {
                   <div className="h-16 w-16 mx-auto border-2 border-dashed border-primary/20 rounded-full flex items-center justify-center overflow-hidden p-2">
                      <img src="https://images.unsplash.com/photo-1560769629-975ec94e6a86?w=100" className="opacity-40 grayscale scale-x-125" alt="Flat Foot" />
                   </div>
-                  <h4 className="font-bold text-xl">เท้าแบน</h4>
+                  <h4 className="font-semibold text-xl">เท้าแบน</h4>
                 </button>
               </div>
             </div>
@@ -474,7 +474,7 @@ export function ShoeWizard({ onClose }: { onClose: () => void }) {
                 <div className="h-16 w-16 bg-green-500/10 text-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
                    <Check className="h-8 w-8" />
                 </div>
-                <h3 className="text-3xl font-black">เราคัดมาให้คุณแล้ว!</h3>
+                <h3 className="text-3xl font-semibold">เราคัดมาให้คุณแล้ว!</h3>
                 <p className="text-muted-foreground">{recommendations.length} รุ่นที่เหมาะสมที่สุดกับสรีระและเป้าหมายของคุณ</p>
               </div>
 
@@ -482,7 +482,7 @@ export function ShoeWizard({ onClose }: { onClose: () => void }) {
                 {recommendations.map((rec, index) => (
                   <div key={rec.id} className="relative group bg-card rounded-3xl border border-primary/5 overflow-hidden flex flex-col md:flex-row gap-6 p-6 hover:shadow-xl transition-all">
                     {index === 0 && (
-                      <div className="absolute top-0 left-0 bg-accent text-white px-4 py-1 text-[10px] font-bold uppercase rounded-br-xl">
+                      <div className="absolute top-0 left-0 bg-accent text-white px-4 py-1 text-[10px] font-semibold uppercase rounded-br-xl">
                         Top Pick
                       </div>
                     )}
@@ -493,18 +493,18 @@ export function ShoeWizard({ onClose }: { onClose: () => void }) {
 
                     <div className="flex-1 flex flex-col">
                       <div className="mb-2">
-                        <p className="text-[10px] font-bold uppercase text-accent tracking-widest">{rec.brand}</p>
-                        <h4 className="text-xl font-bold">{rec.name}</h4>
+                        <p className="text-[10px] font-semibold uppercase text-accent tracking-widest">{rec.brand}</p>
+                        <h4 className="text-xl font-semibold">{rec.name}</h4>
                       </div>
 
                       <div className="flex flex-wrap gap-2 mb-4">
                         {rec.pros?.slice(0, 2).map(pro => (
-                          <span key={pro} className="text-[10px] bg-green-500/10 text-green-600 px-2 py-1 rounded-full font-bold">✓ {pro}</span>
+                          <span key={pro} className="text-[10px] bg-green-500/10 text-green-600 px-2 py-1 rounded-full font-semibold">✓ {pro}</span>
                         ))}
                       </div>
 
                       <div className="mt-auto flex items-center justify-between gap-4">
-                        <span className="text-2xl font-black text-primary">{rec.price}</span>
+                        <span className="text-2xl font-semibold text-primary">{rec.price}</span>
                         <div className="flex gap-2">
                           <Button
                             variant="outline"
@@ -537,7 +537,7 @@ export function ShoeWizard({ onClose }: { onClose: () => void }) {
                     <Scale className="h-6 w-6 text-primary" />
                   </div>
                   <div>
-                    <h5 className="font-bold">ต้องการเทียบจุดต่าง?</h5>
+                    <h5 className="font-semibold">ต้องการเทียบจุดต่าง?</h5>
                     <p className="text-xs text-muted-foreground">เรานำรุ่นที่แนะนำใส่ในตารางเปรียบเทียบให้แล้ว</p>
                   </div>
                 </div>

@@ -26,11 +26,11 @@ const ComparePage = () => {
           </Link>
 
           <div className="flex flex-col gap-1 md:gap-2">
-            <div className="inline-flex items-center gap-2 text-accent font-bold uppercase tracking-[0.2em] text-[10px] md:text-sm">
+            <div className="inline-flex items-center gap-2 text-accent font-semibold uppercase tracking-[0.2em] text-[10px] md:text-sm">
               <Scale className="h-3 w-3 md:h-4 md:w-4" />
               Comparison Center
             </div>
-            <h1 className="font-heading text-3xl md:text-6xl font-black text-primary tracking-tighter uppercase leading-tight">
+            <h1 className="font-heading text-3xl md:text-6xl font-semibold text-primary tracking-tighter uppercase leading-tight">
               เปรียบเทียบสเปค
             </h1>
           </div>
