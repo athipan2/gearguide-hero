@@ -106,6 +106,18 @@ export default function ReviewDetail() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Enable horizontal movement specifically for this page
+    // We target the style directly because overflow-x-hidden might be applied via @apply in CSS
+    const originalOverflowX = document.body.style.overflowX;
+    document.body.style.overflowX = 'auto';
+
+    return () => {
+      // Re-enable overflow-x-hidden when leaving the page to maintain global stability
+      document.body.style.overflowX = originalOverflowX;
+    };
+  }, []);
+
+  useEffect(() => {
     if (!slug) { setLoading(false); return; }
 
     const fetchReview = async () => {
@@ -201,7 +213,7 @@ export default function ReviewDetail() {
   };
 
   return (
-    <div className="min-h-screen bg-white overflow-x-hidden">
+    <div className="min-h-screen bg-white">
       <SEOHead
         title={`${review.name} รีวิว — GearTrail`}
         description={`รีวิว ${review.name} จาก ${review.brand}: ${(review.intro || "").slice(0, 120)}...`}
@@ -241,129 +253,131 @@ export default function ReviewDetail() {
         </nav>
       </div>
 
-      <article className="container mx-auto px-4 pb-16 md:pb-24 pt-2 md:pt-0">
-        {/* Header */}
-        <div className="grid md:grid-cols-2 gap-3 md:gap-12 mb-4 md:mb-16 items-center">
-          <ImageGallery
-            mainImage={review.image_url || ""}
-            images={review.images}
-            alt={review.name}
-            badge={review.badge}
-            badgeClassName={badgeColors[review.badge || ""] || "bg-primary text-primary-foreground"}
-            badgeIcon={<Award className="h-4 w-4" />}
-          />
+      <article className="container mx-auto px-4 pb-16 md:pb-24 pt-2 md:pt-0 overflow-x-auto scrollbar-hide">
+        {/* Upper Moveable Area */}
+        <div className="min-w-[102%] md:min-w-full -mx-[1%] px-[1%] md:mx-0 md:px-0 transition-transform duration-500">
+          {/* Header */}
+          <div className="grid md:grid-cols-2 gap-3 md:gap-12 mb-4 md:mb-16 items-center">
+            <ImageGallery
+              mainImage={review.image_url || ""}
+              images={review.images}
+              alt={review.name}
+              badge={review.badge}
+              badgeClassName={badgeColors[review.badge || ""] || "bg-primary text-primary-foreground"}
+              badgeIcon={<Award className="h-4 w-4" />}
+            />
 
-          <div className="flex flex-col justify-center space-y-4 md:space-y-8">
-            <div className="space-y-1 md:space-y-2">
-              <p className="text-[9px] md:text-sm font-black text-accent uppercase tracking-[0.3em]">{review.brand} // {review.category}</p>
-              <h1 className="font-heading text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-black text-primary leading-[0.95] tracking-tighter uppercase break-words overflow-hidden">{review.name}</h1>
-            </div>
-
-            <div className="flex flex-wrap items-center gap-3 md:gap-6">
-              <div className="flex items-center gap-3 md:gap-4 bg-gradient-to-br from-primary to-primary/80 text-primary-foreground rounded-3xl px-4 py-2 md:px-8 md:py-6 shadow-2xl shadow-primary/20 w-fit relative overflow-hidden group">
-                <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity" />
-                <span className="font-heading text-3xl md:text-6xl font-black tracking-tighter">{review.overall_rating}</span>
-                <div className="relative z-10">
-                  <div className="scale-90 md:scale-110 origin-left">
-                    <RatingStars rating={review.overall_rating} />
-                  </div>
-                  <p className="text-[8px] md:text-[10px] font-black uppercase tracking-[0.2em] opacity-70 mt-1">Overall Performance</p>
-                </div>
+            <div className="flex flex-col justify-center space-y-4 md:space-y-8">
+              <div className="space-y-1 md:space-y-2">
+                <p className="text-[9px] md:text-sm font-black text-accent uppercase tracking-[0.3em]">{review.brand} // {review.category}</p>
+                <h1 className="font-heading text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-black text-primary leading-[0.95] tracking-tighter uppercase break-words overflow-hidden">{review.name}</h1>
               </div>
 
-              {userRating && (
-                <div className="flex items-center gap-3 md:gap-4 bg-white border border-border/40 rounded-3xl px-4 py-2 md:px-8 md:py-6 w-fit shadow-xl shadow-black/[0.02]">
-                  <span className="font-heading text-2xl md:text-4xl font-black text-primary tracking-tighter">{userRating.average.toFixed(1)}</span>
-                  <div>
-                    <div className="scale-75 md:scale-100 origin-left">
-                      <RatingStars rating={userRating.average} />
+              <div className="flex flex-wrap items-center gap-3 md:gap-6">
+                <div className="flex items-center gap-3 md:gap-4 bg-gradient-to-br from-primary to-primary/80 text-primary-foreground rounded-3xl px-4 py-2 md:px-8 md:py-6 shadow-2xl shadow-primary/20 w-fit relative overflow-hidden group">
+                  <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <span className="font-heading text-3xl md:text-6xl font-black tracking-tighter">{review.overall_rating}</span>
+                  <div className="relative z-10">
+                    <div className="scale-90 md:scale-110 origin-left">
+                      <RatingStars rating={review.overall_rating} />
                     </div>
-                    <p className="text-[8px] md:text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/60 mt-1">User Rating ({userRating.count})</p>
+                    <p className="text-[8px] md:text-[10px] font-black uppercase tracking-[0.2em] opacity-70 mt-1">Overall Performance</p>
                   </div>
                 </div>
-              )}
 
-              <div className="bg-accent/5 border border-accent/10 rounded-3xl px-4 py-2 md:px-8 md:py-6">
-                <p className="text-[8px] md:text-[10px] font-black uppercase tracking-[0.2em] text-accent/70 mb-1">Price Estimate</p>
-                <span className="font-heading text-xl md:text-3xl font-black text-accent tracking-tight">{review.price}</span>
-              </div>
-            </div>
-
-            <div className="relative">
-              <Quote className="absolute -top-4 -left-2 h-8 w-8 text-accent/10 -z-10" />
-              <p className="text-muted-foreground text-sm md:text-xl leading-relaxed pl-4 md:pl-6 border-l-2 border-accent/30 font-medium max-w-2xl">
-                {review.intro}
-              </p>
-            </div>
-
-            {/* Mobile Ratings & Specs */}
-            <div className="lg:hidden grid grid-cols-1 gap-4 pt-4 pb-2">
-              <div className="bg-card rounded-2xl border border-border/60 p-4 space-y-3 shadow-sm overflow-hidden">
-                <h3 className="font-heading font-black text-primary text-[10px] uppercase tracking-[0.2em] flex items-center gap-2">
-                  <div className="w-1 h-3 bg-accent rounded-full" />
-                  คะแนนแต่ละด้าน (RATINGS)
-                </h3>
-                <div className="grid grid-cols-1 gap-y-2.5">
-                  {review.ratings.map((r) => (
-                    <RatingBar key={r.label} label={r.label} score={r.score} />
-                  ))}
-                </div>
-              </div>
-              <div className="bg-card rounded-2xl border border-border/60 p-4 shadow-sm overflow-hidden">
-                <h3 className="font-heading font-black text-primary text-[10px] uppercase tracking-[0.2em] flex items-center gap-2 mb-4">
-                  <div className="w-1 h-3 bg-accent rounded-full" />
-                  สเปคทางเทคนิค (SPECS)
-                </h3>
-                <div className="grid grid-cols-1 gap-2">
-                  {[
-                    { icon: Scale, label: "น้ำหนัก", value: review.specs?.find(s => s.label.toLowerCase().includes('weight') || s.label.includes('น้ำหนัก'))?.value || '-' },
-                    { icon: ArrowDown, label: "Drop", value: review.specs?.find(s => s.label.toLowerCase().includes('drop'))?.value || '-' },
-                    { icon: Layers, label: "พื้นรองเท้า", value: review.specs?.find(s => s.label.toLowerCase().includes('midsole') || s.label.includes('พื้นรองเท้า'))?.value || '-' },
-                    { icon: Footprints, label: "พื้นนอก", value: review.specs?.find(s => s.label.toLowerCase().includes('outsole') || s.label.includes('พื้นนอก'))?.value || '-' },
-                    { icon: Target, label: "เหมาะกับ", value: review.specs?.find(s => s.label.toLowerCase().includes('suitable') || s.label.includes('เหมาะกับ'))?.value || '-' },
-                    { icon: Route, label: "ระยะทาง", value: review.specs?.find(s => s.label.toLowerCase().includes('distance') || s.label.includes('ระยะทาง'))?.value || '-' },
-                  ].map((spec, i) => (
-                    <div key={i} className="flex items-start gap-3 p-3 rounded-xl bg-slate-50 border border-slate-200/60 transition-all duration-300">
-                      <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center text-primary shrink-0 border border-slate-200 shadow-sm mt-0.5">
-                        <spec.icon className="w-4 h-4" />
+                {userRating && (
+                  <div className="flex items-center gap-3 md:gap-4 bg-white border border-border/40 rounded-3xl px-4 py-2 md:px-8 md:py-6 w-fit shadow-xl shadow-black/[0.02]">
+                    <span className="font-heading text-2xl md:text-4xl font-black text-primary tracking-tighter">{userRating.average.toFixed(1)}</span>
+                    <div>
+                      <div className="scale-75 md:scale-100 origin-left">
+                        <RatingStars rating={userRating.average} />
                       </div>
-                      <div className="flex flex-col min-w-0">
-                        <span className="text-[8px] uppercase font-black text-slate-400 tracking-widest leading-none mb-1">{spec.label}</span>
-                        <span className="font-bold text-[12px] text-slate-800 leading-tight tracking-tight break-words">{spec.value}</span>
-                      </div>
+                      <p className="text-[8px] md:text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/60 mt-1">User Rating ({userRating.count})</p>
                     </div>
-                  ))}
+                  </div>
+                )}
+
+                <div className="bg-accent/5 border border-accent/10 rounded-3xl px-4 py-2 md:px-8 md:py-6">
+                  <p className="text-[8px] md:text-[10px] font-black uppercase tracking-[0.2em] text-accent/70 mb-1">Price Estimate</p>
+                  <span className="font-heading text-xl md:text-3xl font-black text-accent tracking-tight">{review.price}</span>
                 </div>
               </div>
-            </div>
 
-            <div className="flex flex-wrap gap-3 md:gap-4 pt-2 md:pt-4">
+              <div className="relative">
+                <Quote className="absolute -top-4 -left-2 h-8 w-8 text-accent/10 -z-10" />
+                <p className="text-muted-foreground text-sm md:text-xl leading-relaxed pl-4 md:pl-6 border-l-2 border-accent/30 font-medium max-w-2xl">
+                  {review.intro}
+                </p>
+              </div>
+
+              {/* Mobile Ratings & Specs */}
+              <div className="lg:hidden space-y-4 pt-4">
+                <div className="bg-card rounded-2xl border border-border/60 p-5 space-y-4 shadow-sm">
+                  <h3 className="font-heading font-black text-primary text-xs uppercase tracking-[0.2em] flex items-center gap-2">
+                    <div className="w-1 h-3.5 bg-accent rounded-full" />
+                    คะแนนแต่ละด้าน (RATINGS)
+                  </h3>
+                  <div className="space-y-4">
+                    {review.ratings.map((r) => (
+                      <RatingBar key={r.label} label={r.label} score={r.score} />
+                    ))}
+                  </div>
+                </div>
+
+                <div className="bg-card rounded-2xl border border-border/60 p-5 shadow-sm">
+                  <h3 className="font-heading font-black text-primary text-xs uppercase tracking-[0.2em] flex items-center gap-2 mb-6">
+                    <div className="w-1 h-3.5 bg-accent rounded-full" />
+                    สเปคทางเทคนิค (SPECS)
+                  </h3>
+                  <div className="grid grid-cols-1 gap-4">
+                    {[
+                      { icon: Scale, label: "น้ำหนัก (WEIGHT)", value: review.specs?.find(s => s.label.toLowerCase().includes('weight') || s.label.includes('น้ำหนัก'))?.value || '-' },
+                      { icon: ArrowDown, label: "DROP", value: review.specs?.find(s => s.label.toLowerCase().includes('drop'))?.value || '-' },
+                      { icon: Layers, label: "พื้นรองเท้า (MIDSOLE)", value: review.specs?.find(s => s.label.toLowerCase().includes('midsole') || s.label.includes('พื้นรองเท้า'))?.value || '-' },
+                      { icon: Footprints, label: "พื้นนอก (OUTSOLE)", value: review.specs?.find(s => s.label.toLowerCase().includes('outsole') || s.label.includes('พื้นนอก'))?.value || '-' },
+                    ].map((spec, i) => (
+                      <div key={i} className="flex items-center gap-4">
+                        <div className="h-10 w-10 rounded-xl bg-slate-50 flex items-center justify-center text-slate-400">
+                          <spec.icon className="h-5 w-5" />
+                        </div>
+                        <div className="flex flex-col">
+                          <span className="text-[8px] font-black text-slate-400 tracking-widest">{spec.label}</span>
+                          <span className="font-bold text-sm text-slate-700">{spec.value}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex flex-wrap gap-3 md:gap-4 pt-2 md:pt-4">
               <CTAButton className="flex-1 md:flex-none rounded-full h-12 md:h-14 px-8 md:px-10 shadow-xl text-sm md:text-base" />
-              <Button
-                variant="outline"
-                size="lg"
-                className="flex-1 md:flex-none rounded-full h-12 md:h-14 px-8 md:px-10 border-primary/20 text-sm md:text-base"
-                onClick={() => {
-                  const weight = review.specs?.find(s => s.label.toLowerCase().includes('weight') || s.label.includes('น้ำหนัก'))?.value;
-                  const drop = review.specs?.find(s => s.label.toLowerCase().includes('drop'))?.value;
-                  useComparisonStore.getState().addItem({
-                    name: review.name,
-                    brand: review.brand,
-                    image: review.image_url || "",
-                    rating: review.overall_rating,
-                    price: review.price,
-                    slug: slug,
-                    weight,
-                    drop,
-                    specs: review.specs,
-                    aspectRatings: review.ratings
-                  });
-                  toast.success(`เพิ่ม ${review.name} เข้าสู่การเปรียบเทียบ`);
-                }}
-              >
-                <Plus className="h-4 w-4 mr-2" />
-                เพิ่มลงเปรียบเทียบ
-              </Button>
+                <Button
+                  variant="outline"
+                  size="lg"
+                  className="flex-1 md:flex-none rounded-full h-12 md:h-14 px-8 md:px-10 border-primary/20 text-sm md:text-base"
+                  onClick={() => {
+                    const weight = review.specs?.find(s => s.label.toLowerCase().includes('weight') || s.label.includes('น้ำหนัก'))?.value;
+                    const drop = review.specs?.find(s => s.label.toLowerCase().includes('drop'))?.value;
+                    useComparisonStore.getState().addItem({
+                      name: review.name,
+                      brand: review.brand,
+                      image: review.image_url || "",
+                      rating: review.overall_rating,
+                      price: review.price,
+                      slug: slug,
+                      weight,
+                      drop,
+                      specs: review.specs,
+                      aspectRatings: review.ratings
+                    });
+                    toast.success(`เพิ่ม ${review.name} เข้าสู่การเปรียบเทียบ`);
+                  }}
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  เพิ่มลงเปรียบเทียบ
+                </Button>
+              </div>
             </div>
           </div>
         </div>
