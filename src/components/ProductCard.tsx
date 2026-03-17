@@ -92,11 +92,11 @@ export function ProductCard({ name, brand, image, rating, price, badge, pros, co
         </div>
 
         {/* CTAs */}
-        <div className="grid grid-cols-2 gap-2 pt-1 md:flex md:flex-wrap lg:grid lg:grid-cols-3">
+        <div className="grid grid-cols-2 gap-1.5 pt-1 md:flex md:flex-wrap lg:grid lg:grid-cols-3">
           <Button
             variant="outline"
             size="sm"
-            className="w-full border-primary/20 hover:bg-primary/5 text-[9px] font-bold uppercase tracking-sporty h-9 rounded-lg px-2"
+            className="w-full border-primary/20 hover:bg-primary/5 text-[7px] md:text-[9px] font-bold uppercase tracking-sporty h-9 rounded-lg px-1 md:px-2"
             onClick={() => {
               useComparisonStore.getState().addItem({
                 name, brand, image, rating, price, slug, weight, drop,
@@ -106,19 +106,18 @@ export function ProductCard({ name, brand, image, rating, price, badge, pros, co
               toast.success(`เพิ่ม ${name} เข้าสู่การเปรียบเทียบ`);
             }}
           >
-            <Plus className="h-3 w-3 mr-1 shrink-0" />
             COMPARE
           </Button>
 
           {slug ? (
-            <Button variant="outline" size="sm" className="w-full text-[9px] font-bold uppercase tracking-sporty h-9 rounded-lg px-2" asChild>
+            <Button variant="outline" size="sm" className="w-full text-[7px] md:text-[9px] font-bold uppercase tracking-sporty h-9 rounded-lg px-1 md:px-2" asChild>
               <Link to={`/review/${slug}`}>REVIEW</Link>
             </Button>
           ) : (
-            <Button variant="outline" size="sm" className="w-full text-[9px] font-bold uppercase tracking-sporty h-9 rounded-lg px-2">REVIEW</Button>
+            <Button variant="outline" size="sm" className="w-full text-[7px] md:text-[9px] font-bold uppercase tracking-sporty h-9 rounded-lg px-1 md:px-2">REVIEW</Button>
           )}
 
-          <Button variant="cta" size="sm" className="col-span-2 lg:col-span-1 text-[9px] font-bold uppercase tracking-sporty h-9 rounded-lg px-2" asChild={!!affiliateUrl}>
+          <Button variant="cta" size="sm" className="col-span-2 lg:col-span-1 text-[7px] md:text-[9px] font-bold uppercase tracking-sporty h-9 rounded-lg px-1 md:px-2" asChild={!!affiliateUrl}>
             {affiliateUrl ? (
               <a href={affiliateUrl} target="_blank" rel="noopener noreferrer nofollow">
                 ดูราคา
