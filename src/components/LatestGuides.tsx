@@ -55,18 +55,23 @@ export function LatestGuides() {
   if (articles.length === 0) return null;
 
   return (
-    <section className="container mx-auto px-4 py-16 bg-muted/30 rounded-3xl my-16">
-      <div className="flex items-end justify-between mb-8">
-        <div>
-          <h2 className="font-heading text-2xl md:text-3xl font-bold text-foreground">คู่มือ & เทคนิคการวิ่ง</h2>
-          <p className="text-muted-foreground mt-1">อัปเกรดความรู้เรื่องวิ่งและการดูแลอุปกรณ์</p>
+    <section className="container mx-auto px-4 py-12 md:py-20 bg-muted/30 rounded-[2.5rem] my-12 md:my-20">
+      <div className="flex items-end justify-between mb-8 md:mb-12">
+        <div className="space-y-1">
+          <div className="flex items-center gap-2">
+            <span className="w-8 h-1 bg-accent rounded-full" />
+            <span className="text-[10px] md:text-xs font-bold text-accent uppercase tracking-sporty">TIPS & GUIDES</span>
+          </div>
+          <h2 className="font-heading text-2xl md:text-3xl font-semibold text-foreground uppercase tracking-tight-compact">คู่มือ & เทคนิค</h2>
+          <p className="text-xs md:text-sm text-muted-foreground mt-1 max-w-md">อัปเกรดความรู้เรื่องวิ่งและการดูแลอุปกรณ์ พร้อมรีวิวจริงจากผู้ใช้งาน</p>
         </div>
-        <Link to="/guides" className="hidden md:inline-flex items-center text-sm font-medium text-primary hover:text-accent transition-colors">
-          ดูคู่มือทั้งหมด <ArrowRight className="ml-1 h-4 w-4" />
+        <Link to="/guides" className="hidden md:inline-flex items-center gap-2 text-xs font-bold uppercase tracking-sporty text-primary hover:text-accent transition-all group">
+          ดูคู่มือทั้งหมด
+          <span className="group-hover:translate-x-1 transition-transform">→</span>
         </Link>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
         {articles.map((article) => (
           <Link
             key={article.id}
@@ -80,11 +85,11 @@ export function LatestGuides() {
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
               />
             </div>
-            <div className="p-5">
-              <span className="text-[10px] font-bold text-primary uppercase tracking-widest bg-primary/5 px-2 py-1 rounded mb-3 inline-block">
+            <div className="p-5 md:p-6">
+              <span className="text-[9px] md:text-[10px] font-bold text-primary uppercase tracking-sporty bg-primary/5 px-2.5 py-1 rounded-md mb-3 inline-block">
                 {article.category}
               </span>
-              <h3 className="font-heading font-bold text-foreground group-hover:text-primary transition-colors line-clamp-2 mb-3">
+              <h3 className="font-heading font-semibold text-base md:text-lg text-foreground group-hover:text-primary transition-colors line-clamp-2 mb-3 leading-snug">
                 {article.title}
               </h3>
               <div className="flex items-center text-xs text-muted-foreground">

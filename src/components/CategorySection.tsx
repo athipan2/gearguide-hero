@@ -10,18 +10,21 @@ const categories = [
 
 export function CategorySection() {
   return (
-    <section className="relative py-24 overflow-hidden">
+    <section className="relative py-16 md:py-24 overflow-hidden">
       <div className="absolute inset-0 bg-dot-grid opacity-50" />
 
       <div className="container relative mx-auto px-4">
-        <div className="flex items-end justify-between mb-12">
+        <div className="flex items-end justify-between mb-10 md:mb-14">
           <div className="space-y-2">
-            <div className="w-12 h-1 bg-accent" />
-            <h2 className="font-heading text-3xl md:text-5xl font-semibold text-foreground uppercase tracking-tighter">
+            <div className="flex items-center gap-2">
+              <span className="w-8 h-1 bg-accent rounded-full" />
+              <span className="text-[10px] md:text-xs font-bold text-accent uppercase tracking-sporty">CATEGORIES</span>
+            </div>
+            <h2 className="font-heading text-2xl md:text-4xl font-semibold text-foreground uppercase tracking-tight-compact">
               EXPLORE <span className="text-primary/40">GEAR</span>
             </h2>
           </div>
-          <p className="hidden md:block text-muted-foreground font-medium uppercase tracking-widest text-xs">
+          <p className="hidden md:block text-muted-foreground font-bold uppercase tracking-sporty text-[10px]">
             ค้นหาตามประเภทการใช้งาน
           </p>
         </div>
@@ -39,9 +42,9 @@ export function CategorySection() {
                 <cat.icon className="h-8 w-8" />
               </div>
 
-              <h3 className="font-heading font-semibold text-xl text-card-foreground uppercase tracking-tight">{cat.title}</h3>
+              <h3 className="font-heading font-semibold text-lg md:text-xl text-card-foreground uppercase tracking-tight-compact">{cat.title}</h3>
               <div className="flex items-center gap-2 mt-2">
-                <span className="text-sm font-semibold text-muted-foreground/60">{cat.count} ARTICLES</span>
+                <span className="text-[10px] md:text-xs font-bold text-muted-foreground/60 tracking-sporty uppercase">{cat.count} ARTICLES</span>
                 <div className="flex-1 h-px bg-muted" />
               </div>
 
