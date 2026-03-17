@@ -114,14 +114,19 @@ export function FeaturedReviews() {
   }, []);
 
   return (
-    <section className="container mx-auto px-4 py-16">
-      <div className="flex items-end justify-between mb-8">
-        <div>
-          <h2 className="font-heading text-3xl sm:text-4xl font-semibold text-primary tracking-tighter uppercase">รีวิวล่าสุด</h2>
-          <p className="text-sm sm:text-base text-muted-foreground mt-1">ทดสอบจริง รีวิวจริง อัปเดตทุกสัปดาห์</p>
+    <section className="container mx-auto px-4 py-12 md:py-20">
+      <div className="flex items-end justify-between mb-8 md:mb-12">
+        <div className="space-y-1">
+          <div className="flex items-center gap-2">
+            <span className="w-8 h-1 bg-accent rounded-full" />
+            <span className="text-[10px] md:text-xs font-bold text-accent uppercase tracking-sporty">TESTED & REVIEWED</span>
+          </div>
+          <h2 className="font-heading text-2xl sm:text-3xl md:text-4xl font-semibold text-primary tracking-tight-compact uppercase">รีวิวล่าสุด</h2>
+          <p className="text-xs md:text-sm text-muted-foreground max-w-md leading-relaxed">ทดสอบจริง รีวิวจริง อัปเดตทุกสัปดาห์ เพื่อให้คุณเลือกอุปกรณ์ที่ดีที่สุด</p>
         </div>
-        <a href="#" className="hidden md:inline-flex text-sm font-semibold uppercase tracking-widest text-primary hover:text-accent transition-colors">
-          ดูทั้งหมด →
+        <a href="#" className="hidden md:inline-flex items-center gap-2 text-xs font-bold uppercase tracking-sporty text-primary hover:text-accent transition-all group">
+          ดูทั้งหมด
+          <span className="group-hover:translate-x-1 transition-transform">→</span>
         </a>
       </div>
 

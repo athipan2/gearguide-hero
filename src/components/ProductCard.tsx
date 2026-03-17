@@ -44,12 +44,12 @@ export function ProductCard({ name, brand, image, rating, price, badge, pros, co
 
         <div className="absolute top-3 left-3 flex flex-col gap-2">
           {isNew && (
-            <div className="bg-accent text-accent-foreground px-3 py-1 rounded-lg text-[10px] font-semibold uppercase tracking-wider shadow-xl">
+            <div className="bg-accent text-accent-foreground px-3 py-1 rounded-lg text-[9px] font-semibold uppercase tracking-sporty shadow-xl">
               NEW
             </div>
           )}
           {badge && (
-            <div className={`px-3 py-1 rounded-lg text-[10px] font-semibold uppercase tracking-wider shadow-sm ${badgeColors[badge] || "bg-primary text-primary-foreground"}`}>
+            <div className={`px-3 py-1 rounded-lg text-[9px] font-semibold uppercase tracking-sporty shadow-sm ${badgeColors[badge] || "bg-primary text-primary-foreground"}`}>
               {badge}
             </div>
           )}
@@ -57,46 +57,46 @@ export function ProductCard({ name, brand, image, rating, price, badge, pros, co
       </div>
 
       {/* Content */}
-      <div className="p-4 md:p-5 space-y-3">
+      <div className="p-4 md:p-5 space-y-4">
         <div className="space-y-1">
           <div className="flex items-center gap-2">
             <span className="w-4 h-0.5 bg-accent" />
-            <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-[0.2em]">{brand}</p>
+            <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-sporty">{brand}</p>
           </div>
-          <h3 className="font-heading font-semibold text-lg text-card-foreground line-clamp-2 uppercase tracking-tight group-hover:text-primary transition-colors">{name}</h3>
+          <h3 className="font-heading font-semibold text-base md:text-lg text-card-foreground line-clamp-2 uppercase tracking-tight group-hover:text-primary transition-colors leading-snug">{name}</h3>
         </div>
 
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 sm:gap-0 border-y border-muted py-2">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 sm:gap-0 border-y border-muted py-2.5">
           <RatingStars rating={rating} />
-          <span className="font-heading font-semibold text-xl text-primary">{price}</span>
+          <span className="font-heading font-semibold text-lg md:text-xl text-primary">{price}</span>
         </div>
 
         {/* Pros / Cons */}
-        <div className="grid grid-cols-2 gap-3 text-[11px] py-1">
-          <div className="space-y-1.5">
+        <div className="grid grid-cols-2 gap-3 text-[11px] py-0.5">
+          <div className="space-y-2">
             {pros.slice(0, 2).map((p) => (
               <div key={p} className="flex items-start gap-1.5 text-badge-recommended/80">
                 <ThumbsUp className="h-3 w-3 mt-0.5 shrink-0" />
-                <span className="text-muted-foreground/90 line-clamp-1">{p}</span>
+                <span className="text-muted-foreground/90 line-clamp-2 leading-relaxed">{p}</span>
               </div>
             ))}
           </div>
-          <div className="space-y-1.5">
+          <div className="space-y-2">
             {cons.slice(0, 2).map((c) => (
               <div key={c} className="flex items-start gap-1.5 text-destructive/70">
                 <ThumbsDown className="h-3 w-3 mt-0.5 shrink-0" />
-                <span className="text-muted-foreground/90 line-clamp-1">{c}</span>
+                <span className="text-muted-foreground/90 line-clamp-2 leading-relaxed">{c}</span>
               </div>
             ))}
           </div>
         </div>
 
         {/* CTAs */}
-        <div className="grid grid-cols-2 gap-2 pt-1 md:flex md:flex-wrap">
+        <div className="grid grid-cols-2 gap-2 pt-1 md:flex md:flex-wrap lg:grid lg:grid-cols-3">
           <Button
             variant="outline"
             size="sm"
-            className="w-full md:flex-1 border-primary/20 hover:bg-primary/5 text-[10px] font-semibold uppercase tracking-widest h-10 rounded-lg"
+            className="w-full border-primary/20 hover:bg-primary/5 text-[9px] font-bold uppercase tracking-sporty h-9 rounded-lg px-2"
             onClick={() => {
               useComparisonStore.getState().addItem({
                 name, brand, image, rating, price, slug, weight, drop,
@@ -106,28 +106,28 @@ export function ProductCard({ name, brand, image, rating, price, badge, pros, co
               toast.success(`เพิ่ม ${name} เข้าสู่การเปรียบเทียบ`);
             }}
           >
-            <Plus className="h-3.5 w-3.5 mr-1" />
+            <Plus className="h-3 w-3 mr-1 shrink-0" />
             COMPARE
           </Button>
 
           {slug ? (
-            <Button variant="outline" size="sm" className="w-full md:flex-1 text-[10px] font-semibold uppercase tracking-widest h-10 rounded-lg" asChild>
+            <Button variant="outline" size="sm" className="w-full text-[9px] font-bold uppercase tracking-sporty h-9 rounded-lg px-2" asChild>
               <Link to={`/review/${slug}`}>REVIEW</Link>
             </Button>
           ) : (
-            <Button variant="outline" size="sm" className="w-full md:flex-1 text-[10px] font-semibold uppercase tracking-widest h-10 rounded-lg">REVIEW</Button>
+            <Button variant="outline" size="sm" className="w-full text-[9px] font-bold uppercase tracking-sporty h-9 rounded-lg px-2">REVIEW</Button>
           )}
 
-          <Button variant="cta" size="sm" className="col-span-2 md:flex-1 text-[10px] font-semibold uppercase tracking-widest h-10 rounded-lg" asChild={!!affiliateUrl}>
+          <Button variant="cta" size="sm" className="col-span-2 lg:col-span-1 text-[9px] font-bold uppercase tracking-sporty h-9 rounded-lg px-2" asChild={!!affiliateUrl}>
             {affiliateUrl ? (
               <a href={affiliateUrl} target="_blank" rel="noopener noreferrer nofollow">
                 ดูราคา
-                <ExternalLink className="ml-1 h-3.5 w-3.5" />
+                <ExternalLink className="ml-1 h-3 w-3 shrink-0" />
               </a>
             ) : (
               <div className="flex items-center justify-center">
                 ดูราคา
-                <ExternalLink className="ml-1 h-3.5 w-3.5" />
+                <ExternalLink className="ml-1 h-3 w-3 shrink-0" />
               </div>
             )}
           </Button>

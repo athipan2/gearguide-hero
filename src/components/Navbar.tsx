@@ -45,21 +45,21 @@ export function Navbar() {
       )}
     >
       <div className="container mx-auto flex items-center justify-between h-full px-4">
-        <Link to="/" className="flex items-center gap-2 font-heading font-semibold text-3xl text-primary tracking-tighter">
+        <Link to="/" className="flex items-center gap-2 font-heading font-semibold text-2xl text-primary tracking-tight-compact">
           <div className="relative">
-            <Mountain className="h-8 w-8 text-accent" />
-            <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-primary rounded-full border-2 border-background" />
+            <Mountain className="h-6 w-6 text-accent" />
+            <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-primary rounded-full border-2 border-background" />
           </div>
           <span>GEARTRAIL</span>
         </Link>
 
         {/* Desktop nav */}
-        <div className="hidden md:flex items-center gap-8">
+        <div className="hidden md:flex items-center gap-6">
           {navLinks.map((l) => (
             <Link
               key={l.label}
               to={l.href}
-              className="group relative text-[11px] font-semibold uppercase tracking-[0.2em] text-foreground/60 hover:text-primary transition-colors py-2"
+              className="group relative text-[11px] font-bold uppercase tracking-sporty text-foreground/60 hover:text-primary transition-colors py-2"
             >
               {l.label}
               <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-accent transition-all duration-300 group-hover:w-full" />
@@ -67,11 +67,11 @@ export function Navbar() {
           ))}
         </div>
 
-        <div className="hidden md:flex items-center gap-2 lg:gap-4">
+        <div className="hidden md:flex items-center gap-1 lg:gap-2">
           <Button
             variant="ghost"
             size="icon"
-            className="text-primary hover:bg-primary/5"
+            className="text-primary hover:bg-primary/5 h-9 w-9"
             onClick={() => setSearchOpen(true)}
           >
             <Search className="h-5 w-5" />
@@ -81,19 +81,19 @@ export function Navbar() {
             <Button
               variant="ghost"
               size="sm"
-              className="relative text-primary hover:bg-primary/5 font-semibold uppercase tracking-widest text-xs h-10 px-3"
+              className="relative text-primary hover:bg-primary/5 font-bold uppercase tracking-sporty text-[10px] h-9 px-3"
             >
-              <Scale className="h-5 w-5 mr-2" />
+              <Scale className="h-4 w-4 mr-2" />
               <span>เปรียบเทียบ</span>
               {selectedCount > 0 && (
-                <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-accent text-[10px] text-accent-foreground font-semibold">
+                <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-accent text-[9px] text-accent-foreground font-bold">
                   {selectedCount}
                 </span>
               )}
             </Button>
           </Link>
 
-          <Button variant="cta" size="sm" className="hidden lg:flex">
+          <Button variant="cta" size="sm" className="hidden lg:flex h-9 text-[10px] font-bold tracking-sporty">
             ส่งรีวิว
           </Button>
         </div>
