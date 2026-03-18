@@ -156,8 +156,8 @@ export default function ReviewDetail() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background">
-        <Navbar />
+      <div className="min-h-screen bg-white">
+        <Navbar forceWhite />
         <ReviewDetailSkeleton />
         <Footer />
       </div>
@@ -166,8 +166,8 @@ export default function ReviewDetail() {
 
   if (!review) {
     return (
-      <div className="min-h-screen bg-background">
-        <Navbar />
+      <div className="min-h-screen bg-white">
+        <Navbar forceWhite />
         <div className="container mx-auto px-4 py-20 text-center">
           <h1 className="font-heading text-3xl font-semibold mb-4">ไม่พบรีวิว</h1>
           <Link to="/"><Button variant="cta">กลับหน้าหลัก</Button></Link>
@@ -229,7 +229,7 @@ export default function ReviewDetail() {
           },
         }}
       />
-      <Navbar />
+      <Navbar forceWhite />
 
       {/* Breadcrumb */}
       <div className="container mx-auto px-4 py-4">
