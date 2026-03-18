@@ -87,16 +87,16 @@ export function CommentSection({ reviewId, articleId }: CommentSectionProps) {
   return (
     <section className="mt-20 md:mt-32 border-t border-slate-100 pt-16 md:pt-24">
       <div className="mb-10 md:mb-16">
-        <h2 className="font-heading text-2xl md:text-4xl font-semibold text-primary tracking-tighter uppercase flex items-center gap-3">
-          <span className="h-8 md:h-10 w-1.5 bg-accent rounded-full" />
+        <h2 className="font-heading text-xl md:text-3xl font-semibold text-primary tracking-tighter uppercase flex items-center gap-3">
+          <span className="h-6 md:h-8 w-1.5 bg-accent rounded-full" />
           ถาม-ตอบ & ความคิดเห็น
         </h2>
         <p className="text-muted-foreground text-sm md:text-lg mt-2 font-medium">ร่วมพูดคุย สอบถาม หรือแชร์ประสบการณ์การใช้งานของคุณ</p>
       </div>
 
       {/* Form */}
-      <div className="bg-white rounded-[2rem] p-6 md:p-10 mb-16 border border-slate-200 shadow-sm">
-        <h3 className="font-semibold mb-4 flex items-center gap-2">
+      <div className="mb-20">
+        <h3 className="font-heading text-lg md:text-xl font-semibold mb-6 flex items-center gap-2 text-primary">
           {user ? `ร่วมแบ่งปันประสบการณ์ในฐานะ ${user.email?.split("@")[0]}` : "ร่วมพูดคุยกับเรา"}
         </h3>
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -133,7 +133,7 @@ export function CommentSection({ reviewId, articleId }: CommentSectionProps) {
             value={newComment}
             onChange={(e) => setNewComment(e.target.value)}
             disabled={!user || submitting}
-            className="min-h-[120px] bg-slate-50/50 border-slate-200 rounded-xl p-4 focus:ring-accent focus:border-accent"
+            className="min-h-[150px] bg-slate-50 border-slate-200 rounded-2xl p-6 md:p-8 focus:ring-accent focus:border-accent text-base md:text-lg transition-all"
           />
           <div className="flex justify-end">
             <Button

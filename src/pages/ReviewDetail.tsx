@@ -87,7 +87,7 @@ function RatingBar({ label, score }: { label: string; score: number }) {
         <span className="text-[8px] md:text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-500 group-hover:text-primary transition-colors break-words">{label}</span>
         <span className="text-[10px] md:text-sm font-semibold text-primary tabular-nums shrink-0">{score.toFixed(1)}</span>
       </div>
-      <div className="h-1.5 md:h-2.5 w-full bg-slate-100 rounded-full overflow-hidden border border-slate-200/50 relative">
+      <div className="h-1.5 md:h-2.5 w-full bg-slate-50 rounded-full overflow-hidden border border-slate-200/30 relative">
         <div
           className="h-full bg-gradient-to-r from-primary to-primary/70 rounded-full transition-all duration-1000 ease-out shadow-[0_0_12px_rgba(31,61,43,0.15)] relative z-10 overflow-hidden"
           style={{ width: `${(score / 5) * 100}%` }}
@@ -156,8 +156,8 @@ export default function ReviewDetail() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background">
-        <Navbar />
+      <div className="min-h-screen bg-white">
+        <Navbar className="bg-white/80" />
         <ReviewDetailSkeleton />
         <Footer />
       </div>
@@ -166,8 +166,8 @@ export default function ReviewDetail() {
 
   if (!review) {
     return (
-      <div className="min-h-screen bg-background">
-        <Navbar />
+      <div className="min-h-screen bg-white">
+        <Navbar className="bg-white/80" />
         <div className="container mx-auto px-4 py-20 text-center">
           <h1 className="font-heading text-3xl font-semibold mb-4">ไม่พบรีวิว</h1>
           <Link to="/"><Button variant="cta">กลับหน้าหลัก</Button></Link>
@@ -229,7 +229,7 @@ export default function ReviewDetail() {
           },
         }}
       />
-      <Navbar />
+      <Navbar className="bg-white/80" />
 
       {/* Breadcrumb */}
       <div className="container mx-auto px-4 py-4">
@@ -257,13 +257,13 @@ export default function ReviewDetail() {
               />
             </div>
 
-            <div className="flex flex-col justify-center space-y-4 md:space-y-8">
+            <div className="flex flex-col justify-center space-y-4 md:space-y-6">
               <div className="space-y-1 md:space-y-2">
                 <div className="flex items-center gap-2">
                   <div className="w-8 h-1 bg-accent" />
                   <p className="text-[9px] md:text-sm font-semibold text-slate-400 uppercase tracking-[0.3em]">{review.brand} // {review.category}</p>
                 </div>
-                <h1 className="font-heading text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-semibold text-primary leading-[0.9] tracking-tighter uppercase break-words overflow-hidden">
+                <h1 className="font-heading text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-semibold text-primary leading-[0.9] tracking-tighter uppercase break-words overflow-hidden">
                   {review.name.split(' ').map((word, i) => (
                     <span key={i} className={i % 2 === 0 ? "" : "text-transparent bg-clip-text bg-gradient-to-r from-accent to-orange-500"}>
                       {word}{" "}
@@ -284,7 +284,7 @@ export default function ReviewDetail() {
                   </div>
                 </div>
 
-                <div className="bg-slate-50 border-2 border-slate-100 rounded-2xl px-6 py-4 md:px-10 md:py-8">
+                <div className="border-2 border-slate-100 rounded-2xl px-6 py-4 md:px-10 md:py-8">
                   <p className="text-[8px] md:text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-400 mb-1">MSRP / PRICE</p>
                   <span className="font-heading text-2xl md:text-4xl font-semibold text-primary tracking-tight">{review.price}</span>
                 </div>
@@ -298,8 +298,8 @@ export default function ReviewDetail() {
               </div>
 
               {/* Mobile Ratings & Specs */}
-              <div className="lg:hidden space-y-4 pt-4">
-                <div className="bg-card rounded-2xl border border-border/60 p-5 space-y-4 shadow-sm">
+              <div className="lg:hidden space-y-8 pt-4">
+                <div className="space-y-4">
                   <h3 className="font-heading font-semibold text-primary text-xs uppercase tracking-[0.2em] flex items-center gap-2">
                     <div className="w-1 h-3.5 bg-accent rounded-full" />
                     คะแนนแต่ละด้าน (RATINGS)
@@ -311,7 +311,7 @@ export default function ReviewDetail() {
                   </div>
                 </div>
 
-                <div className="bg-card rounded-2xl border border-border/60 p-5 shadow-sm">
+                <div className="space-y-6">
                   <h3 className="font-heading font-semibold text-primary text-xs uppercase tracking-[0.2em] flex items-center gap-2 mb-6">
                     <div className="w-1 h-3.5 bg-accent rounded-full" />
                     สเปคทางเทคนิค (SPECS)
@@ -324,7 +324,7 @@ export default function ReviewDetail() {
                       { icon: Footprints, label: "พื้นนอก (OUTSOLE)", value: review.specs?.find(s => s.label.toLowerCase().includes('outsole') || s.label.includes('พื้นนอก'))?.value || '-' },
                     ].map((spec, i) => (
                       <div key={i} className="flex items-center gap-4">
-                        <div className="h-10 w-10 rounded-xl bg-slate-50 flex items-center justify-center text-slate-400">
+                        <div className="h-10 w-10 rounded-xl bg-slate-100/50 flex items-center justify-center text-slate-400">
                           <spec.icon className="h-5 w-5" />
                         </div>
                         <div className="flex flex-col">
@@ -372,20 +372,20 @@ export default function ReviewDetail() {
         <div className="grid lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-6">
             {/* Pros / Cons */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
-              <div className="bg-gradient-to-br from-emerald-50/50 to-white border border-emerald-100 rounded-[2rem] p-5 md:p-8 shadow-sm hover:shadow-xl hover:shadow-emerald-500/5 transition-all duration-500 group">
-                <div className="flex items-center justify-between mb-5 md:mb-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 md:gap-12">
+              <div className="transition-all duration-500 group">
+                <div className="flex items-center justify-between mb-6 md:mb-10">
                   <h3 className="font-heading font-semibold text-emerald-700 flex items-center gap-3 uppercase tracking-[0.2em] text-[10px] md:text-xs">
-                    <div className="h-8 w-8 rounded-xl bg-emerald-100 flex items-center justify-center">
+                    <div className="h-8 w-8 rounded-xl bg-emerald-50 flex items-center justify-center">
                       <ThumbsUp className="h-4 w-4" />
                     </div>
                     PROS / จุดเด่น
                   </h3>
-                  <div className="h-px flex-1 bg-emerald-100 ml-4 hidden md:block" />
+                  <div className="h-px flex-1 bg-slate-100 ml-4 hidden md:block" />
                 </div>
-                <ul className="space-y-3 md:space-y-5">
+                <ul className="space-y-4 md:space-y-6">
                   {review.pros.map((p) => (
-                    <li key={p} className="flex items-start gap-4 text-[13px] md:text-base font-semibold text-slate-700 leading-snug group/item">
+                    <li key={p} className="flex items-start gap-4 text-[13px] md:text-lg font-semibold text-slate-700 leading-snug group/item">
                       <div className="h-5 w-5 rounded-full bg-emerald-500 flex items-center justify-center shrink-0 mt-0.5 shadow-lg shadow-emerald-500/20 group-hover/item:scale-110 transition-transform">
                         <Check className="h-3 w-3 text-white" />
                       </div>
@@ -395,19 +395,19 @@ export default function ReviewDetail() {
                 </ul>
               </div>
 
-              <div className="bg-gradient-to-br from-rose-50/50 to-white border border-rose-100 rounded-[2rem] p-5 md:p-8 shadow-sm hover:shadow-xl hover:shadow-rose-500/5 transition-all duration-500 group">
-                <div className="flex items-center justify-between mb-5 md:mb-8">
+              <div className="transition-all duration-500 group">
+                <div className="flex items-center justify-between mb-6 md:mb-10">
                   <h3 className="font-heading font-semibold text-rose-700 flex items-center gap-3 uppercase tracking-[0.2em] text-[10px] md:text-xs">
-                    <div className="h-8 w-8 rounded-xl bg-rose-100 flex items-center justify-center">
+                    <div className="h-8 w-8 rounded-xl bg-rose-50 flex items-center justify-center">
                       <ThumbsDown className="h-4 w-4" />
                     </div>
                     CONS / จุดด้อย
                   </h3>
-                  <div className="h-px flex-1 bg-rose-100 ml-4 hidden md:block" />
+                  <div className="h-px flex-1 bg-slate-100 ml-4 hidden md:block" />
                 </div>
-                <ul className="space-y-3 md:space-y-5">
+                <ul className="space-y-4 md:space-y-6">
                   {review.cons.map((c) => (
-                    <li key={c} className="flex items-start gap-4 text-[13px] md:text-base font-semibold text-slate-700 leading-snug group/item">
+                    <li key={c} className="flex items-start gap-4 text-[13px] md:text-lg font-semibold text-slate-700 leading-snug group/item">
                       <div className="h-5 w-5 rounded-full bg-rose-500 flex items-center justify-center shrink-0 mt-0.5 shadow-lg shadow-rose-500/20 group-hover/item:scale-110 transition-transform">
                         <X className="h-3 w-3 text-white" />
                       </div>
@@ -419,14 +419,14 @@ export default function ReviewDetail() {
             </div>
 
             {/* Sections */}
-            <div className="space-y-4 md:space-y-10 pt-2 md:pt-4">
+            <div className="space-y-10 md:space-y-16 pt-8 md:pt-12">
               {review.sections.map((s) => (
-                <div key={s.title} className="bg-card border border-border/60 rounded-2xl md:rounded-3xl p-5 md:p-10 shadow-sm hover:shadow-md transition-all duration-300">
-                  <h2 className="font-heading text-lg md:text-4xl font-semibold text-primary uppercase tracking-tight flex items-center gap-3 mb-5 md:mb-8 leading-none">
-                    <span className="h-6 md:h-10 w-1.5 bg-accent rounded-full" />
+                <div key={s.title} className="transition-all duration-300">
+                  <h2 className="font-heading text-xl md:text-3xl font-semibold text-primary uppercase tracking-tight flex items-center gap-4 mb-4 md:mb-6 leading-none">
+                    <span className="h-6 md:h-8 w-1.5 bg-accent rounded-full" />
                     {s.title}
                   </h2>
-                  <p className="text-muted-foreground text-[15px] md:text-xl leading-relaxed whitespace-pre-wrap font-medium">{s.body}</p>
+                  <p className="text-muted-foreground text-[15px] md:text-lg leading-relaxed whitespace-pre-wrap font-medium">{s.body}</p>
                 </div>
               ))}
             </div>
@@ -464,7 +464,7 @@ export default function ReviewDetail() {
 
           {/* Sidebar */}
           <aside className="space-y-8">
-            <div className="hidden lg:block bg-card rounded-2xl border border-border/60 p-8 space-y-8 sticky top-24 shadow-sm">
+            <div className="hidden lg:block space-y-12 sticky top-24">
               <div className="p-2">
                 <h3 className="font-heading font-semibold text-primary text-[10px] uppercase tracking-[0.2em] flex items-center gap-2 mb-8">
                   <div className="w-1 h-3.5 bg-accent rounded-full" />
@@ -477,7 +477,7 @@ export default function ReviewDetail() {
                 </div>
               </div>
 
-              <div className="pt-10 border-t border-slate-100 p-2">
+              <div className="pt-10 border-t border-slate-200 p-2">
                 <h3 className="font-heading font-semibold text-primary text-[10px] uppercase tracking-[0.2em] flex items-center gap-2 mb-8">
                   <div className="w-1 h-3.5 bg-accent rounded-full" />
                   สเปคทางเทคนิค (SPECS)
@@ -490,7 +490,7 @@ export default function ReviewDetail() {
                     { icon: Footprints, label: "พื้นนอก (OUTSOLE)", value: review.specs?.find(s => s.label.toLowerCase().includes('outsole') || s.label.includes('พื้นนอก'))?.value || '-' },
                   ].map((spec, i) => (
                     <div key={i} className="flex items-center gap-4 group">
-                      <div className="h-10 w-10 rounded-xl bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-primary group-hover:text-white transition-all">
+                      <div className="h-10 w-10 rounded-xl bg-slate-100/50 flex items-center justify-center text-slate-400 group-hover:bg-primary group-hover:text-white transition-all">
                         <spec.icon className="h-5 w-5" />
                       </div>
                       <div className="flex flex-col">
@@ -503,11 +503,11 @@ export default function ReviewDetail() {
               </div>
 
               <div className="pt-4">
-                <div className="bg-accent/5 rounded-2xl border border-accent/10 p-5 text-center mb-4">
-                  <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-widest mb-1">Price Estimate</p>
-                  <p className="font-heading font-semibold text-primary text-2xl">{review.price}</p>
+                <div className="border-t border-slate-200 pt-8 mb-6">
+                  <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-widest mb-2">Price Estimate</p>
+                  <p className="font-heading font-semibold text-primary text-4xl">{review.price}</p>
                 </div>
-                <CTAButton className="w-full h-14 rounded-2xl shadow-lg shadow-accent/10" isSidebar />
+                <CTAButton className="w-full h-16 rounded-2xl shadow-xl shadow-accent/10" isSidebar />
               </div>
             </div>
 

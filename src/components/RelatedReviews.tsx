@@ -105,10 +105,10 @@ export function RelatedReviews({ currentReview }: RelatedReviewsProps) {
   if (loading || related.length === 0) return null;
 
   return (
-    <section className="container mx-auto px-4 py-16 md:py-24 border-t border-slate-100">
+    <section className="container mx-auto px-4 py-16 md:py-24 border-t border-slate-200">
       <div className="mb-10 md:mb-16">
-        <h2 className="font-heading text-2xl md:text-4xl font-semibold text-primary tracking-tighter uppercase flex items-center gap-3">
-          <span className="h-8 md:h-10 w-1.5 bg-accent rounded-full" />
+        <h2 className="font-heading text-xl md:text-3xl font-semibold text-primary tracking-tighter uppercase flex items-center gap-3">
+          <span className="h-6 md:h-8 w-1.5 bg-accent rounded-full" />
           รีวิวที่เกี่ยวข้อง
         </h2>
         <p className="text-muted-foreground text-sm md:text-lg mt-2 font-medium">สินค้าที่คุณอาจจะสนใจตามความใกล้เคียงของสเปคและราคา</p>

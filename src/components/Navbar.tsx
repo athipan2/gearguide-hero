@@ -22,7 +22,7 @@ const navLinks = [
   { label: "Best Of 2026", href: "#" },
 ];
 
-export function Navbar() {
+export function Navbar({ className }: { className?: string }) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const selectedCount = useComparisonStore((state) => state.selectedItems.length);
@@ -35,13 +35,15 @@ export function Navbar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  const bgClass = isScrolled
+    ? "bg-background/95 backdrop-blur-lg border-primary/10 shadow-lg h-16"
+    : cn("bg-background/80 backdrop-blur-md border-transparent h-20", className);
+
   return (
     <nav
       className={cn(
         "sticky top-0 z-50 w-full transition-all duration-200 border-b",
-        isScrolled
-          ? "bg-background/95 backdrop-blur-lg border-primary/10 shadow-lg h-16"
-          : "bg-background/80 backdrop-blur-md border-transparent h-20"
+        bgClass
       )}
     >
       <div className="container mx-auto flex items-center justify-between h-full px-4">
