@@ -253,8 +253,8 @@ export default function ReviewDetail() {
 
       <article className="container mx-auto px-4 pb-16 md:pb-24 pt-2 md:pt-0 overflow-x-auto scrollbar-hide">
         <div className="min-w-[102%] md:min-w-full -mx-[1%] px-[1%] md:mx-0 md:px-0">
-          <div className="grid md:grid-cols-2 gap-3 md:gap-12 mb-4 md:mb-16 items-center">
-            <div className="relative">
+          <div className="grid md:grid-cols-[35fr_65fr] gap-3 md:gap-12 mb-4 md:mb-16 items-center">
+            <div className="relative px-6 md:px-0">
               <div className="absolute inset-0 bg-grid opacity-20 pointer-events-none" />
               <ImageGallery
                 mainImage={review.image_url || ""}
