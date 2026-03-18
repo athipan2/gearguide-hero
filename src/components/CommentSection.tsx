@@ -95,8 +95,8 @@ export function CommentSection({ reviewId, articleId }: CommentSectionProps) {
       </div>
 
       {/* Form */}
-      <div className="bg-white rounded-[2rem] p-6 md:p-10 mb-16 border border-slate-200 shadow-sm">
-        <h3 className="font-semibold mb-4 flex items-center gap-2">
+      <div className="mb-20">
+        <h3 className="font-heading text-lg md:text-xl font-semibold mb-6 flex items-center gap-2 text-primary">
           {user ? `ร่วมแบ่งปันประสบการณ์ในฐานะ ${user.email?.split("@")[0]}` : "ร่วมพูดคุยกับเรา"}
         </h3>
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -133,7 +133,7 @@ export function CommentSection({ reviewId, articleId }: CommentSectionProps) {
             value={newComment}
             onChange={(e) => setNewComment(e.target.value)}
             disabled={!user || submitting}
-            className="min-h-[120px] bg-slate-50/50 border-slate-200 rounded-xl p-4 focus:ring-accent focus:border-accent"
+            className="min-h-[150px] bg-slate-50 border-slate-200 rounded-2xl p-6 md:p-8 focus:ring-accent focus:border-accent text-base md:text-lg transition-all"
           />
           <div className="flex justify-end">
             <Button
