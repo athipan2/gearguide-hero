@@ -105,15 +105,6 @@ export default function ReviewDetail() {
   const [userRating, setUserRating] = useState<{ average: number; count: number } | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    // Enable horizontal movement specifically for this page
-    const originalOverflowX = document.body.style.overflowX;
-    document.body.style.overflowX = 'auto';
-
-    return () => {
-      document.body.style.overflowX = originalOverflowX;
-    };
-  }, []);
 
   useEffect(() => {
     if (!slug) { setLoading(false); return; }
@@ -251,10 +242,10 @@ export default function ReviewDetail() {
         </nav>
       </div>
 
-      <article className="container mx-auto px-4 pb-16 md:pb-24 pt-2 md:pt-0 overflow-x-auto scrollbar-hide">
-        <div className="min-w-[102%] md:min-w-full -mx-[1%] px-[1%] md:mx-0 md:px-0">
+      <article className="container mx-auto px-4 pb-16 md:pb-24 pt-2 md:pt-0">
+        <div className="md:min-w-full md:mx-0 md:px-0">
           <div className="grid md:grid-cols-[35fr_65fr] gap-3 md:gap-12 mb-4 md:mb-16 items-center">
-            <div className="relative px-6 md:px-0">
+            <div className="relative px-12 md:px-0">
               <div className="absolute inset-0 bg-grid opacity-20 pointer-events-none" />
               <ImageGallery
                 mainImage={review.image_url || ""}
