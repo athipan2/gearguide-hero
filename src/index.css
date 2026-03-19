@@ -172,4 +172,8 @@
     -ms-overflow-style: none;
     scrollbar-width: none;
   }
+
+  .italic-prohibited {
+    font-style: normal !important;
+  }
 }
