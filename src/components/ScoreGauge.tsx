@@ -18,11 +18,11 @@ export function ScoreGauge({
   strokeWidth = 10,
   size
 }: ScoreGaugeProps) {
-  const [offset, setOffset] = useState(0);
   const coordinateSize = 100; // Base size for internal coordinate system
   const radius = (coordinateSize - strokeWidth) / 2;
   const circumference = radius * 2 * Math.PI;
   const percentage = (score / maxScore) * 100;
+  const [offset, setOffset] = useState(circumference);
 
   useEffect(() => {
     const progressOffset = circumference - (percentage / 100) * circumference;

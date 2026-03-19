@@ -247,7 +247,6 @@ export default function ReviewDetail() {
         <div className="md:min-w-full md:mx-0 md:px-0">
           <div className="grid md:grid-cols-[35fr_65fr] gap-3 md:gap-12 mb-4 md:mb-16 items-center">
             <div className="relative px-12 md:px-0">
-              <div className="absolute inset-0 bg-grid opacity-20 pointer-events-none" />
               <ImageGallery
                 mainImage={review.image_url || ""}
                 images={review.images}
@@ -275,7 +274,6 @@ export default function ReviewDetail() {
 
               <div className="flex flex-wrap items-center gap-4 md:gap-10">
                 <div className="relative flex items-center justify-center p-2 md:p-4 bg-card rounded-[2.5rem] shadow-xl border border-primary/5 group overflow-hidden">
-                  <div className="absolute inset-0 bg-grid opacity-[0.03]" />
                   <ScoreGauge
                     score={review.overall_rating}
                     className="w-[100px] h-[100px] md:w-[160px] md:h-[160px]"
@@ -284,7 +282,6 @@ export default function ReviewDetail() {
                 </div>
 
                 <div className="bg-card border border-primary/5 rounded-[2.5rem] px-8 py-6 md:px-12 md:py-10 shadow-xl relative overflow-hidden">
-                   <div className="absolute inset-0 bg-grid opacity-[0.03]" />
                   <p className="text-[9px] md:text-[11px] font-bold uppercase tracking-[0.3em] text-primary/40 mb-2">MSRP / PRICE</p>
                   <span className="font-heading text-3xl md:text-5xl font-bold text-primary tracking-tighter italic-prohibited">{review.price}</span>
                 </div>
@@ -437,7 +434,6 @@ export default function ReviewDetail() {
 
             {/* Verdict */}
               <div className="bg-primary rounded-[2.5rem] md:rounded-[4rem] p-10 md:p-24 shadow-[0_40px_80px_-15px_rgba(10,26,10,0.4)] relative overflow-hidden group text-center border border-white/5">
-                <div className="absolute inset-0 bg-grid opacity-10" />
               <div className="absolute top-0 right-0 w-96 h-96 bg-accent opacity-10 blur-[100px] -translate-y-1/2 translate-x-1/2 pointer-events-none" />
               <div className="absolute bottom-0 left-0 w-96 h-96 bg-emerald-400 opacity-5 blur-[100px] translate-y-1/2 -translate-x-1/2 pointer-events-none" />
 
