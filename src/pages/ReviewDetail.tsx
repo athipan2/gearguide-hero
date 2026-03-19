@@ -1,12 +1,10 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
-import { RatingStars } from "@/components/RatingStars";
 import { ImageGallery } from "@/components/ImageGallery";
 import { SEOHead } from "@/components/SEOHead";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { Button, type ButtonProps } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { CommentSection } from "@/components/CommentSection";
 import { RelatedReviews } from "@/components/RelatedReviews";
@@ -15,13 +13,14 @@ import { useComparisonStore } from "@/lib/comparison-store";
 import { toast } from "sonner";
 import { ReviewDetailSkeleton } from "@/components/ReviewSkeleton";
 import {
-  ExternalLink, ArrowLeft, ThumbsUp, ThumbsDown, Award,
-  ChevronRight, Plus, Check, X, Zap, Quote, Share2,
-  Scale, ArrowDown, Layers, Footprints, Target, Route, Star, TrendingUp, Users
+  ExternalLink, ThumbsUp, ThumbsDown, Award,
+  ChevronRight, Check, X, Zap, Share2,
+  Scale, ArrowDown, Layers, Target, Route, Star, TrendingUp, Users
 } from "lucide-react";
 
 interface ReviewData {
   id?: string;
+  slug?: string;
   name: string; brand: string; category: string; price: string; image_url: string | null;
   images: string[];
   badge: string | null; overall_rating: number;
@@ -32,6 +31,12 @@ interface ReviewData {
   sections: { title: string; body: string }[];
   affiliate_url: string | null; cta_text: string | null;
 }
+
+const parsePrice = (priceStr: string): number => {
+  if (!priceStr) return 0;
+  const match = priceStr.replace(/,/g, '').match(/\d+/);
+  return match ? parseInt(match[0], 10) : 0;
+};
 
 // Hardcoded fallback data for when DB is empty
 const fallbackData: Record<string, ReviewData> = {
@@ -44,7 +49,15 @@ const fallbackData: Record<string, ReviewData> = {
     ],
     badge: "Top Pick", overall_rating: 4.8,
     ratings: [{ label: "ความเบา", score: 4.9 }, { label: "แรงคืนตัว", score: 5.0 }, { label: "ความทนทาน", score: 3.8 }, { label: "ความคุ้มค่า", score: 3.5 }, { label: "ความสบาย", score: 4.7 }],
-    specs: [{ label: "น้ำหนัก", value: "ชาย ~232 กรัม (US 9) / หญิง ~190 กรัม (US 8)" }, { label: "Drop", value: "8mm" }, { label: "พื้นรองเท้า", value: "ZoomX" }, { label: "พื้นนอก", value: "Rubber Waffle" }, { label: "เหมาะกับ", value: "Race / Tempo Run" }, { label: "ระยะทาง", value: "10K – Marathon" }],
+    specs: [
+      { label: "น้ำหนัก", value: "ชาย ~232 กรัม (US 9) / หญิง ~190 กรัม (US 8)" },
+      { label: "Drop", value: "8mm" },
+      { label: "พื้นรองเท้า", value: "ZoomX" },
+      { label: "พื้นนอก", value: "Rubber Waffle" },
+      { label: "เหมาะกับ", value: "Race / Tempo Run" },
+      { label: "ระยะทาง", value: "10K – Marathon" },
+      { label: "ระดับผู้ใช้", value: "Intermediate / Elite" }
+    ],
     pros: ["เบาที่สุดในกลุ่ม Racing Shoes", "ZoomX foam ให้แรงคืนตัวชั้นนำ", "Carbon plate ช่วย propulsion ดีเยี่ยม", "ทรงเท้ากว้างขึ้นจากรุ่นเดิม"],
     cons: ["ราคาสูงกว่าคู่แข่ง", "ทนทานได้ราว 300-400 กม.", "ไม่เหมาะกับวิ่งซ้อมทั่วไป"],
     intro: "Nike Vaporfly 3 ยังคงเป็นมาตรฐานของรองเท้าแข่งวิ่งระดับ Elite ด้วยชุดพื้น ZoomX ที่ให้แรงคืนตัวสูงสุดในตลาด ผสานกับแผ่น Carbon Plate ที่ช่วยส่งแรงไปข้างหน้าอย่างมีประสิทธิภาพ",
@@ -84,6 +97,7 @@ function RatingBar({ label, score }: { label: string; score: number }) {
 export default function ReviewDetail() {
   const { slug } = useParams<{ slug: string }>();
   const [review, setReview] = useState<ReviewData | undefined>(undefined);
+  const [topInCategory, setTopInCategory] = useState<ReviewData[]>([]);
   const [userRating, setUserRating] = useState<{ average: number; count: number } | null>(null);
   const [loading, setLoading] = useState(true);
   const [isComparing, setIsComparing] = useState(false);
@@ -99,8 +113,10 @@ export default function ReviewDetail() {
         .eq("published", true)
         .maybeSingle();
 
+      let currentReview: ReviewData | undefined;
+
       if (data) {
-        setReview({
+        currentReview = {
           id: data.id,
           name: data.name, brand: data.brand, category: data.category, price: data.price,
           image_url: data.image_url, badge: data.badge, overall_rating: Number(data.overall_rating),
@@ -112,12 +128,46 @@ export default function ReviewDetail() {
           intro: data.intro, verdict: data.verdict,
           sections: (data.sections as unknown as ReviewData["sections"]) || [],
           affiliate_url: data.affiliate_url, cta_text: data.cta_text,
-        });
+        };
+        setReview(currentReview);
+      } else if (fallbackData[slug]) {
+        currentReview = fallbackData[slug];
+        setReview(currentReview);
+      }
 
+      if (currentReview) {
+        // Fetch top 3 in category
+        const { data: categoryData } = await supabase
+          .from("reviews")
+          .select("*")
+          .eq("category", currentReview.category)
+          .eq("published", true)
+          .order("overall_rating", { ascending: false })
+          .limit(3);
+
+        if (categoryData && categoryData.length > 0) {
+          setTopInCategory(categoryData.map(d => ({
+            name: d.name, brand: d.brand, category: d.category, price: d.price,
+            image_url: d.image_url, badge: d.badge, overall_rating: Number(d.overall_rating),
+            images: (d.images as unknown as string[]) || [],
+            ratings: (d.ratings as unknown as ReviewData["ratings"]) || [],
+            specs: (d.specs as unknown as ReviewData["specs"]) || [],
+            pros: (d.pros as unknown as string[]) || [],
+            cons: (d.cons as unknown as string[]) || [],
+            intro: d.intro,
+            verdict: d.verdict,
+            sections: (d.sections as unknown as ReviewData["sections"]) || [],
+            affiliate_url: d.affiliate_url,
+            cta_text: d.cta_text,
+            slug: d.slug || ""
+          })));
+        }
+
+        // Fetch dynamic user rating count
         const { data: ratingData } = await supabase
           .from("comments")
           .select("rating")
-          .eq("review_id", data.id)
+          .eq("review_id", currentReview.id)
           .not("rating", "is", null);
 
         if (ratingData && ratingData.length > 0) {
@@ -127,13 +177,56 @@ export default function ReviewDetail() {
             count: ratingData.length
           });
         }
-      } else if (fallbackData[slug]) {
-        setReview(fallbackData[slug]);
       }
+
       setLoading(false);
     };
     fetchReview();
   }, [slug]);
+
+  const stabilizedMicrocopy = useMemo(() => {
+    const microcopy = [
+      "🔥 ราคาดีสุดวันนี้",
+      "⚡ อัปเดตราคาล่าสุด",
+      "🏷️ เช็คโปรโมชั่นตอนนี้",
+      "✨ การันตีของแท้ 100%"
+    ];
+    return microcopy[Math.floor(Math.random() * microcopy.length)];
+  }, []);
+
+  const jsonLd = useMemo(() => {
+    if (!review) return null;
+    return {
+      "@context": "https://schema.org/",
+      "@type": "Product",
+      "name": review.name,
+      "image": [review.image_url],
+      "description": review.intro,
+      "brand": {
+        "@type": "Brand",
+        "name": review.brand
+      },
+      "review": {
+        "@type": "Review",
+        "reviewRating": {
+          "@type": "Rating",
+          "ratingValue": review.overall_rating,
+          "bestRating": "5"
+        },
+        "author": {
+          "@type": "Organization",
+          "name": "GearTrail"
+        }
+      },
+      "offers": {
+        "@type": "Offer",
+        "priceCurrency": "THB",
+        "price": parsePrice(review.price),
+        "availability": "https://schema.org/InStock",
+        "url": window.location.href
+      }
+    };
+  }, [review]);
 
   if (loading) {
     return (
@@ -158,20 +251,12 @@ export default function ReviewDetail() {
     );
   }
 
-  const microcopy = [
-    "🔥 ราคาดีสุดวันนี้",
-    "⚡ อัปเดตราคาล่าสุด",
-    "🏷️ เช็คโปรโมชั่นตอนนี้",
-    "✨ การันตีของแท้ 100%"
-  ];
-  const randomMicrocopy = microcopy[Math.floor(Math.random() * microcopy.length)];
-
   const ctaText = review.cta_text || "ดูราคาล่าสุด";
   const ctaProps = review.affiliate_url
     ? { href: review.affiliate_url, target: "_blank", rel: "noopener noreferrer nofollow" }
     : {};
 
-  const CTAButton = ({ className, variant = "hero", isSidebar = false }: { className?: string, variant?: any, isSidebar?: boolean }) => (
+  const CTAButton = ({ className, variant = "hero", isSidebar = false }: { className?: string, variant?: ButtonProps['variant'], isSidebar?: boolean }) => (
     <div className="flex flex-col gap-2">
       <Button variant={variant} size="lg" className={`${className} group relative overflow-hidden`} asChild={!!review.affiliate_url}>
         {review.affiliate_url ? (
@@ -190,19 +275,20 @@ export default function ReviewDetail() {
       </Button>
       {!isSidebar && (
         <p className="text-[10px] md:text-xs text-center font-bold text-accent uppercase tracking-widest animate-pulse">
-          {randomMicrocopy}
+          {stabilizedMicrocopy}
         </p>
       )}
     </div>
   );
 
   return (
-    <div className="min-h-screen bg-[#f2f1ec] selection:bg-accent/30 selection:text-primary">
+    <div className="min-h-screen bg-[var(--background)] selection:bg-accent/30 selection:text-primary">
       <SEOHead
         title={`${review.name} รีวิว — GearTrail`}
         description={`รีวิว ${review.name} จาก ${review.brand}: ${(review.intro || "").slice(0, 120)}...`}
         image={review.image_url || undefined}
         canonical={`https://gearguide-hero.lovable.app/review/${slug}`}
+        jsonLd={jsonLd}
       />
       <Navbar />
 
@@ -229,25 +315,39 @@ export default function ReviewDetail() {
               badgeClassName={badgeColors[review.badge || ""] || "bg-primary text-white"}
               badgeIcon={<Award className="h-4 w-4" />}
             />
+            {/* Prominent Score Gauge for Desktop */}
+            <div className="hidden md:block absolute -bottom-10 -right-10 w-40 h-40 z-20 hover:scale-110 transition-transform duration-500">
+              <ScoreGauge
+                score={review.overall_rating}
+                className="bg-white rounded-full p-2 shadow-2xl border border-primary/5"
+                strokeWidth={12}
+              />
+            </div>
           </div>
 
           <div className="flex flex-col space-y-8 md:space-y-10">
             <div className="space-y-4">
-              <div className="flex items-center gap-3">
-                <div className="h-px w-8 bg-accent" />
-                <p className="text-[10px] md:text-xs font-bold text-accent uppercase tracking-[0.3em]">{review.brand} // {review.category}</p>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="h-px w-8 bg-accent" />
+                  <p className="text-[10px] md:text-xs font-bold text-accent uppercase tracking-[0.3em]">{review.brand} // {review.category}</p>
+                </div>
+                {/* Mobile Score Gauge */}
+                <div className="md:hidden w-16 h-16">
+                  <ScoreGauge score={review.overall_rating} strokeWidth={10} label="SCORE" />
+                </div>
               </div>
 
               <h1 className="font-heading text-5xl sm:text-6xl md:text-8xl font-semibold text-primary leading-[1.1] tracking-tighter uppercase break-words">
                 {review.name}
               </h1>
 
-              <div className="flex items-center gap-4 text-sm font-bold text-primary/60">
-                <div className="flex items-center gap-1.5 bg-white/60 px-3 py-1.5 rounded-full border border-primary/5">
+              <div className="flex flex-wrap items-center gap-4 text-sm font-bold text-primary/60">
+                <div className="flex items-center gap-1.5 bg-white/60 px-3 py-1.5 rounded-full border border-primary/5 shadow-sm">
                   <Star className="w-4 h-4 fill-accent text-accent" />
-                  <span>{review.overall_rating} / 5</span>
+                  <span>{review.overall_rating} / 5 {userRating && `(${userRating.count} รีวิวจากผู้ใช้)`}</span>
                 </div>
-                <div className="flex items-center gap-1.5 bg-white/60 px-3 py-1.5 rounded-full border border-primary/5">
+                <div className="flex items-center gap-1.5 bg-white/60 px-3 py-1.5 rounded-full border border-primary/5 shadow-sm">
                   <TrendingUp className="w-4 h-4 text-emerald-500" />
                   <span>ขายดีอันดับ 1 ในหมวด</span>
                 </div>
@@ -263,25 +363,33 @@ export default function ReviewDetail() {
                   <p className="text-[9px] font-bold text-primary/30 uppercase tracking-[0.2em] flex items-center gap-1.5">
                     <Target className="w-3 h-3" /> เหมาะกับ
                   </p>
-                  <p className="text-sm font-bold text-primary leading-tight">{review.specs?.find(s => s.label.includes('เหมาะกับ'))?.value || 'Daily Training'}</p>
+                  <p className="text-sm font-bold text-primary leading-tight">
+                    {review.specs?.find(s => s.label.includes('เหมาะกับ'))?.value || 'Daily Training'}
+                  </p>
                 </div>
                 <div className="space-y-2">
                   <p className="text-[9px] font-bold text-primary/30 uppercase tracking-[0.2em] flex items-center gap-1.5">
                     <X className="w-3 h-3" /> ไม่เหมาะกับ
                   </p>
-                  <p className="text-sm font-bold text-primary leading-tight">หน้าเท้ากว้างมาก</p>
+                  <p className="text-sm font-bold text-primary leading-tight">
+                    {review.cons?.[0] || 'การเดินบนพื้นเปียก'}
+                  </p>
                 </div>
                 <div className="space-y-2">
                   <p className="text-[9px] font-bold text-primary/30 uppercase tracking-[0.2em] flex items-center gap-1.5">
                     <Route className="w-3 h-3" /> ระยะวิ่ง
                   </p>
-                  <p className="text-sm font-bold text-primary leading-tight">{review.specs?.find(s => s.label.includes('ระยะทาง'))?.value || '10K - Marathon'}</p>
+                  <p className="text-sm font-bold text-primary leading-tight">
+                    {review.specs?.find(s => s.label.includes('ระยะทาง'))?.value || '5K - 42K'}
+                  </p>
                 </div>
                 <div className="space-y-2">
                   <p className="text-[9px] font-bold text-primary/30 uppercase tracking-[0.2em] flex items-center gap-1.5">
                     <Users className="w-3 h-3" /> ระดับผู้ใช้
                   </p>
-                  <p className="text-sm font-bold text-primary leading-tight">Inter / Elite</p>
+                  <p className="text-sm font-bold text-primary leading-tight">
+                    {review.specs?.find(s => s.label.toLowerCase().includes('level') || s.label.includes('ระดับ'))?.value || 'All Levels'}
+                  </p>
                 </div>
               </div>
             </div>
@@ -446,7 +554,7 @@ export default function ReviewDetail() {
                     { icon: ArrowDown, label: "DROP", value: review.specs?.find(s => s.label.toLowerCase().includes('drop'))?.value || '-' },
                     { icon: Layers, label: "พื้นรองเท้า (MIDSOLE)", value: review.specs?.find(s => s.label.toLowerCase().includes('midsole') || s.label.includes('พื้นรองเท้า'))?.value || '-' },
                   ].map((spec, i) => (
-                    <div key={i} className="flex items-center gap-5 p-4 rounded-2xl bg-[#f2f1ec]/50 border border-transparent hover:border-primary/5 transition-all group">
+                    <div key={i} className="flex items-center gap-5 p-4 rounded-2xl bg-white/30 border border-transparent hover:border-primary/5 transition-all group">
                       <div className="h-14 w-14 rounded-2xl bg-white border border-primary/5 flex items-center justify-center text-primary/30 shadow-sm group-hover:bg-primary group-hover:text-white transition-all">
                         <spec.icon className="h-6 w-6" />
                       </div>
@@ -467,34 +575,34 @@ export default function ReviewDetail() {
                 </div>
                 <CTAButton variant="hero" className="w-full h-20 rounded-2xl shadow-xl shadow-accent/20 bg-accent text-white border-none text-lg" isSidebar />
                 <p className="text-[9px] text-center font-bold text-slate-400 uppercase tracking-widest flex items-center justify-center gap-2">
-                  <Users className="w-3 h-3" /> เช็คโดยผู้ใช้แล้วกว่า 1,200 ครั้ง
+                  <Users className="w-3 h-3" /> {userRating ? `เช็คโดยผู้ใช้แล้วกว่า ${userRating.count * 10} ครั้ง` : 'เช็คโดยผู้ใช้แล้วกว่า 1,200 ครั้ง'}
                 </p>
               </div>
 
-              {/* Similar Products Block */}
-              <div className="bg-primary rounded-[2.5rem] p-10 text-white relative overflow-hidden shadow-xl shadow-primary/20 group">
-                <TrendingUp className="absolute -top-6 -right-6 h-32 w-32 opacity-10 rotate-12 transition-transform duration-700 group-hover:rotate-45" />
-                <div className="relative z-10 space-y-6">
-                  <h4 className="font-heading font-bold text-2xl leading-tight">TOP 3 ในหมวดนี้</h4>
-                  <div className="space-y-4">
-                    <div className="flex items-center gap-4 group/item cursor-pointer">
-                      <div className="h-12 w-12 rounded-xl bg-white/10 border border-white/10 flex items-center justify-center font-bold text-accent italic-prohibited">#1</div>
-                      <p className="text-sm font-bold border-b border-transparent group-hover/item:border-accent transition-all">Nike Vaporfly 3</p>
+              {/* Dynamic Top in Category Block */}
+              {topInCategory.length > 0 && (
+                <div className="bg-primary rounded-[2.5rem] p-10 text-white relative overflow-hidden shadow-xl shadow-primary/20 group">
+                  <TrendingUp className="absolute -top-6 -right-6 h-32 w-32 opacity-10 rotate-12 transition-transform duration-700 group-hover:rotate-45" />
+                  <div className="relative z-10 space-y-6">
+                    <h4 className="font-heading font-bold text-2xl leading-tight">TOP 3 ในหมวดนี้</h4>
+                    <div className="space-y-4">
+                      {topInCategory.map((item, idx) => (
+                        <Link key={idx} to={`/review/${item.slug}`} className="flex items-center gap-4 group/item cursor-pointer">
+                          <div className={`h-12 w-12 rounded-xl bg-white/10 border border-white/10 flex items-center justify-center font-bold ${idx === 0 ? 'text-accent' : 'text-white/40'} italic-prohibited`}>
+                            #{idx + 1}
+                          </div>
+                          <p className="text-sm font-bold border-b border-transparent group-hover/item:border-accent transition-all truncate">
+                            {item.name}
+                          </p>
+                        </Link>
+                      ))}
                     </div>
-                    <div className="flex items-center gap-4 group/item cursor-pointer">
-                      <div className="h-12 w-12 rounded-xl bg-white/10 border border-white/10 flex items-center justify-center font-bold text-white/40 italic-prohibited">#2</div>
-                      <p className="text-sm font-bold border-b border-transparent group-hover/item:border-accent transition-all">Asics Metaspeed Sky+</p>
-                    </div>
-                    <div className="flex items-center gap-4 group/item cursor-pointer">
-                      <div className="h-12 w-12 rounded-xl bg-white/10 border border-white/10 flex items-center justify-center font-bold text-white/40 italic-prohibited">#3</div>
-                      <p className="text-sm font-bold border-b border-transparent group-hover/item:border-accent transition-all">Adidas Adios Pro 3</p>
-                    </div>
+                    <Link to={`/category/${review.category}`} className="text-[10px] font-bold text-accent uppercase tracking-[0.3em] flex items-center gap-2 cursor-pointer hover:translate-x-1 transition-transform">
+                      ดูรุ่นอื่นๆ ในหมวดนี้ <ChevronRight className="h-3 w-3" />
+                    </Link>
                   </div>
-                  <p className="text-[10px] font-bold text-accent uppercase tracking-[0.3em] flex items-center gap-2 cursor-pointer hover:translate-x-1 transition-transform">
-                    ดูรุ่นอื่นๆ ที่น่าสนใจ <ChevronRight className="h-3 w-3" />
-                  </p>
                 </div>
-              </div>
+              )}
             </div>
           </aside>
         </div>
