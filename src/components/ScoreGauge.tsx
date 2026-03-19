@@ -7,6 +7,7 @@ interface ScoreGaugeProps {
   className?: string;
   label?: string;
   strokeWidth?: number;
+  size?: number; // Visual size in pixels (optional, Tailwind classes preferred)
 }
 
 export function ScoreGauge({
@@ -14,11 +15,12 @@ export function ScoreGauge({
   maxScore = 5,
   className,
   label = "CORE SCORE",
-  strokeWidth = 10
+  strokeWidth = 10,
+  size
 }: ScoreGaugeProps) {
   const [offset, setOffset] = useState(0);
-  const size = 100; // Base size for internal coordinate system
-  const radius = (size - strokeWidth) / 2;
+  const coordinateSize = 100; // Base size for internal coordinate system
+  const radius = (coordinateSize - strokeWidth) / 2;
   const circumference = radius * 2 * Math.PI;
   const percentage = (score / maxScore) * 100;
 
@@ -33,16 +35,17 @@ export function ScoreGauge({
 
   return (
     <div
-      className={cn("relative flex items-center justify-center aspect-square w-full h-full", className)}
+      className={cn("relative flex items-center justify-center aspect-square", className)}
+      style={size ? { width: size, height: size } : undefined}
     >
       <svg
-        viewBox={`0 0 ${size} ${size}`}
+        viewBox={`0 0 ${coordinateSize} ${coordinateSize}`}
         className="rotate-[-90deg] w-full h-full"
       >
         {/* Background circle */}
         <circle
-          cx={size / 2}
-          cy={size / 2}
+          cx={coordinateSize / 2}
+          cy={coordinateSize / 2}
           r={radius}
           stroke="currentColor"
           strokeWidth={strokeWidth}
@@ -51,8 +54,8 @@ export function ScoreGauge({
         />
         {/* Progress circle */}
         <circle
-          cx={size / 2}
-          cy={size / 2}
+          cx={coordinateSize / 2}
+          cy={coordinateSize / 2}
           r={radius}
           stroke="currentColor"
           strokeWidth={strokeWidth}
@@ -68,11 +71,11 @@ export function ScoreGauge({
         />
       </svg>
 
-      <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
-        <span className="font-heading text-[25%] md:text-[30%] font-semibold tracking-tighter text-primary leading-none">
+      <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-[15%]">
+        <span className="font-heading text-3xl md:text-5xl font-semibold tracking-tighter text-primary leading-none">
           {score.toFixed(1)}
         </span>
-        <span className="text-[6%] md:text-[7%] font-semibold uppercase tracking-widest text-primary/40 mt-[2%]">
+        <span className="text-[8px] md:text-[10px] font-semibold uppercase tracking-widest text-primary/40 mt-1 md:mt-2">
           {label}
         </span>
       </div>

@@ -278,8 +278,8 @@ export default function ReviewDetail() {
                   <div className="absolute inset-0 bg-grid opacity-[0.03]" />
                   <ScoreGauge
                     score={review.overall_rating}
-                    size={window.innerWidth < 768 ? 100 : 160}
-                    strokeWidth={window.innerWidth < 768 ? 10 : 18}
+                    className="w-[100px] h-[100px] md:w-[160px] md:h-[160px]"
+                    strokeWidth={14}
                   />
                 </div>
 
