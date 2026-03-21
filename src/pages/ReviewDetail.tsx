@@ -242,7 +242,7 @@ export default function ReviewDetail() {
     return (
       <div className="min-h-screen bg-background">
         <Navbar />
-        <div className="container mx-auto px-4 py-20 text-center">
+        <div className="max-w-[800px] mx-auto px-4 py-20 text-center">
           <h1 className="font-heading text-3xl font-semibold mb-4">ไม่พบรีวิว</h1>
           <Link to="/"><Button variant="cta">กลับหน้าหลัก</Button></Link>
         </div>
@@ -293,7 +293,7 @@ export default function ReviewDetail() {
       <Navbar />
 
       {/* Breadcrumb */}
-      <div className="container mx-auto px-4 pt-8 pb-4">
+      <div className="max-w-[800px] mx-auto px-4 pt-8 pb-4">
         <nav className="flex items-center gap-2 text-[10px] md:text-xs font-bold uppercase tracking-[0.2em] text-slate-400">
           <Link to="/" className="hover:text-primary transition-colors">HOME</Link>
           <ChevronRight className="h-3 w-3" />
@@ -303,9 +303,9 @@ export default function ReviewDetail() {
         </nav>
       </div>
 
-      <article className="container mx-auto px-4 pb-16 md:pb-24">
+      <article className="max-w-[800px] mx-auto px-4 pb-12 md:pb-16">
         {/* Hero Section */}
-        <div className="grid md:grid-cols-[40fr_60fr] gap-8 md:gap-20 mb-16 md:mb-24 items-start">
+        <div className="grid md:grid-cols-[45fr_55fr] gap-6 md:gap-10 mb-12 md:mb-16 items-start">
           <div className="relative">
             <ImageGallery
               mainImage={review.image_url || ""}
@@ -314,6 +314,7 @@ export default function ReviewDetail() {
               badge={review.badge}
               badgeClassName={badgeColors[review.badge || ""] || "bg-primary text-white"}
               badgeIcon={<Award className="h-4 w-4" />}
+              isCompact={true}
             />
             {/* Prominent Score Gauge for Desktop */}
             <div className="hidden md:block absolute -bottom-10 -right-10 w-40 h-40 z-20 hover:scale-110 transition-transform duration-500">
@@ -338,7 +339,7 @@ export default function ReviewDetail() {
                 </div>
               </div>
 
-              <h1 className="font-heading text-5xl sm:text-6xl md:text-8xl font-semibold text-primary leading-[1.1] tracking-tighter uppercase break-words">
+              <h1 className="font-heading text-3xl sm:text-4xl md:text-5xl font-semibold text-primary leading-[1.1] tracking-tighter uppercase break-words">
                 {review.name}
               </h1>
 
@@ -355,10 +356,10 @@ export default function ReviewDetail() {
             </div>
 
             {/* Quick Summary Card */}
-            <div className="bg-white/80 backdrop-blur-sm border border-primary/5 rounded-[2.5rem] p-8 md:p-10 shadow-sm relative overflow-hidden group">
+            <div className="bg-white/80 backdrop-blur-sm border border-primary/5 rounded-3xl p-6 md:p-8 shadow-sm relative overflow-hidden group">
               <div className="absolute top-0 right-0 w-32 h-32 bg-accent/5 blur-3xl rounded-full transition-transform duration-700 group-hover:scale-150" />
 
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 relative z-10">
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 relative z-10">
                 <div className="space-y-2">
                   <p className="text-[9px] font-bold text-primary/30 uppercase tracking-[0.2em] flex items-center gap-1.5">
                     <Target className="w-3 h-3" /> เหมาะกับ
@@ -394,17 +395,17 @@ export default function ReviewDetail() {
               </div>
             </div>
 
-            <p className="text-lg md:text-2xl font-medium text-slate-600 leading-[1.8] max-w-3xl">
+            <p className="text-base md:text-lg font-medium text-slate-600 leading-[1.8] max-w-3xl">
               {review.intro}
             </p>
 
-            <div className="flex flex-wrap gap-4 pt-4">
-              <CTAButton className="flex-1 md:flex-none h-16 md:h-20 px-10 md:px-14 rounded-2xl shadow-2xl shadow-accent/20 bg-accent text-white border-none active:scale-95 transition-all" />
+            <div className="flex flex-wrap gap-4 pt-2">
+              <CTAButton className="flex-1 md:flex-none h-12 md:h-14 px-8 md:px-10 rounded-xl shadow-xl shadow-accent/20 bg-accent text-white border-none active:scale-95 transition-all" />
 
               <Button
                 variant="outline"
                 size="lg"
-                className="flex-1 md:flex-none h-16 md:h-20 px-8 md:px-10 rounded-2xl border-primary/10 bg-white hover:bg-slate-50 text-primary font-bold text-xs uppercase tracking-widest transition-all active:scale-95"
+                className="flex-1 md:flex-none h-12 md:h-14 px-6 md:px-8 rounded-xl border-primary/10 bg-white hover:bg-slate-50 text-primary font-bold text-[10px] uppercase tracking-widest transition-all active:scale-95"
                 onClick={() => {
                   const weight = review.specs?.find(s => s.label.toLowerCase().includes('weight') || s.label.includes('น้ำหนัก'))?.value;
                   const drop = review.specs?.find(s => s.label.toLowerCase().includes('drop'))?.value;
@@ -432,26 +433,26 @@ export default function ReviewDetail() {
           </div>
         </div>
 
-        <div className="grid lg:grid-cols-3 gap-16 md:gap-24">
-          <div className="lg:col-span-2 space-y-20 md:space-y-32">
+        <div className="grid lg:grid-cols-3 gap-10 md:gap-14">
+          <div className="lg:col-span-2 space-y-16 md:space-y-20">
             {/* Pros / Cons */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 md:gap-12">
-              <div className="bg-emerald-50/20 border border-emerald-100/30 rounded-[2.5rem] p-10 md:p-14 transition-all duration-500 group relative overflow-hidden shadow-sm hover:shadow-md">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 md:gap-8">
+              <div className="bg-emerald-50/20 border border-emerald-100/30 rounded-3xl p-8 md:p-10 transition-all duration-500 group relative overflow-hidden shadow-sm hover:shadow-md">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 blur-3xl rounded-full -translate-y-1/2 translate-x-1/2" />
-                <div className="flex items-center gap-5 mb-10 md:mb-14">
-                  <div className="h-14 w-14 rounded-2xl bg-emerald-500 flex items-center justify-center shadow-lg shadow-emerald-500/20">
-                    <ThumbsUp className="h-7 w-7 text-white" />
+                <div className="flex items-center gap-4 mb-8 md:mb-10">
+                  <div className="h-10 w-10 rounded-xl bg-emerald-500 flex items-center justify-center shadow-lg shadow-emerald-500/20">
+                    <ThumbsUp className="h-5 w-5 text-white" />
                   </div>
                   <div>
-                    <h3 className="font-heading font-semibold text-emerald-900 uppercase tracking-[0.3em] text-[10px] md:text-xs mb-1.5">PROS</h3>
+                    <h3 className="font-heading font-semibold text-emerald-900 uppercase tracking-[0.3em] text-[10px] md:text-xs mb-1">PROS</h3>
                     <p className="text-emerald-700/60 font-bold text-[10px] md:text-xs uppercase tracking-widest">จุดเด่นที่ประทับใจ</p>
                   </div>
                 </div>
-                <ul className="space-y-6 md:space-y-8">
+                <ul className="space-y-4 md:space-y-6">
                   {review.pros.map((p) => (
-                    <li key={p} className="flex items-start gap-5 text-base md:text-2xl font-bold text-slate-800 leading-snug group/item">
-                      <div className="h-7 w-7 rounded-full bg-emerald-500/10 flex items-center justify-center shrink-0 mt-0.5 group-hover/item:bg-emerald-500 group-hover/item:text-white transition-all">
-                        <Check className="h-4 w-4" />
+                    <li key={p} className="flex items-start gap-4 text-sm md:text-lg font-bold text-slate-800 leading-snug group/item">
+                      <div className="h-6 w-6 rounded-full bg-emerald-500/10 flex items-center justify-center shrink-0 mt-0.5 group-hover/item:bg-emerald-500 group-hover/item:text-white transition-all">
+                        <Check className="h-3 w-3" />
                       </div>
                       {p}
                     </li>
@@ -459,22 +460,22 @@ export default function ReviewDetail() {
                 </ul>
               </div>
 
-              <div className="bg-rose-50/20 border border-rose-100/30 rounded-[2.5rem] p-10 md:p-14 transition-all duration-500 group relative overflow-hidden shadow-sm hover:shadow-md">
+              <div className="bg-rose-50/20 border border-rose-100/30 rounded-3xl p-8 md:p-10 transition-all duration-500 group relative overflow-hidden shadow-sm hover:shadow-md">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-rose-500/5 blur-3xl rounded-full -translate-y-1/2 translate-x-1/2" />
-                <div className="flex items-center gap-5 mb-10 md:mb-14">
-                  <div className="h-14 w-14 rounded-2xl bg-rose-500 flex items-center justify-center shadow-lg shadow-rose-500/20">
-                    <ThumbsDown className="h-7 w-7 text-white" />
+                <div className="flex items-center gap-4 mb-8 md:mb-10">
+                  <div className="h-10 w-10 rounded-xl bg-rose-500 flex items-center justify-center shadow-lg shadow-rose-500/20">
+                    <ThumbsDown className="h-5 w-5 text-white" />
                   </div>
                   <div>
-                    <h3 className="font-heading font-semibold text-rose-900 uppercase tracking-[0.3em] text-[10px] md:text-xs mb-1.5">CONS</h3>
+                    <h3 className="font-heading font-semibold text-rose-900 uppercase tracking-[0.3em] text-[10px] md:text-xs mb-1">CONS</h3>
                     <p className="text-rose-700/60 font-bold text-[10px] md:text-xs uppercase tracking-widest">จุดที่ควรพิจารณา</p>
                   </div>
                 </div>
-                <ul className="space-y-6 md:space-y-8">
+                <ul className="space-y-4 md:space-y-6">
                   {review.cons.map((c) => (
-                    <li key={c} className="flex items-start gap-5 text-base md:text-2xl font-bold text-slate-800 leading-snug group/item">
-                      <div className="h-7 w-7 rounded-full bg-rose-500/10 flex items-center justify-center shrink-0 mt-0.5 group-hover/item:bg-rose-500 group-hover/item:text-white transition-all">
-                        <X className="h-4 w-4" />
+                    <li key={c} className="flex items-start gap-4 text-sm md:text-lg font-bold text-slate-800 leading-snug group/item">
+                      <div className="h-6 w-6 rounded-full bg-rose-500/10 flex items-center justify-center shrink-0 mt-0.5 group-hover/item:bg-rose-500 group-hover/item:text-white transition-all">
+                        <X className="h-3 w-3" />
                       </div>
                       {c}
                     </li>
@@ -484,14 +485,14 @@ export default function ReviewDetail() {
             </div>
 
             {/* Sections */}
-            <div className="space-y-24 md:space-y-40">
+            <div className="space-y-16 md:space-y-24">
               {review.sections.map((s) => (
                 <div key={s.title} className="group">
-                  <h2 className="font-heading text-2xl md:text-6xl font-semibold text-primary uppercase tracking-tighter flex items-center gap-6 mb-10 md:mb-14 leading-none group-hover:translate-x-3 transition-transform duration-700">
-                    <span className="h-10 md:h-16 w-3 bg-accent rounded-full shadow-lg shadow-accent/20" />
+                  <h2 className="font-heading text-xl md:text-3xl font-semibold text-primary uppercase tracking-tighter flex items-center gap-4 mb-6 md:mb-8 leading-none group-hover:translate-x-2 transition-transform duration-700">
+                    <span className="h-8 md:h-10 w-2.5 bg-accent rounded-full shadow-lg shadow-accent/20" />
                     {s.title}
                   </h2>
-                  <p className="text-slate-600 text-lg md:text-3xl leading-[1.8] whitespace-pre-wrap font-medium border-l-[6px] border-primary/5 pl-8 md:pl-14">
+                  <p className="text-slate-600 text-base md:text-lg leading-[1.8] whitespace-pre-wrap font-medium border-l-[4px] border-primary/5 pl-6 md:pl-10">
                     {s.body}
                   </p>
                 </div>
@@ -499,22 +500,22 @@ export default function ReviewDetail() {
             </div>
 
             {/* Verdict Card */}
-            <div className="bg-primary rounded-[3rem] md:rounded-[5rem] p-12 md:p-32 shadow-[0_50px_100px_-20px_rgba(10,26,10,0.5)] relative overflow-hidden group border border-white/5">
+            <div className="bg-primary rounded-3xl md:rounded-[2.5rem] p-8 md:p-16 shadow-[0_30px_60px_-15px_rgba(10,26,10,0.5)] relative overflow-hidden group border border-white/5">
               <div className="absolute top-0 right-0 w-[40rem] h-[40rem] bg-accent/10 blur-[120px] -translate-y-1/2 translate-x-1/2 pointer-events-none" />
               <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-[0.05] pointer-events-none" />
 
               <div className="relative z-10 max-w-5xl mx-auto text-center">
-                <div className="inline-flex items-center gap-3 px-8 py-3 bg-white/5 backdrop-blur-2xl border border-white/10 text-white rounded-full text-[10px] md:text-xs font-bold uppercase tracking-[0.4em] mb-12 md:mb-20">
-                  <Zap className="h-4 w-4 fill-accent text-accent animate-pulse" />
+                <div className="inline-flex items-center gap-2 px-6 py-2 bg-white/5 backdrop-blur-2xl border border-white/10 text-white rounded-full text-[10px] md:text-xs font-bold uppercase tracking-[0.4em] mb-8 md:mb-12">
+                  <Zap className="h-3 w-3 fill-accent text-accent animate-pulse" />
                   THE ULTIMATE VERDICT
                 </div>
 
-                <h2 className="font-heading text-3xl md:text-7xl lg:text-8xl font-semibold text-white mb-16 md:mb-24 leading-[1.1] tracking-tighter">
+                <h2 className="font-heading text-2xl md:text-4xl lg:text-5xl font-semibold text-white mb-10 md:mb-16 leading-[1.1] tracking-tighter">
                   "{review.verdict}"
                 </h2>
 
-                <div className="flex flex-col md:flex-row items-center justify-center gap-8">
-                  <CTAButton variant="hero" className="h-16 md:h-24 px-12 md:px-24 rounded-full text-lg md:text-3xl w-full md:w-auto shadow-2xl shadow-accent/40 bg-accent text-white border-none hover:scale-105 active:scale-95 transition-all duration-500" />
+                <div className="flex flex-col md:flex-row items-center justify-center gap-6">
+                  <CTAButton variant="hero" className="h-12 md:h-16 px-10 md:px-16 rounded-full text-base md:text-xl w-full md:w-auto shadow-2xl shadow-accent/40 bg-accent text-white border-none hover:scale-105 active:scale-95 transition-all duration-500" />
 
                   <div className="flex items-center gap-5 text-white/40 text-[10px] md:text-xs font-bold uppercase tracking-[0.3em]">
                     <div className="h-px w-10 bg-white/10" />
@@ -527,15 +528,15 @@ export default function ReviewDetail() {
           </div>
 
           {/* Sidebar */}
-          <aside className="space-y-12">
-            <div className="sticky top-24 space-y-12">
+          <aside className="space-y-8">
+            <div className="sticky top-24 space-y-8">
               {/* Ratings Sidebar Block */}
-              <div className="bg-white/50 backdrop-blur-md border border-primary/5 rounded-[2.5rem] p-10 shadow-sm">
-                <h3 className="font-heading font-bold text-primary text-[10px] uppercase tracking-[0.3em] flex items-center gap-3 mb-10">
-                  <div className="w-1.5 h-4 bg-accent rounded-full" />
+              <div className="bg-white/50 backdrop-blur-md border border-primary/5 rounded-3xl p-6 shadow-sm">
+                <h3 className="font-heading font-bold text-primary text-[10px] uppercase tracking-[0.3em] flex items-center gap-2 mb-6">
+                  <div className="w-1.5 h-3 bg-accent rounded-full" />
                   RATINGS
                 </h3>
-                <div className="space-y-8">
+                <div className="space-y-6">
                   {review.ratings.map((r) => (
                     <RatingBar key={r.label} label={r.label} score={r.score} />
                   ))}
@@ -543,24 +544,24 @@ export default function ReviewDetail() {
               </div>
 
               {/* Specs Sidebar Block */}
-              <div className="bg-white/50 backdrop-blur-md border border-primary/5 rounded-[2.5rem] p-10 shadow-sm">
-                <h3 className="font-heading font-bold text-primary text-[10px] uppercase tracking-[0.3em] flex items-center gap-3 mb-10">
-                  <div className="w-1.5 h-4 bg-accent rounded-full" />
+              <div className="bg-white/50 backdrop-blur-md border border-primary/5 rounded-3xl p-6 shadow-sm">
+                <h3 className="font-heading font-bold text-primary text-[10px] uppercase tracking-[0.3em] flex items-center gap-2 mb-6">
+                  <div className="w-1.5 h-3 bg-accent rounded-full" />
                   TECHNICAL SPECS
                 </h3>
-                <div className="grid gap-6">
+                <div className="grid gap-4">
                   {[
                     { icon: Scale, label: "น้ำหนัก (WEIGHT)", value: review.specs?.find(s => s.label.toLowerCase().includes('weight') || s.label.includes('น้ำหนัก'))?.value || '-' },
                     { icon: ArrowDown, label: "DROP", value: review.specs?.find(s => s.label.toLowerCase().includes('drop'))?.value || '-' },
                     { icon: Layers, label: "พื้นรองเท้า (MIDSOLE)", value: review.specs?.find(s => s.label.toLowerCase().includes('midsole') || s.label.includes('พื้นรองเท้า'))?.value || '-' },
                   ].map((spec, i) => (
-                    <div key={i} className="flex items-center gap-5 p-4 rounded-2xl bg-white/30 border border-transparent hover:border-primary/5 transition-all group">
-                      <div className="h-14 w-14 rounded-2xl bg-white border border-primary/5 flex items-center justify-center text-primary/30 shadow-sm group-hover:bg-primary group-hover:text-white transition-all">
-                        <spec.icon className="h-6 w-6" />
+                    <div key={i} className="flex items-center gap-4 p-3 rounded-xl bg-white/30 border border-transparent hover:border-primary/5 transition-all group">
+                      <div className="h-10 w-10 rounded-xl bg-white border border-primary/5 flex items-center justify-center text-primary/30 shadow-sm group-hover:bg-primary group-hover:text-white transition-all">
+                        <spec.icon className="h-5 w-5" />
                       </div>
                       <div className="flex flex-col">
                         <span className="text-[9px] font-bold text-primary/30 tracking-widest uppercase mb-0.5">{spec.label}</span>
-                        <span className="font-bold text-base text-primary leading-tight">{spec.value}</span>
+                        <span className="font-bold text-sm text-primary leading-tight">{spec.value}</span>
                       </div>
                     </div>
                   ))}
@@ -568,12 +569,12 @@ export default function ReviewDetail() {
               </div>
 
               {/* Price & CTA Sidebar Block */}
-              <div className="bg-white/50 backdrop-blur-md border border-primary/5 rounded-[2.5rem] p-10 shadow-sm space-y-8">
+              <div className="bg-white/50 backdrop-blur-md border border-primary/5 rounded-3xl p-6 shadow-sm space-y-6">
                 <div>
-                  <p className="text-[10px] font-bold text-primary/30 uppercase tracking-[0.3em] mb-2">ESTIMATED PRICE</p>
-                  <p className="font-heading font-bold text-primary text-5xl tracking-tighter italic-prohibited">{review.price}</p>
+                  <p className="text-[10px] font-bold text-primary/30 uppercase tracking-[0.3em] mb-1">ESTIMATED PRICE</p>
+                  <p className="font-heading font-bold text-primary text-3xl tracking-tighter italic-prohibited">{review.price}</p>
                 </div>
-                <CTAButton variant="hero" className="w-full h-20 rounded-2xl shadow-xl shadow-accent/20 bg-accent text-white border-none text-lg" isSidebar />
+                <CTAButton variant="hero" className="w-full h-14 rounded-xl shadow-xl shadow-accent/20 bg-accent text-white border-none text-base" isSidebar />
                 <p className="text-[9px] text-center font-bold text-slate-400 uppercase tracking-widest flex items-center justify-center gap-2">
                   <Users className="w-3 h-3" /> {userRating ? `เช็คโดยผู้ใช้แล้วกว่า ${userRating.count * 10} ครั้ง` : 'เช็คโดยผู้ใช้แล้วกว่า 1,200 ครั้ง'}
                 </p>
@@ -581,17 +582,17 @@ export default function ReviewDetail() {
 
               {/* Dynamic Top in Category Block */}
               {topInCategory.length > 0 && (
-                <div className="bg-primary rounded-[2.5rem] p-10 text-white relative overflow-hidden shadow-xl shadow-primary/20 group">
-                  <TrendingUp className="absolute -top-6 -right-6 h-32 w-32 opacity-10 rotate-12 transition-transform duration-700 group-hover:rotate-45" />
-                  <div className="relative z-10 space-y-6">
-                    <h4 className="font-heading font-bold text-2xl leading-tight">TOP 3 ในหมวดนี้</h4>
-                    <div className="space-y-4">
+                <div className="bg-primary rounded-3xl p-6 text-white relative overflow-hidden shadow-xl shadow-primary/20 group">
+                  <TrendingUp className="absolute -top-6 -right-6 h-24 w-24 opacity-10 rotate-12 transition-transform duration-700 group-hover:rotate-45" />
+                  <div className="relative z-10 space-y-4">
+                    <h4 className="font-heading font-bold text-xl leading-tight">TOP 3 ในหมวดนี้</h4>
+                    <div className="space-y-3">
                       {topInCategory.map((item, idx) => (
-                        <Link key={idx} to={`/review/${item.slug}`} className="flex items-center gap-4 group/item cursor-pointer">
-                          <div className={`h-12 w-12 rounded-xl bg-white/10 border border-white/10 flex items-center justify-center font-bold ${idx === 0 ? 'text-accent' : 'text-white/40'} italic-prohibited`}>
+                        <Link key={idx} to={`/review/${item.slug}`} className="flex items-center gap-3 group/item cursor-pointer">
+                          <div className={`h-10 w-10 rounded-xl bg-white/10 border border-white/10 flex items-center justify-center font-bold ${idx === 0 ? 'text-accent' : 'text-white/40'} italic-prohibited`}>
                             #{idx + 1}
                           </div>
-                          <p className="text-sm font-bold border-b border-transparent group-hover/item:border-accent transition-all truncate">
+                          <p className="text-xs font-bold border-b border-transparent group-hover/item:border-accent transition-all truncate">
                             {item.name}
                           </p>
                         </Link>
@@ -609,20 +610,23 @@ export default function ReviewDetail() {
 
         {/* Comments Section */}
         {review.id && (
-          <div className="mt-32">
-            <CommentSection reviewId={review.id} />
+          <div className="mt-16">
+            <CommentSection reviewId={review.id} isCompact={true} />
           </div>
         )}
       </article>
 
       {/* Related Reviews */}
-      <RelatedReviews currentReview={{
-        id: review.id,
-        category: review.category,
-        overall_rating: review.overall_rating,
-        price: review.price,
-        slug: slug || ""
-      }} />
+      <RelatedReviews
+        currentReview={{
+          id: review.id,
+          category: review.category,
+          overall_rating: review.overall_rating,
+          price: review.price,
+          slug: slug || ""
+        }}
+        isCompact={true}
+      />
 
       {/* Mobile sticky CTA */}
       <div className="lg:hidden fixed bottom-0 inset-x-0 bg-white/80 backdrop-blur-2xl border-t border-primary/5 p-4 z-50 pb-[max(1.5rem,env(safe-area-inset-bottom))] shadow-[0_-20px_50px_rgba(0,0,0,0.1)]">
