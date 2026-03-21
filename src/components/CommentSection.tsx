@@ -6,6 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { MessageSquare, Send, User, Star } from "lucide-react";
 import { toast } from "sonner";
 import { RatingStars } from "./RatingStars";
+import { cn } from "@/lib/utils";
 
 interface Comment {
   id: string;
@@ -18,9 +19,10 @@ interface Comment {
 interface CommentSectionProps {
   reviewId?: string;
   articleId?: string;
+  isCompact?: boolean;
 }
 
-export function CommentSection({ reviewId, articleId }: CommentSectionProps) {
+export function CommentSection({ reviewId, articleId, isCompact }: CommentSectionProps) {
   const { user } = useAuth();
   const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState("");
@@ -85,18 +87,29 @@ export function CommentSection({ reviewId, articleId }: CommentSectionProps) {
   };
 
   return (
-    <section className="mt-20 md:mt-32 border-t border-slate-100 pt-16 md:pt-24">
-      <div className="mb-10 md:mb-16">
-        <h2 className="font-heading text-2xl md:text-4xl font-semibold text-primary tracking-tighter uppercase flex items-center gap-3">
-          <span className="h-8 md:h-10 w-1.5 bg-accent rounded-full" />
+    <section className={cn(
+      "border-t border-slate-100",
+      isCompact ? "mt-16 md:mt-24 pt-12 md:pt-16" : "mt-20 md:mt-32 pt-16 md:pt-24"
+    )}>
+      <div className={cn(isCompact ? "mb-8 md:mb-12" : "mb-10 md:mb-16")}>
+        <h2 className={cn(
+          "font-heading font-semibold text-primary tracking-tighter uppercase flex items-center gap-3",
+          isCompact ? "text-xl md:text-2xl" : "text-2xl md:text-4xl"
+        )}>
+          <span className={cn("bg-accent rounded-full", isCompact ? "h-6 md:h-8 w-1.5" : "h-8 md:h-10 w-1.5")} />
           ถาม-ตอบ & ความคิดเห็น
         </h2>
-        <p className="text-muted-foreground text-sm md:text-lg mt-2 font-medium">ร่วมพูดคุย สอบถาม หรือแชร์ประสบการณ์การใช้งานของคุณ</p>
+        <p className={cn("text-muted-foreground mt-2 font-medium", isCompact ? "text-xs md:text-base" : "text-sm md:text-lg")}>
+          ร่วมพูดคุย สอบถาม หรือแชร์ประสบการณ์การใช้งานของคุณ
+        </p>
       </div>
 
       {/* Form */}
-      <div className="mb-20">
-        <h3 className="font-heading text-lg md:text-xl font-semibold mb-6 flex items-center gap-2 text-primary">
+      <div className={cn(isCompact ? "mb-12" : "mb-20")}>
+        <h3 className={cn(
+          "font-heading font-semibold mb-6 flex items-center gap-2 text-primary",
+          isCompact ? "text-base md:text-lg" : "text-lg md:text-xl"
+        )}>
           {user ? `ร่วมแบ่งปันประสบการณ์ในฐานะ ${user.email?.split("@")[0]}` : "ร่วมพูดคุยกับเรา"}
         </h3>
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -133,7 +146,10 @@ export function CommentSection({ reviewId, articleId }: CommentSectionProps) {
             value={newComment}
             onChange={(e) => setNewComment(e.target.value)}
             disabled={!user || submitting}
-            className="min-h-[150px] bg-slate-50 border-slate-200 rounded-2xl p-6 md:p-8 focus:ring-accent focus:border-accent text-base md:text-lg transition-all"
+            className={cn(
+              "bg-slate-50 border-slate-200 rounded-2xl focus:ring-accent focus:border-accent transition-all",
+              isCompact ? "min-h-[120px] p-4 md:p-6 text-sm md:text-base" : "min-h-[150px] p-6 md:p-8 text-base md:text-lg"
+            )}
           />
           <div className="flex justify-end">
             <Button

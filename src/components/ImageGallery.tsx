@@ -3,6 +3,7 @@ import useEmblaCarousel from "embla-carousel-react";
 import { ChevronLeft, ChevronRight, ZoomIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTrigger, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { cn } from "@/lib/utils";
 
 interface ImageGalleryProps {
   mainImage: string;
@@ -11,9 +12,10 @@ interface ImageGalleryProps {
   badge?: string | null;
   badgeClassName?: string;
   badgeIcon?: React.ReactNode;
+  isCompact?: boolean;
 }
 
-export function ImageGallery({ mainImage, images, alt, badge, badgeClassName, badgeIcon }: ImageGalleryProps) {
+export function ImageGallery({ mainImage, images, alt, badge, badgeClassName, badgeIcon, isCompact }: ImageGalleryProps) {
   const allImages = [mainImage, ...images].filter(Boolean);
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [emblaRef, emblaApi] = useEmblaCarousel({
@@ -43,7 +45,10 @@ export function ImageGallery({ mainImage, images, alt, badge, badgeClassName, ba
     return (
       <Dialog>
         <DialogTrigger asChild>
-          <div className="relative rounded-[2rem] overflow-hidden bg-muted shadow-2xl aspect-[4/3] cursor-zoom-in group">
+          <div className={cn(
+            "relative overflow-hidden bg-muted aspect-[4/3] cursor-zoom-in group",
+            isCompact ? "rounded-2xl shadow-xl" : "rounded-[2rem] shadow-2xl"
+          )}>
             <img src={allImages[0] || ""} alt={alt} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
             <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center">
               <ZoomIn className="text-white opacity-0 group-hover:opacity-100 transition-opacity w-8 h-8" />
@@ -68,9 +73,12 @@ export function ImageGallery({ mainImage, images, alt, badge, badgeClassName, ba
   }
 
   return (
-    <div className="space-y-3">
+    <div className={cn(isCompact ? "space-y-2" : "space-y-3")}>
       {/* Main carousel */}
-      <div className="relative rounded-[2rem] overflow-hidden bg-muted shadow-2xl aspect-[4/3] group w-full">
+      <div className={cn(
+        "relative overflow-hidden bg-muted aspect-[4/3] group w-full",
+        isCompact ? "rounded-2xl shadow-xl" : "rounded-[2rem] shadow-2xl"
+      )}>
         <div className="overflow-hidden h-full w-full" ref={emblaRef}>
           <div className="flex h-full">
             {allImages.map((img, i) => (
@@ -130,16 +138,21 @@ export function ImageGallery({ mainImage, images, alt, badge, badgeClassName, ba
       </div>
 
       {/* Thumbnails */}
-      <div className="flex gap-2 md:gap-3 overflow-x-auto pb-2 px-1 scrollbar-hide snap-x snap-mandatory">
+      <div className={cn(
+        "flex overflow-x-auto pb-2 px-1 scrollbar-hide snap-x snap-mandatory",
+        isCompact ? "gap-2" : "gap-2 md:gap-3"
+      )}>
         {allImages.map((img, i) => (
           <button
             key={i}
             onClick={() => scrollTo(i)}
-            className={`shrink-0 w-12 h-12 md:w-20 md:h-20 rounded-xl md:rounded-2xl overflow-hidden border-2 transition-all snap-start ${
+            className={cn(
+              "shrink-0 overflow-hidden border-2 transition-all snap-start",
+              isCompact ? "w-10 h-10 md:w-16 md:h-16 rounded-lg md:rounded-xl" : "w-12 h-12 md:w-20 md:h-20 rounded-xl md:rounded-2xl",
               i === selectedIndex
                 ? "border-primary ring-2 md:ring-4 ring-primary/10 scale-95 shadow-lg"
                 : "border-transparent opacity-40 hover:opacity-100 hover:scale-105"
-            }`}
+            )}
           >
             <img src={img} alt={`${alt} thumbnail ${i + 1}`} className="w-full h-full object-cover" />
           </button>

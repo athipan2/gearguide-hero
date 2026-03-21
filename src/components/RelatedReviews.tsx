@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { ProductCard } from "./ProductCard";
+import { cn } from "@/lib/utils";
 
 interface RelatedReview {
   id: string;
@@ -29,6 +30,7 @@ interface RelatedReviewsProps {
     price: string;
     slug?: string;
   };
+  isCompact?: boolean;
 }
 
 const parsePrice = (priceStr: string): number => {
@@ -38,7 +40,7 @@ const parsePrice = (priceStr: string): number => {
   return match ? parseInt(match[0], 10) : 0;
 };
 
-export function RelatedReviews({ currentReview }: RelatedReviewsProps) {
+export function RelatedReviews({ currentReview, isCompact }: RelatedReviewsProps) {
   const [related, setRelated] = useState<RelatedReview[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -105,15 +107,26 @@ export function RelatedReviews({ currentReview }: RelatedReviewsProps) {
   if (loading || related.length === 0) return null;
 
   return (
-    <section className="container mx-auto px-4 py-16 md:py-24 border-t border-slate-200">
-      <div className="mb-10 md:mb-16">
-        <h2 className="font-heading text-2xl md:text-4xl font-semibold text-primary tracking-tighter uppercase flex items-center gap-3">
-          <span className="h-8 md:h-10 w-1.5 bg-accent rounded-full" />
+    <section className={cn(
+      "px-4 border-t border-slate-200",
+      isCompact ? "max-w-[800px] mx-auto py-12 md:py-16" : "container mx-auto py-16 md:py-24"
+    )}>
+      <div className={cn(isCompact ? "mb-8 md:mb-12" : "mb-10 md:mb-16")}>
+        <h2 className={cn(
+          "font-heading font-semibold text-primary tracking-tighter uppercase flex items-center gap-3",
+          isCompact ? "text-xl md:text-2xl" : "text-2xl md:text-4xl"
+        )}>
+          <span className={cn("bg-accent rounded-full", isCompact ? "h-6 md:h-8 w-1.5" : "h-8 md:h-10 w-1.5")} />
           รีวิวที่เกี่ยวข้อง
         </h2>
-        <p className="text-muted-foreground text-sm md:text-lg mt-2 font-medium">สินค้าที่คุณอาจจะสนใจตามความใกล้เคียงของสเปคและราคา</p>
+        <p className={cn("text-muted-foreground mt-2 font-medium", isCompact ? "text-xs md:text-base" : "text-sm md:text-lg")}>
+          สินค้าที่คุณอาจจะสนใจตามความใกล้เคียงของสเปคและราคา
+        </p>
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+      <div className={cn(
+        "grid grid-cols-1 sm:grid-cols-2 gap-6 md:gap-8",
+        !isCompact && "lg:grid-cols-3"
+      )}>
         {related.map((rev) => (
           <ProductCard
             key={rev.id}
