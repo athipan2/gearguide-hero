@@ -76,8 +76,9 @@ export function ImageGallery({ mainImage, images, alt, badge, badgeClassName, ba
     <div className={cn(isCompact ? "space-y-3 md:space-y-2" : "space-y-4 md:space-y-3")}>
       {/* Main carousel */}
       <div className={cn(
-        "relative overflow-hidden bg-muted aspect-[4/3] group w-full",
-        isCompact ? "md:rounded-2xl shadow-xl" : "md:rounded-[2rem] shadow-2xl"
+        "relative overflow-hidden bg-muted aspect-[4/3] md:aspect-[4/3] group w-full",
+        isCompact ? "md:rounded-2xl shadow-xl" : "md:rounded-[2rem] shadow-2xl",
+        "rounded-none md:rounded-2xl" // Force edge-to-edge on mobile
       )}>
         <div className="overflow-hidden h-full w-full" ref={emblaRef}>
           <div className="flex h-full">

@@ -12,6 +12,7 @@ import { ScoreGauge } from "@/components/ScoreGauge";
 import { useComparisonStore } from "@/lib/comparison-store";
 import { toast } from "sonner";
 import { ReviewDetailSkeleton } from "@/components/ReviewSkeleton";
+import { cn } from "@/lib/utils";
 import {
   ExternalLink, ThumbsUp, ThumbsDown, Award,
   ChevronRight, Check, X, Zap, Share2,
@@ -109,6 +110,45 @@ export default function ReviewDetail() {
   const [loading, setLoading] = useState(true);
   const [isComparing, setIsComparing] = useState(false);
 
+  const stabilizedMicrocopy = useMemo(() => {
+    return microcopyOptions[Math.floor(Math.random() * microcopyOptions.length)];
+  }, []);
+
+  const jsonLd = useMemo(() => {
+    if (!review) return null;
+    const currentUrl = typeof window !== 'undefined' ? window.location.href : '';
+    return {
+      "@context": "https://schema.org/",
+      "@type": "Product",
+      "name": review.name,
+      "image": [review.image_url],
+      "description": review.intro,
+      "brand": {
+        "@type": "Brand",
+        "name": review.brand
+      },
+      "review": {
+        "@type": "Review",
+        "reviewRating": {
+          "@type": "Rating",
+          "ratingValue": review.overall_rating,
+          "bestRating": "5"
+        },
+        "author": {
+          "@type": "Organization",
+          "name": "GearTrail"
+        }
+      },
+      "offers": {
+        "@type": "Offer",
+        "priceCurrency": "THB",
+        "price": parsePrice(review.price),
+        "availability": "https://schema.org/InStock",
+        "url": currentUrl
+      }
+    };
+  }, [review]);
+
   useEffect(() => {
     if (!slug) { setLoading(false); return; }
 
@@ -191,50 +231,6 @@ export default function ReviewDetail() {
     fetchReview();
   }, [slug]);
 
-  const stabilizedMicrocopy = useMemo(() => {
-    const microcopy = [
-      "🔥 ราคาดีสุดวันนี้",
-      "⚡ อัปเดตราคาล่าสุด",
-      "🏷️ เช็คโปรโมชั่นตอนนี้",
-      "✨ การันตีของแท้ 100%"
-    ];
-    return microcopy[Math.floor(Math.random() * microcopy.length)];
-  }, []);
-
-  const jsonLd = useMemo(() => {
-    if (!review) return null;
-    return {
-      "@context": "https://schema.org/",
-      "@type": "Product",
-      "name": review.name,
-      "image": [review.image_url],
-      "description": review.intro,
-      "brand": {
-        "@type": "Brand",
-        "name": review.brand
-      },
-      "review": {
-        "@type": "Review",
-        "reviewRating": {
-          "@type": "Rating",
-          "ratingValue": review.overall_rating,
-          "bestRating": "5"
-        },
-        "author": {
-          "@type": "Organization",
-          "name": "GearTrail"
-        }
-      },
-      "offers": {
-        "@type": "Offer",
-        "priceCurrency": "THB",
-        "price": parsePrice(review.price),
-        "availability": "https://schema.org/InStock",
-        "url": window.location.href
-      }
-    };
-  }, [review]);
-
   if (loading) {
     return (
       <div className="min-h-screen bg-background">
@@ -258,18 +254,23 @@ export default function ReviewDetail() {
     );
   }
 
-  const ctaText = review.cta_text || "ดูราคาล่าสุด";
-  const ctaProps = review.affiliate_url
+  const ctaText = review?.cta_text || "ดูราคาล่าสุด";
+  const ctaProps = review?.affiliate_url
     ? { href: review.affiliate_url, target: "_blank", rel: "noopener noreferrer nofollow" }
     : {};
 
-  const stabilizedMicrocopy = useMemo(() => {
-    return microcopyOptions[Math.floor(Math.random() * microcopyOptions.length)];
-  }, []);
-
-  const CTAButton = ({ className, variant = "hero", isSidebar = false, showMicrocopy = true }: { className?: string, variant?: ButtonProps['variant'], isSidebar?: boolean, showMicrocopy?: boolean }) => (
+  const CTAButton = ({ className, variant = "hero", isSidebar = false, showMicrocopy = true, isSticky = false }: { className?: string, variant?: ButtonProps['variant'], isSidebar?: boolean, showMicrocopy?: boolean, isSticky?: boolean }) => (
     <div className="flex flex-col gap-2 w-full">
-      <Button variant={variant} size="lg" className={`${className} group relative overflow-hidden`} asChild={!!review.affiliate_url}>
+      <Button
+        variant={variant}
+        size="lg"
+        className={cn(
+          className,
+          "group relative overflow-hidden transition-all active:scale-95",
+          isSticky && "bg-accent hover:bg-accent/90 border-none shadow-accent/20 animate-pulse-subtle"
+        )}
+        asChild={!!review.affiliate_url}
+      >
         {review.affiliate_url ? (
           <a {...ctaProps}>
             <span className="relative z-10 flex items-center gap-2">
@@ -284,8 +285,11 @@ export default function ReviewDetail() {
           </div>
         )}
       </Button>
-      {showMicrocopy && !isSidebar && (
-        <p className="text-[10px] md:text-xs text-center font-bold text-accent uppercase tracking-widest animate-pulse">
+      {showMicrocopy && (
+        <p className={cn(
+          "text-[10px] md:text-xs text-center font-bold uppercase tracking-widest",
+          isSticky ? "text-accent/80" : "text-accent animate-pulse"
+        )}>
           {stabilizedMicrocopy}
         </p>
       )}
@@ -293,7 +297,7 @@ export default function ReviewDetail() {
   );
 
   return (
-    <div className="min-h-screen bg-[var(--background)] selection:bg-accent/30 selection:text-primary">
+    <div className="min-h-screen bg-[var(--background)] selection:bg-accent/30 selection:text-primary pb-20 md:pb-0">
       <SEOHead
         title={`${review.name} รีวิว — GearTrail`}
         description={`รีวิว ${review.name} จาก ${review.brand}: ${(review.intro || "").slice(0, 120)}...`}
@@ -303,21 +307,20 @@ export default function ReviewDetail() {
       />
       <Navbar />
 
-      {/* Breadcrumb */}
-      <div className="max-w-[800px] mx-auto px-3 pt-8 pb-4">
-        <nav className="flex items-center gap-2 text-[10px] md:text-xs font-bold uppercase tracking-[0.2em] text-slate-400">
+      <article className="max-w-[800px] mx-auto pb-12 md:pb-16 px-3 md:px-0">
+        {/* Breadcrumb - Desktop Only */}
+        <div className="hidden md:flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 py-8">
           <Link to="/" className="hover:text-primary transition-colors">HOME</Link>
           <ChevronRight className="h-3 w-3" />
           <span className="hover:text-primary transition-colors cursor-pointer">{review.category}</span>
           <ChevronRight className="h-3 w-3" />
           <span className="text-primary">{review.name}</span>
-        </nav>
-      </div>
+        </div>
 
-      <article className="max-w-[800px] mx-auto pb-12 md:pb-16">
         {/* Hero Section */}
-        <div className="grid md:grid-cols-[45fr_55fr] gap-4 md:gap-10 mb-8 md:mb-16 items-start">
-          <div className="relative">
+        <div className="grid grid-cols-1 md:grid-cols-[45fr_55fr] gap-6 md:gap-10 mb-8 md:mb-16 items-start">
+          {/* Product Image Dominates Mobile Hero */}
+          <div className="relative -mx-3 md:mx-0">
             <ImageGallery
               mainImage={review.image_url || ""}
               images={review.images}
@@ -337,18 +340,19 @@ export default function ReviewDetail() {
             </div>
           </div>
 
-          <div className="flex flex-col space-y-4 md:space-y-10 px-3 md:px-0">
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="h-px w-8 bg-accent" />
-                  <p className="text-[10px] md:text-xs font-bold text-accent uppercase tracking-[0.3em]">{review.brand} // {review.category}</p>
-                </div>
+          <div className="flex flex-col space-y-6 md:space-y-10">
+            {/* Mobile-First Compact Title + Score + Price Block */}
+            <div className="space-y-4">
+              <div className="flex items-center justify-between md:mb-2">
                 <div className="flex items-center gap-2">
+                  <div className="h-px w-6 bg-accent" />
+                  <p className="text-[10px] font-bold text-accent uppercase tracking-widest">{review.brand} • {review.category}</p>
+                </div>
+                <div className="flex items-center gap-2 md:hidden">
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="h-8 w-8 rounded-full bg-white/50 border border-primary/5 shadow-sm md:hidden"
+                    className="h-8 w-8 rounded-full bg-white border border-primary/5 shadow-sm"
                     onClick={() => {
                       if (navigator.share) {
                         navigator.share({ title: review.name, text: review.intro || "", url: window.location.href }).catch(() => {});
@@ -360,64 +364,38 @@ export default function ReviewDetail() {
                   >
                     <Share2 className="w-4 h-4 text-primary/60" />
                   </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8 rounded-full bg-white/50 border border-primary/5 shadow-sm md:hidden"
-                    onClick={() => {
-                      const weight = review.specs?.find(s => s.label.toLowerCase().includes('weight') || s.label.includes('น้ำหนัก'))?.value;
-                      const drop = review.specs?.find(s => s.label.toLowerCase().includes('drop'))?.value;
-                      if (slug) {
-                        useComparisonStore.getState().addItem({
-                          name: review.name,
-                          brand: review.brand,
-                          image: review.image_url || "",
-                          rating: review.overall_rating,
-                          price: review.price,
-                          slug: slug,
-                          weight,
-                          drop,
-                          specs: review.specs,
-                          aspectRatings: review.ratings
-                        });
-                        toast.success(`เพิ่ม ${review.name} เข้าสู่การเปรียบเทียบ`);
-                      }
-                    }}
-                  >
-                    <Scale className="w-4 h-4 text-primary/60" />
-                  </Button>
                 </div>
               </div>
 
-              <h1 className="font-heading text-3xl sm:text-4xl md:text-5xl font-semibold text-primary leading-[1.1] tracking-tighter uppercase break-words">
+              <h1 className="font-heading text-3xl md:text-5xl font-semibold text-primary leading-tight tracking-tighter uppercase break-words">
                 {review.name}
               </h1>
 
-              {/* Compact Block: Rating + Price + Badges */}
-              <div className="flex flex-col gap-4 bg-white/50 backdrop-blur-sm p-4 rounded-2xl border border-primary/5 shadow-sm md:bg-transparent md:p-0 md:border-none md:shadow-none">
+              {/* Combined Block: Price (Dominant) + Rating + Badges */}
+              <div className="bg-white rounded-3xl p-5 border border-primary/5 shadow-sm md:bg-transparent md:p-0 md:border-none md:shadow-none space-y-4">
+                <div className="hidden md:flex items-baseline gap-2">
+                  <span className="text-4xl md:text-5xl font-heading font-bold text-primary tracking-tighter italic-prohibited">{review.price}</span>
+                  <span className="text-xs font-bold text-accent uppercase animate-pulse">🔥 Best Price Today</span>
+                </div>
+
+                <div className="flex md:hidden items-baseline gap-2">
+                  <span className="text-4xl font-heading font-bold text-primary tracking-tighter italic-prohibited">{review.price}</span>
+                  <span className="text-xs font-bold text-accent uppercase animate-pulse">🔥 Best Price</span>
+                </div>
+
                 <div className="flex flex-wrap items-center gap-2">
-                  <div className="flex items-center gap-1.5 bg-white px-3 py-1.5 rounded-full border border-primary/5 shadow-sm">
+                  <div className="flex items-center gap-1.5 bg-slate-50 px-3 py-1.5 rounded-full border border-primary/5">
                     <Star className="w-4 h-4 fill-accent text-accent" />
-                    <span className="text-sm font-bold text-primary">{review.overall_rating} / 5</span>
+                    <span className="text-sm font-bold text-primary">{review.overall_rating}</span>
                     <span className="text-[10px] text-primary/40 font-bold ml-1 uppercase">({userRating?.count || 120} REVIEWS)</span>
                   </div>
-                  <div className="flex items-center gap-1.5 bg-white px-3 py-1.5 rounded-full border border-primary/5 shadow-sm">
+                  <div className="flex items-center gap-1.5 bg-slate-50 px-3 py-1.5 rounded-full border border-primary/5">
                     <Check className="w-3.5 h-3.5 text-emerald-500" />
                     <span className="text-[10px] font-bold text-emerald-600 uppercase">Verified</span>
                   </div>
-                  <div className="flex items-center gap-1.5 bg-emerald-500 text-white px-3 py-1.5 rounded-full shadow-sm">
-                    <TrendingUp className="w-3.5 h-3.5" />
-                    <span className="text-[10px] font-bold uppercase">Best Price</span>
-                  </div>
-                </div>
-
-                <div className="flex items-baseline justify-between md:hidden">
-                  <div className="flex flex-col">
-                    <p className="text-[9px] font-bold text-primary/30 uppercase tracking-[0.3em] mb-0.5">ESTIMATED PRICE</p>
-                    <div className="flex items-baseline gap-2">
-                      <p className="font-heading font-bold text-primary text-4xl tracking-tighter italic-prohibited">{review.price}</p>
-                      <span className="text-[10px] font-bold text-rose-500 uppercase animate-pulse">🔥 Limited</span>
-                    </div>
+                  <div className="flex items-center gap-1.5 bg-emerald-500/10 text-emerald-600 px-3 py-1.5 rounded-full">
+                    <Award className="w-3.5 h-3.5" />
+                    <span className="text-[10px] font-bold uppercase">Top Pick</span>
                   </div>
                 </div>
               </div>
@@ -714,11 +692,12 @@ export default function ReviewDetail() {
         isCompact={true}
       />
 
-      {/* Mobile sticky CTA */}
-      <div className="lg:hidden fixed bottom-0 inset-x-0 bg-white/95 backdrop-blur-2xl border-t border-primary/5 px-3 pt-3 z-50 pb-[max(1rem,env(safe-area-inset-bottom))] shadow-[0_-20px_50px_rgba(0,0,0,0.1)]">
+      {/* Mobile sticky CTA - Enhanced with Orange Contrast & Animation */}
+      <div className="md:hidden fixed bottom-0 inset-x-0 bg-white/95 backdrop-blur-2xl border-t border-primary/5 px-4 pt-3 z-50 pb-[max(1rem,env(safe-area-inset-bottom))] shadow-[0_-20px-50px_rgba(0,0,0,0.1)]">
         <CTAButton
-          className="w-full h-14 rounded-xl font-bold text-lg uppercase tracking-wider shadow-xl shadow-accent/20 bg-accent text-white border-none active:scale-95 transition-all animate-in fade-in slide-in-from-bottom-4 duration-500"
+          className="w-full h-14 rounded-2xl font-bold text-lg uppercase tracking-wider shadow-xl"
           showMicrocopy={true}
+          isSticky={true}
         />
       </div>
 
