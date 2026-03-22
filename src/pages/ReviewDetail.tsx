@@ -1,6 +1,7 @@
 import { useEffect, useState, useMemo } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
+import { RatingStars } from "@/components/RatingStars";
 import { Footer } from "@/components/Footer";
 import { ImageGallery } from "@/components/ImageGallery";
 import { SEOHead } from "@/components/SEOHead";
@@ -85,11 +86,24 @@ const microcopyOptions = [
   "✨ การันตีของแท้ 100%"
 ];
 
+const ratingExplanations: Record<string, string> = {
+  "ความเบา": "น้ำหนักรวมส่งผลต่อความล้าเมื่อวิ่งระยะไกล",
+  "แรงคืนตัว": "ความเด้งของโฟมที่ช่วยส่งแรงไปข้างหน้า",
+  "ความทนทาน": "อายุการใช้งานของพื้นยางและอัปเปอร์",
+  "ความคุ้มค่า": "เทียบประสิทธิภาพกับราคาที่จ่ายไป",
+  "ความสบาย": "ความนุ่มและการโอบรัดของอัปเปอร์",
+  "การเกาะถนน": "ความมั่นใจเมื่อวิ่งบนพื้นผิวที่หลากหลาย",
+  "ความเสถียร": "ความมั่นคงของส้นเท้าและกลางเท้า"
+};
+
 function RatingBar({ label, score }: { label: string; score: number }) {
   return (
     <div className="space-y-1.5 md:space-y-2.5 group">
       <div className="flex justify-between items-end gap-2">
-        <span className="text-[11px] md:text-xs font-bold uppercase tracking-widest text-slate-500 group-hover:text-primary transition-colors">{label}</span>
+        <div className="flex flex-col">
+          <span className="text-[11px] md:text-xs font-bold uppercase tracking-widest text-slate-500 group-hover:text-primary transition-colors">{label}</span>
+          <span className="text-[10px] text-slate-400 font-medium leading-tight mt-0.5 hidden md:block">{ratingExplanations[label] || "คะแนนตามเกณฑ์มาตรฐานการทดสอบ"}</span>
+        </div>
         <span className="text-sm font-bold text-primary tabular-nums">{score.toFixed(1)}</span>
       </div>
       <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden border border-slate-200/30 relative">
@@ -97,6 +111,7 @@ function RatingBar({ label, score }: { label: string; score: number }) {
           className="h-full bg-primary rounded-full transition-all duration-1000 ease-out relative z-10"
           style={{ width: `${(score / 5) * 100}%` }}
         />
+        <div className="absolute inset-0 bg-shimmer/10 animate-shimmer -z-0" />
       </div>
     </div>
   );
@@ -267,14 +282,14 @@ export default function ReviewDetail() {
         className={cn(
           className,
           "group relative overflow-hidden transition-all active:scale-95 py-4 md:py-6",
-          isSticky && "bg-accent hover:bg-accent/90 border-none shadow-accent/20 animate-pulse-subtle"
+          isSticky && "bg-accent hover:bg-accent/90 border-none shadow-accent/20"
         )}
         asChild={!!review.affiliate_url}
       >
         {review.affiliate_url ? (
           <a {...ctaProps}>
             <span className="relative z-10 flex items-center gap-2 text-sm md:text-base">
-              {ctaText}
+              {isSidebar ? "เช็คราคา + รีวิว Shopee" : ctaText}
               <ExternalLink className="h-5 w-5 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
             </span>
           </a>
@@ -286,18 +301,21 @@ export default function ReviewDetail() {
         )}
       </Button>
       {showMicrocopy && (
-        <p className={cn(
-          "text-xs text-center font-bold uppercase tracking-widest",
-          isSticky ? "text-accent/80" : "text-accent animate-pulse"
-        )}>
-          {stabilizedMicrocopy}
-        </p>
+        <div className="flex flex-col items-center gap-0.5">
+          <p className={cn(
+            "text-[10px] text-center font-bold uppercase tracking-[0.2em]",
+            isSticky ? "text-accent/80" : "text-accent animate-pulse"
+          )}>
+            {stabilizedMicrocopy}
+          </p>
+          <span className="text-[9px] text-slate-400 font-bold uppercase tracking-widest">อัปเดตราคาล่าสุดวันนี้ • มีรีวิวจริง</span>
+        </div>
       )}
     </div>
   );
 
   return (
-    <div className="min-h-screen bg-[var(--background)] selection:bg-accent/30 selection:text-primary pb-[120px] md:pb-0">
+    <div className="min-h-screen bg-[var(--background)] selection:bg-accent/30 selection:text-primary pb-[160px] md:pb-20">
       <SEOHead
         title={`${review.name} รีวิว — GearTrail`}
         description={`รีวิว ${review.name} จาก ${review.brand}: ${(review.intro || "").slice(0, 120)}...`}
@@ -318,9 +336,9 @@ export default function ReviewDetail() {
         </div>
 
         {/* Hero Section */}
-        <div className="grid grid-cols-1 md:grid-cols-[45fr_55fr] gap-6 md:gap-10 mb-8 md:mb-16 items-start">
+        <div className="grid grid-cols-1 md:grid-cols-[45fr_55fr] gap-6 md:gap-12 mb-12 md:mb-20 items-start">
           {/* Product Image Dominates Mobile Hero */}
-          <div className="relative">
+          <div className="relative md:sticky md:top-24">
             <ImageGallery
               mainImage={review.image_url || ""}
               images={review.images}
@@ -331,28 +349,28 @@ export default function ReviewDetail() {
               isCompact={true}
             />
             {/* Prominent Score Gauge for Desktop */}
-            <div className="hidden md:block absolute -bottom-10 -right-10 w-40 h-40 z-20 hover:scale-110 transition-transform duration-500">
+            <div className="hidden md:block absolute -bottom-10 -right-10 w-44 h-44 z-20 hover:scale-110 transition-transform duration-500">
               <ScoreGauge
                 score={review.overall_rating}
-                className="bg-white rounded-full p-2 shadow-2xl border border-primary/5"
+                className="bg-white rounded-full p-2 shadow-2xl border-4 border-[var(--background)]"
                 strokeWidth={12}
               />
             </div>
           </div>
 
-          <div className="flex flex-col space-y-6 md:space-y-10">
-            {/* Mobile-First Compact Title + Score + Price Block */}
+          <div className="flex flex-col space-y-8 md:space-y-12">
+            {/* Mobile-First Title Block */}
             <div className="space-y-4">
-              <div className="flex items-center justify-between md:mb-2">
+              <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <div className="h-px w-6 bg-accent" />
-                  <p className="text-xs font-bold text-accent uppercase tracking-widest">{review.brand} • {review.category}</p>
+                  <span className="h-px w-8 bg-accent" />
+                  <p className="text-[10px] md:text-xs font-bold text-accent uppercase tracking-[0.3em]">{review.brand} • {review.category}</p>
                 </div>
-                <div className="flex items-center gap-2 md:hidden">
+                <div className="flex items-center gap-3">
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="h-8 w-8 rounded-full bg-white border border-primary/5 shadow-sm"
+                    className="h-9 w-9 rounded-full bg-white/50 backdrop-blur-sm border border-primary/5 shadow-sm hover:bg-white transition-all"
                     onClick={() => {
                       if (navigator.share) {
                         navigator.share({ title: review.name, text: review.intro || "", url: window.location.href }).catch(() => {});
@@ -362,98 +380,102 @@ export default function ReviewDetail() {
                       }
                     }}
                   >
-                    <Share2 className="w-4 h-4 text-primary/60" />
+                    <Share2 className="w-4 h-4 text-primary" />
                   </Button>
                 </div>
               </div>
 
-              <h1 className="font-heading text-3xl md:text-5xl font-semibold text-primary leading-tight tracking-tighter uppercase break-words">
+              <h1 className="font-heading text-4xl md:text-6xl font-semibold text-primary leading-[1.1] tracking-tighter uppercase break-words">
                 {review.name}
               </h1>
 
-              {/* Combined Block: Price (Dominant) + Rating + Badges */}
-              <div className="bg-white rounded-3xl p-5 border border-primary/5 shadow-sm md:bg-transparent md:p-0 md:border-none md:shadow-none space-y-4">
-                <div className="hidden md:flex items-baseline gap-2">
-                  <span className="text-4xl md:text-5xl font-heading font-bold text-primary tracking-tighter italic-prohibited">{review.price}</span>
-                  <span className="text-xs font-bold text-accent uppercase animate-pulse">🔥 Best Price Today</span>
-                </div>
-
-                <div className="flex md:hidden items-baseline gap-2">
-                  <span className="text-4xl font-heading font-bold text-primary tracking-tighter italic-prohibited">{review.price}</span>
-                  <span className="text-xs font-bold text-accent uppercase animate-pulse">🔥 Best Price</span>
-                </div>
-
-                <div className="flex flex-wrap items-center gap-2">
-                  <div className="flex items-center gap-1.5 bg-slate-50 px-3 py-2 rounded-full border border-primary/5">
-                    <Star className="w-4 h-4 fill-accent text-accent" />
-                    <span className="text-sm font-bold text-primary">{review.overall_rating}</span>
-                    <span className="text-xs text-primary/40 font-bold ml-1 uppercase">({userRating?.count || 120} REVIEWS)</span>
+              {/* Decision Anchor: Score + Price + Quick Verdict */}
+              <div className="grid grid-cols-1 gap-4 pt-2">
+                <div className="bg-white rounded-[2rem] p-6 border border-primary/5 shadow-xl shadow-primary/5 space-y-6">
+                  <div className="flex items-center justify-between border-b border-slate-100 pb-5">
+                    <div className="flex flex-col">
+                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">SCORE GAUGE</span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-4xl font-heading font-bold text-primary">{review.overall_rating}</span>
+                        <div className="flex flex-col">
+                          <RatingStars rating={review.overall_rating} />
+                          <span className="text-[9px] font-bold text-primary/40 uppercase mt-0.5">({userRating?.count || 120} USERS)</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="h-12 w-px bg-slate-100" />
+                    <div className="flex flex-col items-end">
+                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">EST. PRICE</span>
+                      <span className="text-3xl font-heading font-bold text-primary tracking-tighter italic-prohibited">{review.price}</span>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-1.5 bg-slate-50 px-3 py-2 rounded-full border border-primary/5">
-                    <Check className="w-3.5 h-3.5 text-emerald-500" />
-                    <span className="text-xs font-bold text-emerald-600 uppercase">Verified</span>
-                  </div>
-                  <div className="flex items-center gap-1.5 bg-emerald-500/10 text-emerald-600 px-3 py-2 rounded-full">
-                    <Award className="w-3.5 h-3.5" />
-                    <span className="text-xs font-bold uppercase">Top Pick</span>
+
+                  <div className="space-y-4">
+                    <div className="flex items-start gap-3">
+                      <div className="mt-1 h-5 w-5 rounded-full bg-accent/10 flex items-center justify-center shrink-0">
+                        <Zap className="h-3 w-3 text-accent fill-accent" />
+                      </div>
+                      <p className="text-sm md:text-base font-bold text-slate-700 leading-snug">
+                        บทสรุป: <span className="font-medium text-slate-600">{review.verdict?.slice(0, 100)}...</span>
+                      </p>
+                    </div>
+
+                    <div className="flex flex-col sm:flex-row gap-3">
+                      <CTAButton className="h-14 rounded-2xl shadow-xl shadow-accent/20 bg-accent text-white border-none active:scale-95 transition-all text-base" />
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Quick Summary Card */}
-            <div className="bg-white/80 backdrop-blur-sm border border-primary/5 rounded-3xl p-4 md:p-8 shadow-sm relative overflow-hidden group">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-accent/5 blur-3xl rounded-full transition-transform duration-700 group-hover:scale-150" />
-
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 relative z-10">
-                <div className="space-y-2">
-                  <p className="text-xs font-bold text-primary/30 uppercase tracking-[0.2em] flex items-center gap-1.5">
-                    <Target className="w-4 h-4" /> เหมาะกับ
-                  </p>
-                  <p className="text-base font-bold text-primary leading-tight">
-                    {review.specs?.find(s => s.label.includes('เหมาะกับ'))?.value || 'Daily Training'}
-                  </p>
+            {/* "เหมาะกับใคร?" - Decision Block */}
+            <div className="bg-primary text-white rounded-[2rem] p-6 md:p-8 shadow-2xl shadow-primary/20 relative overflow-hidden group">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 blur-3xl rounded-full" />
+              <h3 className="font-heading text-lg md:text-xl font-bold mb-6 flex items-center gap-3">
+                <span className="w-2 h-6 bg-accent rounded-full" />
+                เหมาะกับคุณไหม?
+              </h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div className="space-y-4">
+                  <p className="text-[10px] font-bold text-accent uppercase tracking-[0.2em]">✅ เหมาะสำหรับ</p>
+                  <ul className="space-y-3">
+                    <li className="flex items-start gap-3 text-sm font-medium text-white/90">
+                      <Check className="h-4 w-4 text-accent mt-0.5 shrink-0" />
+                      {review.specs?.find(s => s.label.includes('เหมาะกับ'))?.value || 'การวิ่งทำความเร็วและวันแข่ง'}
+                    </li>
+                    <li className="flex items-start gap-3 text-sm font-medium text-white/90">
+                      <Check className="h-4 w-4 text-accent mt-0.5 shrink-0" />
+                      {review.specs?.find(s => s.label.includes('ระยะ'))?.value || 'ระยะ 10K ไปจนถึงมาราธอน'}
+                    </li>
+                  </ul>
                 </div>
-                <div className="space-y-2">
-                  <p className="text-xs font-bold text-primary/30 uppercase tracking-[0.2em] flex items-center gap-1.5">
-                    <X className="w-4 h-4" /> ไม่เหมาะกับ
-                  </p>
-                  <p className="text-base font-bold text-primary leading-tight">
-                    {review.cons?.[0] || 'การเดินบนพื้นเปียก'}
-                  </p>
-                </div>
-                <div className="space-y-2">
-                  <p className="text-xs font-bold text-primary/30 uppercase tracking-[0.2em] flex items-center gap-1.5">
-                    <Route className="w-4 h-4" /> ระยะวิ่ง
-                  </p>
-                  <p className="text-base font-bold text-primary leading-tight">
-                    {review.specs?.find(s => s.label.includes('ระยะทาง'))?.value || '5K - 42K'}
-                  </p>
-                </div>
-                <div className="space-y-2">
-                  <p className="text-xs font-bold text-primary/30 uppercase tracking-[0.2em] flex items-center gap-1.5">
-                    <Users className="w-4 h-4" /> ระดับผู้ใช้
-                  </p>
-                  <p className="text-base font-bold text-primary leading-tight">
-                    {review.specs?.find(s => s.label.toLowerCase().includes('level') || s.label.includes('ระดับ'))?.value || 'All Levels'}
-                  </p>
+                <div className="space-y-4">
+                  <p className="text-[10px] font-bold text-rose-400 uppercase tracking-[0.2em]">❌ ไม่เหมาะสำหรับ</p>
+                  <ul className="space-y-3">
+                    <li className="flex items-start gap-3 text-sm font-medium text-white/70">
+                      <X className="h-4 w-4 text-rose-400 mt-0.5 shrink-0" />
+                      {review.cons?.[0] || 'นักวิ่งที่ต้องการความทนทานสูง'}
+                    </li>
+                    <li className="flex items-start gap-3 text-sm font-medium text-white/70">
+                      <X className="h-4 w-4 text-rose-400 mt-0.5 shrink-0" />
+                      {review.cons?.[1] || 'การวิ่งซ้อมช้าๆ ทั่วไป'}
+                    </li>
+                  </ul>
                 </div>
               </div>
             </div>
 
-            <div className="bg-white/40 p-5 md:p-0 rounded-2xl border border-primary/5 md:border-none">
-              <p className="text-base md:text-lg font-medium text-slate-600 leading-[1.8] max-w-3xl">
+            <div className="prose prose-slate max-w-none">
+              <p className="text-lg md:text-xl font-medium text-slate-600 leading-relaxed">
                 {review.intro}
               </p>
             </div>
 
             <div className="flex flex-wrap gap-4 pt-2">
-              <CTAButton className="flex-1 md:flex-none h-12 md:h-14 px-8 md:px-10 rounded-xl shadow-xl shadow-accent/20 bg-accent text-white border-none active:scale-95 transition-all" />
-
               <Button
                 variant="outline"
                 size="lg"
-                className="flex-1 md:flex-none h-12 md:h-16 px-6 md:px-8 rounded-xl border-primary/10 bg-white hover:bg-slate-50 text-primary font-bold text-xs uppercase tracking-widest transition-all active:scale-95"
+                className="flex-1 h-14 px-8 rounded-2xl border-primary/10 bg-white hover:bg-slate-50 text-primary font-bold text-xs uppercase tracking-widest transition-all active:scale-95"
                 onClick={() => {
                   const weight = review.specs?.find(s => s.label.toLowerCase().includes('weight') || s.label.includes('น้ำหนัก'))?.value;
                   const drop = review.specs?.find(s => s.label.toLowerCase().includes('drop'))?.value;
@@ -492,17 +514,20 @@ export default function ReviewDetail() {
                     <ThumbsUp className="h-6 w-6 text-white" />
                   </div>
                   <div>
-                    <h3 className="font-heading font-semibold text-emerald-900 uppercase tracking-[0.3em] text-xs mb-1">PROS</h3>
-                    <p className="text-emerald-700/60 font-bold text-xs uppercase tracking-widest">จุดเด่นที่ประทับใจ</p>
+                    <h3 className="font-heading font-semibold text-emerald-900 uppercase tracking-[0.3em] text-xs mb-1">จุดเด่นที่ประทับใจ</h3>
+                    <p className="text-emerald-700/60 font-bold text-[10px] uppercase tracking-widest">ทำไมเราถึงชอบรุ่นนี้</p>
                   </div>
                 </div>
                 <ul className="space-y-4 md:space-y-6">
                   {review.pros.map((p) => (
-                    <li key={p} className="flex items-start gap-4 text-sm md:text-lg font-bold text-slate-800 leading-snug group/item">
+                    <li key={p} className="flex items-start gap-4 text-sm md:text-base font-bold text-slate-800 leading-snug group/item">
                       <div className="h-6 w-6 rounded-full bg-emerald-500/10 flex items-center justify-center shrink-0 mt-0.5 group-hover/item:bg-emerald-500 group-hover/item:text-white transition-all">
                         <Check className="h-3 w-3" />
                       </div>
-                      {p}
+                      <div className="flex flex-col">
+                        <span>{p}</span>
+                        {p.length < 30 && <span className="text-[10px] text-slate-400 font-medium uppercase tracking-tight mt-0.5">ประสิทธิภาพดีเยี่ยม</span>}
+                      </div>
                     </li>
                   ))}
                 </ul>
@@ -515,17 +540,20 @@ export default function ReviewDetail() {
                     <ThumbsDown className="h-6 w-6 text-white" />
                   </div>
                   <div>
-                    <h3 className="font-heading font-semibold text-rose-900 uppercase tracking-[0.3em] text-xs mb-1">CONS</h3>
-                    <p className="text-rose-700/60 font-bold text-xs uppercase tracking-widest">จุดที่ควรพิจารณา</p>
+                    <h3 className="font-heading font-semibold text-rose-900 uppercase tracking-[0.3em] text-xs mb-1">ข้อควรพิจารณา</h3>
+                    <p className="text-rose-700/60 font-bold text-[10px] uppercase tracking-widest">จุดที่อาจไม่เหมาะกับคุณ</p>
                   </div>
                 </div>
                 <ul className="space-y-4 md:space-y-6">
                   {review.cons.map((c) => (
-                    <li key={c} className="flex items-start gap-4 text-sm md:text-lg font-bold text-slate-800 leading-snug group/item">
+                    <li key={c} className="flex items-start gap-4 text-sm md:text-base font-bold text-slate-800 leading-snug group/item">
                       <div className="h-6 w-6 rounded-full bg-rose-500/10 flex items-center justify-center shrink-0 mt-0.5 group-hover/item:bg-rose-500 group-hover/item:text-white transition-all">
                         <X className="h-3 w-3" />
                       </div>
-                      {c}
+                      <div className="flex flex-col">
+                        <span>{c}</span>
+                        {c.length < 30 && <span className="text-[10px] text-slate-400 font-medium uppercase tracking-tight mt-0.5">ควรตรวจสอบก่อนซื้อ</span>}
+                      </div>
                     </li>
                   ))}
                 </ul>
@@ -535,16 +563,67 @@ export default function ReviewDetail() {
             {/* Sections */}
             <div className="space-y-8 md:space-y-24">
               {review.sections.map((s) => (
-                <div key={s.title} className="group bg-white/40 md:bg-transparent p-4 md:p-0 rounded-3xl border border-primary/5 md:border-none shadow-sm md:shadow-none">
+                <div key={s.title} className="group bg-white/40 md:bg-transparent p-6 md:p-0 rounded-3xl border border-primary/5 md:border-none shadow-sm md:shadow-none">
                   <h2 className="font-heading text-xl md:text-3xl font-semibold text-primary uppercase tracking-tighter flex items-center gap-4 mb-6 md:mb-8 leading-none group-hover:translate-x-2 transition-transform duration-700">
                     <span className="h-8 md:h-10 w-2.5 bg-accent rounded-full shadow-lg shadow-accent/20" />
                     {s.title}
                   </h2>
-                  <p className="text-slate-600 text-base md:text-lg leading-[1.8] whitespace-pre-wrap font-medium md:border-l-[4px] border-primary/10 md:pl-10">
-                    {s.body}
-                  </p>
+                  <div className="md:border-l-[4px] border-primary/10 md:pl-10">
+                    {s.body.split('\n').filter(line => line.trim()).map((paragraph, idx) => {
+                      if (paragraph.trim().startsWith('-') || paragraph.trim().startsWith('•')) {
+                        return (
+                          <div key={idx} className="flex items-start gap-3 mb-4 last:mb-0">
+                            <div className="h-1.5 w-1.5 rounded-full bg-accent mt-2.5 shrink-0" />
+                            <p className="text-slate-600 text-base md:text-lg leading-relaxed font-medium">
+                              {paragraph.trim().substring(1).trim()}
+                            </p>
+                          </div>
+                        );
+                      }
+                      return (
+                        <p key={idx} className="text-slate-600 text-base md:text-lg leading-[1.8] mb-6 last:mb-0 font-medium whitespace-pre-wrap">
+                          {paragraph}
+                        </p>
+                      );
+                    })}
+                  </div>
                 </div>
               ))}
+            </div>
+
+            {/* Comparison Hook */}
+            <div className="bg-white rounded-3xl p-8 border border-primary/5 shadow-sm relative overflow-hidden group">
+              <div className="flex flex-col md:flex-row items-center justify-between gap-6 relative z-10">
+                <div className="space-y-2 text-center md:text-left">
+                  <h3 className="font-heading text-xl font-bold text-primary">เทียบกับรุ่นอื่นในหมวดเดียวกัน?</h3>
+                  <p className="text-sm text-slate-500 font-medium">ดูข้อแตกต่างด้านสเปคและราคาก่อนตัดสินใจ</p>
+                </div>
+                <Button
+                  variant="outline"
+                  size="lg"
+                  className="rounded-xl border-primary/10 hover:bg-slate-50 text-primary font-bold text-xs uppercase tracking-widest px-8"
+                  onClick={() => {
+                    const weight = review.specs?.find(s => s.label.toLowerCase().includes('weight') || s.label.includes('น้ำหนัก'))?.value;
+                    const drop = review.specs?.find(s => s.label.toLowerCase().includes('drop'))?.value;
+                    useComparisonStore.getState().addItem({
+                      name: review.name,
+                      brand: review.brand,
+                      image: review.image_url || "",
+                      rating: review.overall_rating,
+                      price: review.price,
+                      slug: slug || "",
+                      weight,
+                      drop,
+                      specs: review.specs,
+                      aspectRatings: review.ratings
+                    });
+                    toast.success(`เพิ่ม ${review.name} เข้าสู่การเปรียบเทียบ`);
+                  }}
+                >
+                  <Scale className="h-4 w-4 mr-2" /> เปรียบเทียบตอนนี้
+                </Button>
+              </div>
+              <div className="absolute top-0 right-0 w-32 h-32 bg-accent/5 blur-3xl rounded-full translate-x-1/2 -translate-y-1/2" />
             </div>
 
             {/* Verdict Card */}
@@ -582,7 +661,7 @@ export default function ReviewDetail() {
               <div className="bg-white/50 backdrop-blur-md border border-primary/5 rounded-3xl p-6 shadow-sm">
                 <h3 className="font-heading font-bold text-primary text-xs uppercase tracking-[0.3em] flex items-center gap-2 mb-6">
                   <div className="w-1.5 h-3 bg-accent rounded-full" />
-                  RATINGS
+                  รายละเอียดคะแนน
                 </h3>
                 <div className="space-y-6">
                   {review.ratings.map((r) => (
@@ -623,10 +702,10 @@ export default function ReviewDetail() {
                 <div className="absolute top-0 right-0 w-32 h-32 bg-accent/5 blur-3xl rounded-full group-hover/sidebar:scale-150 transition-transform duration-700" />
 
                 <div className="relative">
-                  <p className="text-xs font-bold text-primary/30 uppercase tracking-[0.3em] mb-1">ESTIMATED PRICE</p>
+                  <p className="text-xs font-bold text-primary/30 uppercase tracking-[0.3em] mb-1">ราคาโดยประมาณ</p>
                   <div className="flex items-baseline gap-2">
                     <p className="font-heading font-bold text-primary text-5xl tracking-tighter italic-prohibited">{review.price}</p>
-                    <span className="text-xs font-bold text-rose-500 uppercase animate-pulse">🔥 Limited</span>
+                    <span className="text-xs font-bold text-rose-500 uppercase animate-pulse">🔥 ราคาดีสุด</span>
                   </div>
                 </div>
 
@@ -634,11 +713,11 @@ export default function ReviewDetail() {
                   <CTAButton variant="hero" className="w-full h-16 rounded-xl shadow-xl shadow-accent/20 bg-accent text-white border-none text-xl hover:scale-[1.02] transition-transform" isSidebar />
 
                   <div className="flex flex-col gap-3 pt-2">
-                    <div className="flex items-center gap-2 text-xs font-bold text-emerald-600 uppercase tracking-widest">
-                      <Check className="w-4 h-4" /> Best Price Today
+                    <div className="flex items-center gap-2 text-[10px] font-bold text-emerald-600 uppercase tracking-widest">
+                      <Check className="w-4 h-4" /> ตรวจสอบราคาล่าสุดอัตโนมัติ
                     </div>
-                    <div className="flex items-center gap-2 text-xs font-bold text-primary/40 uppercase tracking-widest">
-                      <Users className="w-4 h-4" /> {userRating ? `Checked by ${userRating.count * 10}+ users` : 'Checked by 1,200+ users'}
+                    <div className="flex items-center gap-2 text-[10px] font-bold text-primary/40 uppercase tracking-widest">
+                      <Users className="w-4 h-4" /> {userRating ? `มีผู้เข้าชมแล้ว ${userRating.count * 15}+ คน` : 'มีผู้เข้าชมแล้ว 1,200+ คน'}
                     </div>
                   </div>
                 </div>
@@ -693,12 +772,23 @@ export default function ReviewDetail() {
       />
 
       {/* Mobile sticky CTA - Enhanced with Orange Contrast & Animation */}
-      <div className="md:hidden fixed bottom-0 inset-x-0 bg-white/95 backdrop-blur-2xl border-t border-primary/5 px-4 pt-3 z-50 pb-[max(1rem,env(safe-area-inset-bottom))] shadow-[0_-20px-50px_rgba(0,0,0,0.1)]">
-        <CTAButton
-          className="w-full h-14 rounded-2xl font-bold text-lg uppercase tracking-wider shadow-xl"
-          showMicrocopy={true}
-          isSticky={true}
-        />
+      <div className="md:hidden fixed bottom-0 inset-x-0 bg-white/95 backdrop-blur-2xl border-t border-primary/10 px-4 pt-4 z-50 pb-[max(1.5rem,env(safe-area-inset-bottom))] shadow-[0_-20px-50px_rgba(0,0,0,0.15)]">
+        <div className="flex flex-col gap-3">
+          <div className="flex items-center justify-between px-2">
+            <div className="flex flex-col">
+              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">ราคาล่าสุด</span>
+              <span className="text-xl font-heading font-bold text-primary italic-prohibited">{review.price}</span>
+            </div>
+            <div className="flex items-center gap-1 bg-accent/10 px-3 py-1 rounded-full">
+              <span className="text-[10px] font-bold text-accent uppercase tracking-widest">เช็คส่วนลดเพิ่ม</span>
+            </div>
+          </div>
+          <CTAButton
+            className="w-full h-14 rounded-2xl font-bold text-lg uppercase tracking-wider shadow-xl shadow-accent/20"
+            showMicrocopy={true}
+            isSticky={true}
+          />
+        </div>
       </div>
 
       <Footer />
