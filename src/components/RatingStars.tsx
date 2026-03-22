@@ -13,13 +13,13 @@ export function RatingStars({ rating, maxRating = 5 }: RatingStarsProps) {
   return (
     <div className="flex items-center gap-0.5">
       {Array.from({ length: full }).map((_, i) => (
-        <Star key={`f${i}`} className="h-4 w-4 fill-rating text-rating" />
+        <Star key={`f${i}`} className="h-4 w-4 md:h-5 md:w-5 fill-rating text-rating" />
       ))}
-      {hasHalf && <StarHalf className="h-4 w-4 fill-rating text-rating" />}
+      {hasHalf && <StarHalf className="h-4 w-4 md:h-5 md:w-5 fill-rating text-rating" />}
       {Array.from({ length: empty }).map((_, i) => (
-        <Star key={`e${i}`} className="h-4 w-4 text-muted-foreground/30" />
+        <Star key={`e${i}`} className="h-4 w-4 md:h-5 md:w-5 text-muted-foreground/30" />
       ))}
-      <span className="ml-1.5 text-sm font-semibold text-foreground">{rating.toFixed(1)}</span>
+      <span className="ml-1.5 text-base md:text-sm font-bold text-foreground">{rating.toFixed(1)}</span>
     </div>
   );
 }

@@ -44,12 +44,12 @@ export function ProductCard({ name, brand, image, rating, price, badge, pros, co
 
         <div className="absolute top-3 left-3 flex flex-col gap-2">
           {isNew && (
-            <div className="bg-accent text-accent-foreground px-3 py-1 rounded-lg text-[9px] font-semibold uppercase tracking-sporty shadow-xl">
+            <div className="bg-accent text-accent-foreground px-3 py-1.5 rounded-lg text-xs font-semibold uppercase tracking-sporty shadow-xl">
               NEW
             </div>
           )}
           {badge && (
-            <div className={`px-3 py-1 rounded-lg text-[9px] font-semibold uppercase tracking-sporty shadow-sm ${badgeColors[badge] || "bg-primary text-primary-foreground"}`}>
+            <div className={`px-3 py-1.5 rounded-lg text-xs font-semibold uppercase tracking-sporty shadow-sm ${badgeColors[badge] || "bg-primary text-primary-foreground"}`}>
               {badge}
             </div>
           )}
@@ -61,7 +61,7 @@ export function ProductCard({ name, brand, image, rating, price, badge, pros, co
         <div className="space-y-1">
           <div className="flex items-center gap-2">
             <span className="w-4 h-0.5 bg-accent" />
-            <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-sporty">{brand}</p>
+            <p className="text-xs font-bold text-muted-foreground uppercase tracking-sporty">{brand}</p>
           </div>
           <h3 className="font-heading font-semibold text-base md:text-lg text-card-foreground line-clamp-2 uppercase tracking-tight group-hover:text-primary transition-colors leading-snug">{name}</h3>
         </div>
@@ -72,20 +72,20 @@ export function ProductCard({ name, brand, image, rating, price, badge, pros, co
         </div>
 
         {/* Pros / Cons */}
-        <div className="grid grid-cols-2 gap-3 text-[11px] py-0.5">
+        <div className="grid grid-cols-2 gap-3 text-xs py-0.5">
           <div className="space-y-2">
             {pros.slice(0, 2).map((p) => (
               <div key={p} className="flex items-start gap-1.5 text-badge-recommended/80">
-                <ThumbsUp className="h-3 w-3 mt-0.5 shrink-0" />
-                <span className="text-muted-foreground/90 line-clamp-2 leading-relaxed">{p}</span>
+                <ThumbsUp className="h-3.5 w-3.5 mt-0.5 shrink-0" />
+                <span className="text-muted-foreground/90 line-clamp-2 leading-relaxed font-medium">{p}</span>
               </div>
             ))}
           </div>
           <div className="space-y-2">
             {cons.slice(0, 2).map((c) => (
               <div key={c} className="flex items-start gap-1.5 text-destructive/70">
-                <ThumbsDown className="h-3 w-3 mt-0.5 shrink-0" />
-                <span className="text-muted-foreground/90 line-clamp-2 leading-relaxed">{c}</span>
+                <ThumbsDown className="h-3.5 w-3.5 mt-0.5 shrink-0" />
+                <span className="text-muted-foreground/90 line-clamp-2 leading-relaxed font-medium">{c}</span>
               </div>
             ))}
           </div>
@@ -96,7 +96,7 @@ export function ProductCard({ name, brand, image, rating, price, badge, pros, co
           <Button
             variant="outline"
             size="sm"
-            className="w-full border-primary/20 hover:bg-primary/5 text-[7px] md:text-[9px] font-bold uppercase tracking-sporty h-9 rounded-lg px-1 md:px-2"
+            className="w-full border-primary/20 hover:bg-primary/5 text-[10px] md:text-xs font-bold uppercase tracking-sporty h-10 md:h-9 rounded-lg px-1 md:px-2"
             onClick={() => {
               useComparisonStore.getState().addItem({
                 name, brand, image, rating, price, slug, weight, drop,
@@ -110,14 +110,14 @@ export function ProductCard({ name, brand, image, rating, price, badge, pros, co
           </Button>
 
           {slug ? (
-            <Button variant="outline" size="sm" className="w-full text-[7px] md:text-[9px] font-bold uppercase tracking-sporty h-9 rounded-lg px-1 md:px-2" asChild>
+            <Button variant="outline" size="sm" className="w-full text-[10px] md:text-xs font-bold uppercase tracking-sporty h-10 md:h-9 rounded-lg px-1 md:px-2" asChild>
               <Link to={`/review/${slug}`}>REVIEW</Link>
             </Button>
           ) : (
-            <Button variant="outline" size="sm" className="w-full text-[7px] md:text-[9px] font-bold uppercase tracking-sporty h-9 rounded-lg px-1 md:px-2">REVIEW</Button>
+            <Button variant="outline" size="sm" className="w-full text-[10px] md:text-xs font-bold uppercase tracking-sporty h-10 md:h-9 rounded-lg px-1 md:px-2">REVIEW</Button>
           )}
 
-          <Button variant="cta" size="sm" className="col-span-2 lg:col-span-1 text-[7px] md:text-[9px] font-bold uppercase tracking-sporty h-9 rounded-lg px-1 md:px-2" asChild={!!affiliateUrl}>
+          <Button variant="cta" size="sm" className="col-span-2 lg:col-span-1 text-[10px] md:text-xs font-bold uppercase tracking-sporty h-11 md:h-9 rounded-lg px-1 md:px-2" asChild={!!affiliateUrl}>
             {affiliateUrl ? (
               <a href={affiliateUrl} target="_blank" rel="noopener noreferrer nofollow">
                 ดูราคา

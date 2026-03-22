@@ -89,10 +89,10 @@ function RatingBar({ label, score }: { label: string; score: number }) {
   return (
     <div className="space-y-1.5 md:space-y-2.5 group">
       <div className="flex justify-between items-end gap-2">
-        <span className="text-[10px] md:text-[11px] font-bold uppercase tracking-widest text-slate-500 group-hover:text-primary transition-colors">{label}</span>
-        <span className="text-xs md:text-sm font-bold text-primary tabular-nums">{score.toFixed(1)}</span>
+        <span className="text-[11px] md:text-xs font-bold uppercase tracking-widest text-slate-500 group-hover:text-primary transition-colors">{label}</span>
+        <span className="text-sm font-bold text-primary tabular-nums">{score.toFixed(1)}</span>
       </div>
-      <div className="h-1.5 md:h-2 w-full bg-slate-100 rounded-full overflow-hidden border border-slate-200/30 relative">
+      <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden border border-slate-200/30 relative">
         <div
           className="h-full bg-primary rounded-full transition-all duration-1000 ease-out relative z-10"
           style={{ width: `${(score / 5) * 100}%` }}
@@ -266,20 +266,20 @@ export default function ReviewDetail() {
         size="lg"
         className={cn(
           className,
-          "group relative overflow-hidden transition-all active:scale-95",
+          "group relative overflow-hidden transition-all active:scale-95 py-4 md:py-6",
           isSticky && "bg-accent hover:bg-accent/90 border-none shadow-accent/20 animate-pulse-subtle"
         )}
         asChild={!!review.affiliate_url}
       >
         {review.affiliate_url ? (
           <a {...ctaProps}>
-            <span className="relative z-10 flex items-center gap-2">
+            <span className="relative z-10 flex items-center gap-2 text-sm md:text-base">
               {ctaText}
               <ExternalLink className="h-5 w-5 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
             </span>
           </a>
         ) : (
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 text-sm md:text-base">
             {ctaText}
             <ExternalLink className="h-5 w-5" />
           </div>
@@ -287,7 +287,7 @@ export default function ReviewDetail() {
       </Button>
       {showMicrocopy && (
         <p className={cn(
-          "text-[10px] md:text-xs text-center font-bold uppercase tracking-widest",
+          "text-xs text-center font-bold uppercase tracking-widest",
           isSticky ? "text-accent/80" : "text-accent animate-pulse"
         )}>
           {stabilizedMicrocopy}
@@ -309,7 +309,7 @@ export default function ReviewDetail() {
 
       <article className="max-w-[800px] mx-auto pb-12 md:pb-16 px-3 md:px-0">
         {/* Breadcrumb - Desktop Only */}
-        <div className="hidden md:flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 py-8">
+        <div className="hidden md:flex items-center gap-2 text-xs font-bold uppercase tracking-[0.2em] text-slate-400 py-8">
           <Link to="/" className="hover:text-primary transition-colors">HOME</Link>
           <ChevronRight className="h-3 w-3" />
           <span className="hover:text-primary transition-colors cursor-pointer">{review.category}</span>
@@ -346,7 +346,7 @@ export default function ReviewDetail() {
               <div className="flex items-center justify-between md:mb-2">
                 <div className="flex items-center gap-2">
                   <div className="h-px w-6 bg-accent" />
-                  <p className="text-[10px] font-bold text-accent uppercase tracking-widest">{review.brand} • {review.category}</p>
+                  <p className="text-xs font-bold text-accent uppercase tracking-widest">{review.brand} • {review.category}</p>
                 </div>
                 <div className="flex items-center gap-2 md:hidden">
                   <Button
@@ -384,18 +384,18 @@ export default function ReviewDetail() {
                 </div>
 
                 <div className="flex flex-wrap items-center gap-2">
-                  <div className="flex items-center gap-1.5 bg-slate-50 px-3 py-1.5 rounded-full border border-primary/5">
+                  <div className="flex items-center gap-1.5 bg-slate-50 px-3 py-2 rounded-full border border-primary/5">
                     <Star className="w-4 h-4 fill-accent text-accent" />
                     <span className="text-sm font-bold text-primary">{review.overall_rating}</span>
-                    <span className="text-[10px] text-primary/40 font-bold ml-1 uppercase">({userRating?.count || 120} REVIEWS)</span>
+                    <span className="text-xs text-primary/40 font-bold ml-1 uppercase">({userRating?.count || 120} REVIEWS)</span>
                   </div>
-                  <div className="flex items-center gap-1.5 bg-slate-50 px-3 py-1.5 rounded-full border border-primary/5">
+                  <div className="flex items-center gap-1.5 bg-slate-50 px-3 py-2 rounded-full border border-primary/5">
                     <Check className="w-3.5 h-3.5 text-emerald-500" />
-                    <span className="text-[10px] font-bold text-emerald-600 uppercase">Verified</span>
+                    <span className="text-xs font-bold text-emerald-600 uppercase">Verified</span>
                   </div>
-                  <div className="flex items-center gap-1.5 bg-emerald-500/10 text-emerald-600 px-3 py-1.5 rounded-full">
+                  <div className="flex items-center gap-1.5 bg-emerald-500/10 text-emerald-600 px-3 py-2 rounded-full">
                     <Award className="w-3.5 h-3.5" />
-                    <span className="text-[10px] font-bold uppercase">Top Pick</span>
+                    <span className="text-xs font-bold uppercase">Top Pick</span>
                   </div>
                 </div>
               </div>
@@ -405,36 +405,36 @@ export default function ReviewDetail() {
             <div className="bg-white/80 backdrop-blur-sm border border-primary/5 rounded-3xl p-4 md:p-8 shadow-sm relative overflow-hidden group">
               <div className="absolute top-0 right-0 w-32 h-32 bg-accent/5 blur-3xl rounded-full transition-transform duration-700 group-hover:scale-150" />
 
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 relative z-10">
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 relative z-10">
                 <div className="space-y-2">
-                  <p className="text-[9px] font-bold text-primary/30 uppercase tracking-[0.2em] flex items-center gap-1.5">
-                    <Target className="w-3 h-3" /> เหมาะกับ
+                  <p className="text-xs font-bold text-primary/30 uppercase tracking-[0.2em] flex items-center gap-1.5">
+                    <Target className="w-4 h-4" /> เหมาะกับ
                   </p>
-                  <p className="text-sm font-bold text-primary leading-tight">
+                  <p className="text-base font-bold text-primary leading-tight">
                     {review.specs?.find(s => s.label.includes('เหมาะกับ'))?.value || 'Daily Training'}
                   </p>
                 </div>
                 <div className="space-y-2">
-                  <p className="text-[9px] font-bold text-primary/30 uppercase tracking-[0.2em] flex items-center gap-1.5">
-                    <X className="w-3 h-3" /> ไม่เหมาะกับ
+                  <p className="text-xs font-bold text-primary/30 uppercase tracking-[0.2em] flex items-center gap-1.5">
+                    <X className="w-4 h-4" /> ไม่เหมาะกับ
                   </p>
-                  <p className="text-sm font-bold text-primary leading-tight">
+                  <p className="text-base font-bold text-primary leading-tight">
                     {review.cons?.[0] || 'การเดินบนพื้นเปียก'}
                   </p>
                 </div>
                 <div className="space-y-2">
-                  <p className="text-[9px] font-bold text-primary/30 uppercase tracking-[0.2em] flex items-center gap-1.5">
-                    <Route className="w-3 h-3" /> ระยะวิ่ง
+                  <p className="text-xs font-bold text-primary/30 uppercase tracking-[0.2em] flex items-center gap-1.5">
+                    <Route className="w-4 h-4" /> ระยะวิ่ง
                   </p>
-                  <p className="text-sm font-bold text-primary leading-tight">
+                  <p className="text-base font-bold text-primary leading-tight">
                     {review.specs?.find(s => s.label.includes('ระยะทาง'))?.value || '5K - 42K'}
                   </p>
                 </div>
                 <div className="space-y-2">
-                  <p className="text-[9px] font-bold text-primary/30 uppercase tracking-[0.2em] flex items-center gap-1.5">
-                    <Users className="w-3 h-3" /> ระดับผู้ใช้
+                  <p className="text-xs font-bold text-primary/30 uppercase tracking-[0.2em] flex items-center gap-1.5">
+                    <Users className="w-4 h-4" /> ระดับผู้ใช้
                   </p>
-                  <p className="text-sm font-bold text-primary leading-tight">
+                  <p className="text-base font-bold text-primary leading-tight">
                     {review.specs?.find(s => s.label.toLowerCase().includes('level') || s.label.includes('ระดับ'))?.value || 'All Levels'}
                   </p>
                 </div>
@@ -453,7 +453,7 @@ export default function ReviewDetail() {
               <Button
                 variant="outline"
                 size="lg"
-                className="flex-1 md:flex-none h-12 md:h-14 px-6 md:px-8 rounded-xl border-primary/10 bg-white hover:bg-slate-50 text-primary font-bold text-[10px] uppercase tracking-widest transition-all active:scale-95"
+                className="flex-1 md:flex-none h-12 md:h-16 px-6 md:px-8 rounded-xl border-primary/10 bg-white hover:bg-slate-50 text-primary font-bold text-xs uppercase tracking-widest transition-all active:scale-95"
                 onClick={() => {
                   const weight = review.specs?.find(s => s.label.toLowerCase().includes('weight') || s.label.includes('น้ำหนัก'))?.value;
                   const drop = review.specs?.find(s => s.label.toLowerCase().includes('drop'))?.value;
@@ -485,15 +485,15 @@ export default function ReviewDetail() {
           <div className="lg:col-span-2 space-y-8 md:space-y-20">
             {/* Pros / Cons */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-8">
-              <div className="bg-emerald-50/20 border border-emerald-100/30 rounded-3xl p-4 md:p-10 transition-all duration-500 group relative overflow-hidden shadow-sm hover:shadow-md">
+              <div className="bg-emerald-50/20 border border-emerald-100/30 rounded-3xl p-6 md:p-10 transition-all duration-500 group relative overflow-hidden shadow-sm hover:shadow-md">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 blur-3xl rounded-full -translate-y-1/2 translate-x-1/2" />
                 <div className="flex items-center gap-4 mb-8 md:mb-10">
-                  <div className="h-10 w-10 rounded-xl bg-emerald-500 flex items-center justify-center shadow-lg shadow-emerald-500/20">
-                    <ThumbsUp className="h-5 w-5 text-white" />
+                  <div className="h-12 w-12 rounded-xl bg-emerald-500 flex items-center justify-center shadow-lg shadow-emerald-500/20">
+                    <ThumbsUp className="h-6 w-6 text-white" />
                   </div>
                   <div>
-                    <h3 className="font-heading font-semibold text-emerald-900 uppercase tracking-[0.3em] text-[10px] md:text-xs mb-1">PROS</h3>
-                    <p className="text-emerald-700/60 font-bold text-[10px] md:text-xs uppercase tracking-widest">จุดเด่นที่ประทับใจ</p>
+                    <h3 className="font-heading font-semibold text-emerald-900 uppercase tracking-[0.3em] text-xs mb-1">PROS</h3>
+                    <p className="text-emerald-700/60 font-bold text-xs uppercase tracking-widest">จุดเด่นที่ประทับใจ</p>
                   </div>
                 </div>
                 <ul className="space-y-4 md:space-y-6">
@@ -508,15 +508,15 @@ export default function ReviewDetail() {
                 </ul>
               </div>
 
-              <div className="bg-rose-50/20 border border-rose-100/30 rounded-3xl p-4 md:p-10 transition-all duration-500 group relative overflow-hidden shadow-sm hover:shadow-md">
+              <div className="bg-rose-50/20 border border-rose-100/30 rounded-3xl p-6 md:p-10 transition-all duration-500 group relative overflow-hidden shadow-sm hover:shadow-md">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-rose-500/5 blur-3xl rounded-full -translate-y-1/2 translate-x-1/2" />
                 <div className="flex items-center gap-4 mb-8 md:mb-10">
-                  <div className="h-10 w-10 rounded-xl bg-rose-500 flex items-center justify-center shadow-lg shadow-rose-500/20">
-                    <ThumbsDown className="h-5 w-5 text-white" />
+                  <div className="h-12 w-12 rounded-xl bg-rose-500 flex items-center justify-center shadow-lg shadow-rose-500/20">
+                    <ThumbsDown className="h-6 w-6 text-white" />
                   </div>
                   <div>
-                    <h3 className="font-heading font-semibold text-rose-900 uppercase tracking-[0.3em] text-[10px] md:text-xs mb-1">CONS</h3>
-                    <p className="text-rose-700/60 font-bold text-[10px] md:text-xs uppercase tracking-widest">จุดที่ควรพิจารณา</p>
+                    <h3 className="font-heading font-semibold text-rose-900 uppercase tracking-[0.3em] text-xs mb-1">CONS</h3>
+                    <p className="text-rose-700/60 font-bold text-xs uppercase tracking-widest">จุดที่ควรพิจารณา</p>
                   </div>
                 </div>
                 <ul className="space-y-4 md:space-y-6">
@@ -553,8 +553,8 @@ export default function ReviewDetail() {
               <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-[0.05] pointer-events-none" />
 
               <div className="relative z-10 max-w-5xl mx-auto text-center">
-                <div className="inline-flex items-center gap-2 px-6 py-2 bg-white/5 backdrop-blur-2xl border border-white/10 text-white rounded-full text-[10px] md:text-xs font-bold uppercase tracking-[0.4em] mb-8 md:mb-12">
-                  <Zap className="h-3 w-3 fill-accent text-accent animate-pulse" />
+                <div className="inline-flex items-center gap-2 px-6 py-3 bg-white/5 backdrop-blur-2xl border border-white/10 text-white rounded-full text-xs font-bold uppercase tracking-[0.4em] mb-8 md:mb-12">
+                  <Zap className="h-4 w-4 fill-accent text-accent animate-pulse" />
                   THE ULTIMATE VERDICT
                 </div>
 
@@ -565,7 +565,7 @@ export default function ReviewDetail() {
                 <div className="flex flex-col md:flex-row items-center justify-center gap-6">
                   <CTAButton variant="hero" className="h-12 md:h-16 px-10 md:px-16 rounded-full text-base md:text-xl w-full md:w-auto shadow-2xl shadow-accent/40 bg-accent text-white border-none hover:scale-105 active:scale-95 transition-all duration-500" />
 
-                  <div className="flex items-center gap-5 text-white/40 text-[10px] md:text-xs font-bold uppercase tracking-[0.3em]">
+                  <div className="flex items-center gap-5 text-white/40 text-xs font-bold uppercase tracking-[0.3em]">
                     <div className="h-px w-10 bg-white/10" />
                     GearTrail Certified
                     <div className="h-px w-10 bg-white/10" />
@@ -580,7 +580,7 @@ export default function ReviewDetail() {
             <div className="sticky top-24 space-y-8">
               {/* Ratings Sidebar Block */}
               <div className="bg-white/50 backdrop-blur-md border border-primary/5 rounded-3xl p-6 shadow-sm">
-                <h3 className="font-heading font-bold text-primary text-[10px] uppercase tracking-[0.3em] flex items-center gap-2 mb-6">
+                <h3 className="font-heading font-bold text-primary text-xs uppercase tracking-[0.3em] flex items-center gap-2 mb-6">
                   <div className="w-1.5 h-3 bg-accent rounded-full" />
                   RATINGS
                 </h3>
@@ -593,7 +593,7 @@ export default function ReviewDetail() {
 
               {/* Specs Sidebar Block */}
               <div className="bg-white border border-primary/5 rounded-3xl p-6 shadow-sm">
-                <h3 className="font-heading font-bold text-primary text-[10px] uppercase tracking-[0.3em] flex items-center gap-2 mb-6">
+                <h3 className="font-heading font-bold text-primary text-xs uppercase tracking-[0.3em] flex items-center gap-2 mb-6">
                   <div className="w-1.5 h-3 bg-accent rounded-full" />
                   KEY SPECS
                 </h3>
@@ -606,12 +606,12 @@ export default function ReviewDetail() {
                     if (spec.label.includes('ระยะ')) Icon = Route;
 
                     return (
-                      <div key={i} className="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-primary/5 group hover:bg-slate-100 transition-colors">
+                      <div key={i} className="flex items-center justify-between p-4 rounded-xl bg-slate-50 border border-primary/5 group hover:bg-slate-100 transition-colors">
                         <div className="flex items-center gap-3">
-                          <Icon className="h-4 w-4 text-primary/40 group-hover:text-primary transition-colors" />
-                          <span className="text-[10px] font-bold text-primary/40 uppercase tracking-wider">{spec.label}</span>
+                          <Icon className="h-5 w-5 text-primary/40 group-hover:text-primary transition-colors" />
+                          <span className="text-xs font-bold text-primary/40 uppercase tracking-wider">{spec.label}</span>
                         </div>
-                        <span className="font-bold text-xs text-primary">{spec.value}</span>
+                        <span className="font-bold text-sm text-primary">{spec.value}</span>
                       </div>
                     );
                   })}
@@ -623,22 +623,22 @@ export default function ReviewDetail() {
                 <div className="absolute top-0 right-0 w-32 h-32 bg-accent/5 blur-3xl rounded-full group-hover/sidebar:scale-150 transition-transform duration-700" />
 
                 <div className="relative">
-                  <p className="text-[10px] font-bold text-primary/30 uppercase tracking-[0.3em] mb-1">ESTIMATED PRICE</p>
+                  <p className="text-xs font-bold text-primary/30 uppercase tracking-[0.3em] mb-1">ESTIMATED PRICE</p>
                   <div className="flex items-baseline gap-2">
-                    <p className="font-heading font-bold text-primary text-4xl tracking-tighter italic-prohibited">{review.price}</p>
-                    <span className="text-[10px] font-bold text-rose-500 uppercase animate-pulse">🔥 Limited</span>
+                    <p className="font-heading font-bold text-primary text-5xl tracking-tighter italic-prohibited">{review.price}</p>
+                    <span className="text-xs font-bold text-rose-500 uppercase animate-pulse">🔥 Limited</span>
                   </div>
                 </div>
 
                 <div className="space-y-4 relative">
-                  <CTAButton variant="hero" className="w-full h-16 rounded-xl shadow-xl shadow-accent/20 bg-accent text-white border-none text-lg hover:scale-[1.02] transition-transform" isSidebar />
+                  <CTAButton variant="hero" className="w-full h-16 rounded-xl shadow-xl shadow-accent/20 bg-accent text-white border-none text-xl hover:scale-[1.02] transition-transform" isSidebar />
 
                   <div className="flex flex-col gap-3 pt-2">
-                    <div className="flex items-center gap-2 text-[10px] font-bold text-emerald-600 uppercase tracking-widest">
-                      <Check className="w-3 h-3" /> Best Price Today
+                    <div className="flex items-center gap-2 text-xs font-bold text-emerald-600 uppercase tracking-widest">
+                      <Check className="w-4 h-4" /> Best Price Today
                     </div>
-                    <div className="flex items-center gap-2 text-[10px] font-bold text-primary/40 uppercase tracking-widest">
-                      <Users className="w-3 h-3" /> {userRating ? `Checked by ${userRating.count * 10}+ users` : 'Checked by 1,200+ users'}
+                    <div className="flex items-center gap-2 text-xs font-bold text-primary/40 uppercase tracking-widest">
+                      <Users className="w-4 h-4" /> {userRating ? `Checked by ${userRating.count * 10}+ users` : 'Checked by 1,200+ users'}
                     </div>
                   </div>
                 </div>
@@ -662,7 +662,7 @@ export default function ReviewDetail() {
                         </Link>
                       ))}
                     </div>
-                    <Link to={`/category/${review.category}`} className="text-[10px] font-bold text-accent uppercase tracking-[0.3em] flex items-center gap-2 cursor-pointer hover:translate-x-1 transition-transform">
+                    <Link to={`/category/${review.category}`} className="text-xs font-bold text-accent uppercase tracking-[0.3em] flex items-center gap-2 cursor-pointer hover:translate-x-1 transition-transform">
                       ดูรุ่นอื่นๆ ในหมวดนี้ <ChevronRight className="h-3 w-3" />
                     </Link>
                   </div>

@@ -54,7 +54,7 @@ export function ImageGallery({ mainImage, images, alt, badge, badgeClassName, ba
               <ZoomIn className="text-white opacity-0 group-hover:opacity-100 transition-opacity w-8 h-8" />
             </div>
             {badge && (
-              <div className={`absolute top-4 left-4 md:top-6 md:left-6 px-4 py-1.5 md:px-5 md:py-2 rounded-full text-[10px] md:text-xs font-semibold uppercase tracking-widest flex items-center gap-2 shadow-xl ${badgeClassName || "bg-primary text-primary-foreground"}`}>
+              <div className={`absolute top-4 left-4 md:top-6 md:left-6 px-5 py-2 md:px-6 md:py-2.5 rounded-full text-xs font-semibold uppercase tracking-widest flex items-center gap-2 shadow-xl ${badgeClassName || "bg-primary text-primary-foreground"}`}>
                 {badgeIcon}
                 {badge}
               </div>
@@ -108,7 +108,7 @@ export function ImageGallery({ mainImage, images, alt, badge, badgeClassName, ba
         </div>
 
         {badge && (
-          <div className={`absolute top-4 left-4 md:top-6 md:left-6 px-4 py-1.5 md:px-5 md:py-2 rounded-full text-[10px] md:text-xs font-semibold uppercase tracking-widest flex items-center gap-2 shadow-xl z-10 ${badgeClassName || "bg-primary text-primary-foreground"}`}>
+          <div className={`absolute top-4 left-4 md:top-6 md:left-6 px-5 py-2 md:px-6 md:py-2.5 rounded-full text-xs font-semibold uppercase tracking-widest flex items-center gap-2 shadow-xl z-10 ${badgeClassName || "bg-primary text-primary-foreground"}`}>
             {badgeIcon}
             {badge}
           </div>
@@ -133,15 +133,15 @@ export function ImageGallery({ mainImage, images, alt, badge, badgeClassName, ba
         </Button>
 
         {/* Counter */}
-        <div className="absolute bottom-4 right-4 bg-background/70 backdrop-blur-sm text-foreground text-[10px] md:text-xs font-semibold px-3 py-1 rounded-full z-10">
+        <div className="absolute bottom-4 right-4 bg-background/70 backdrop-blur-sm text-foreground text-xs font-semibold px-4 py-1.5 rounded-full z-10">
           {selectedIndex + 1} / {allImages.length}
         </div>
       </div>
 
       {/* Thumbnails */}
       <div className={cn(
-        "flex overflow-x-auto pb-2 px-3 md:px-1 scrollbar-hide snap-x snap-mandatory",
-        isCompact ? "gap-2" : "gap-2 md:gap-3"
+        "flex overflow-x-auto pb-3 pt-1 px-3 md:px-1 scrollbar-hide snap-x snap-mandatory",
+        isCompact ? "gap-3" : "gap-3 md:gap-4"
       )}>
         {allImages.map((img, i) => (
           <button
@@ -149,7 +149,7 @@ export function ImageGallery({ mainImage, images, alt, badge, badgeClassName, ba
             onClick={() => scrollTo(i)}
             className={cn(
               "shrink-0 overflow-hidden border-2 transition-all snap-start",
-              isCompact ? "w-10 h-10 md:w-16 md:h-16 rounded-lg md:rounded-xl" : "w-12 h-12 md:w-20 md:h-20 rounded-xl md:rounded-2xl",
+              isCompact ? "w-14 h-14 md:w-18 md:h-18 rounded-lg md:rounded-xl" : "w-16 h-16 md:w-24 md:h-24 rounded-xl md:rounded-2xl",
               i === selectedIndex
                 ? "border-primary ring-2 md:ring-4 ring-primary/10 scale-95 shadow-lg"
                 : "border-transparent opacity-40 hover:opacity-100 hover:scale-105"
