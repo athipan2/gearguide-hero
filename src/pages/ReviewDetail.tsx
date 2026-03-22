@@ -297,7 +297,7 @@ export default function ReviewDetail() {
   );
 
   return (
-    <div className="min-h-screen bg-[var(--background)] selection:bg-accent/30 selection:text-primary pb-20 md:pb-0">
+    <div className="min-h-screen bg-[var(--background)] selection:bg-accent/30 selection:text-primary pb-[120px] md:pb-0">
       <SEOHead
         title={`${review.name} รีวิว — GearTrail`}
         description={`รีวิว ${review.name} จาก ${review.brand}: ${(review.intro || "").slice(0, 120)}...`}
@@ -701,7 +701,6 @@ export default function ReviewDetail() {
         />
       </div>
 
-      <div className="h-20 lg:hidden" />
       <Footer />
     </div>
   );
