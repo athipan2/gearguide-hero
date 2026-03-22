@@ -47,9 +47,9 @@ export function ImageGallery({ mainImage, images, alt, badge, badgeClassName, ba
         <DialogTrigger asChild>
           <div className={cn(
             "relative overflow-hidden bg-muted aspect-[4/3] cursor-zoom-in group",
-            isCompact ? "rounded-2xl shadow-xl" : "rounded-[2rem] shadow-2xl"
+            isCompact ? "md:rounded-2xl shadow-xl" : "md:rounded-[2rem] shadow-2xl"
           )}>
-            <img src={allImages[0] || ""} alt={alt} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+            <img src={allImages[0] || ""} alt={alt} className="w-full h-full object-cover md:group-hover:scale-105 transition-transform duration-700" />
             <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center">
               <ZoomIn className="text-white opacity-0 group-hover:opacity-100 transition-opacity w-8 h-8" />
             </div>
@@ -73,11 +73,12 @@ export function ImageGallery({ mainImage, images, alt, badge, badgeClassName, ba
   }
 
   return (
-    <div className={cn(isCompact ? "space-y-2" : "space-y-3")}>
+    <div className={cn(isCompact ? "space-y-3 md:space-y-2" : "space-y-4 md:space-y-3")}>
       {/* Main carousel */}
       <div className={cn(
-        "relative overflow-hidden bg-muted aspect-[4/3] group w-full",
-        isCompact ? "rounded-2xl shadow-xl" : "rounded-[2rem] shadow-2xl"
+        "relative overflow-hidden bg-muted aspect-[4/3] md:aspect-[4/3] group w-full",
+        isCompact ? "md:rounded-2xl shadow-xl" : "md:rounded-[2rem] shadow-2xl",
+        "rounded-none md:rounded-2xl" // Force edge-to-edge on mobile
       )}>
         <div className="overflow-hidden h-full w-full" ref={emblaRef}>
           <div className="flex h-full">
@@ -139,7 +140,7 @@ export function ImageGallery({ mainImage, images, alt, badge, badgeClassName, ba
 
       {/* Thumbnails */}
       <div className={cn(
-        "flex overflow-x-auto pb-2 px-1 scrollbar-hide snap-x snap-mandatory",
+        "flex overflow-x-auto pb-2 px-3 md:px-1 scrollbar-hide snap-x snap-mandatory",
         isCompact ? "gap-2" : "gap-2 md:gap-3"
       )}>
         {allImages.map((img, i) => (
