@@ -46,11 +46,11 @@ export function ImageGallery({ mainImage, images, alt, badge, badgeClassName, ba
       <Dialog>
         <DialogTrigger asChild>
           <div className={cn(
-            "relative overflow-hidden bg-muted aspect-[4/3] cursor-zoom-in group",
-            isCompact ? "md:rounded-2xl shadow-xl" : "md:rounded-[2rem] shadow-2xl"
+            "relative overflow-hidden bg-slate-50 aspect-[4/3] cursor-zoom-in group p-4",
+            isCompact ? "rounded-2xl md:rounded-2xl shadow-xl" : "rounded-3xl md:rounded-[2rem] shadow-2xl"
           )}>
-            <img src={allImages[0] || ""} alt={alt} className="w-full h-full object-cover md:group-hover:scale-105 transition-transform duration-700" />
-            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center">
+            <img src={allImages[0] || ""} alt={alt} className="w-full h-full object-contain md:group-hover:scale-105 transition-transform duration-700" />
+            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors flex items-center justify-center">
               <ZoomIn className="text-white opacity-0 group-hover:opacity-100 transition-opacity w-8 h-8" />
             </div>
             {badge && (
@@ -76,9 +76,9 @@ export function ImageGallery({ mainImage, images, alt, badge, badgeClassName, ba
     <div className={cn(isCompact ? "space-y-3 md:space-y-2" : "space-y-4 md:space-y-3")}>
       {/* Main carousel */}
       <div className={cn(
-        "relative overflow-hidden bg-muted aspect-[4/3] md:aspect-[4/3] group w-full",
-        isCompact ? "md:rounded-2xl shadow-xl" : "md:rounded-[2rem] shadow-2xl",
-        "rounded-none md:rounded-2xl" // Force edge-to-edge on mobile
+        "relative overflow-hidden bg-slate-50 aspect-[4/3] md:aspect-[4/3] group w-full",
+        isCompact ? "rounded-2xl md:rounded-2xl shadow-xl" : "rounded-3xl md:rounded-[2rem] shadow-2xl",
+        "p-4" // Padding to make image smaller
       )}>
         <div className="overflow-hidden h-full w-full" ref={emblaRef}>
           <div className="flex h-full">
@@ -90,7 +90,7 @@ export function ImageGallery({ mainImage, images, alt, badge, badgeClassName, ba
                       <img
                         src={img}
                         alt={`${alt} - ${i + 1}`}
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-contain"
                       />
                     </div>
                   </DialogTrigger>
@@ -148,14 +148,14 @@ export function ImageGallery({ mainImage, images, alt, badge, badgeClassName, ba
             key={i}
             onClick={() => scrollTo(i)}
             className={cn(
-              "shrink-0 overflow-hidden border-2 transition-all snap-start",
+              "shrink-0 overflow-hidden border-2 transition-all snap-start bg-slate-50 p-1",
               isCompact ? "w-14 h-14 md:w-18 md:h-18 rounded-lg md:rounded-xl" : "w-16 h-16 md:w-24 md:h-24 rounded-xl md:rounded-2xl",
               i === selectedIndex
                 ? "border-primary ring-2 md:ring-4 ring-primary/10 scale-95 shadow-lg"
                 : "border-transparent opacity-40 hover:opacity-100 hover:scale-105"
             )}
           >
-            <img src={img} alt={`${alt} thumbnail ${i + 1}`} className="w-full h-full object-cover" />
+            <img src={img} alt={`${alt} thumbnail ${i + 1}`} className="w-full h-full object-contain" />
           </button>
         ))}
       </div>
