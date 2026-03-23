@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { ProductCard } from "@/components/ProductCard";
 import { supabase } from "@/integrations/supabase/client";
 import { FastFilters } from "./FastFilters";
+import { Link } from "react-router-dom";
 import { ProductCardSkeleton } from "./ReviewSkeleton";
 
 const fallbackProducts = [
@@ -124,10 +125,10 @@ export function FeaturedReviews() {
           <h2 className="font-heading text-2xl sm:text-3xl md:text-4xl font-semibold text-primary tracking-tight-compact uppercase">รีวิวล่าสุด</h2>
           <p className="text-xs md:text-sm text-muted-foreground max-w-md leading-relaxed">ทดสอบจริง รีวิวจริง อัปเดตทุกสัปดาห์ เพื่อให้คุณเลือกอุปกรณ์ที่ดีที่สุด</p>
         </div>
-        <a href="#" className="hidden md:inline-flex items-center gap-2 text-xs font-bold uppercase tracking-sporty text-primary hover:text-accent transition-all group">
+        <Link to="/category" className="hidden md:inline-flex items-center gap-2 text-xs font-bold uppercase tracking-sporty text-primary hover:text-accent transition-all group">
           ดูทั้งหมด
           <span className="group-hover:translate-x-1 transition-transform">→</span>
-        </a>
+        </Link>
       </div>
 
       <FastFilters />

@@ -13,7 +13,7 @@ import { ScoreGauge } from "@/components/ScoreGauge";
 import { useComparisonStore } from "@/lib/comparison-store";
 import { toast } from "sonner";
 import { ReviewDetailSkeleton } from "@/components/ReviewSkeleton";
-import { cn } from "@/lib/utils";
+import { cn, parseThaiPrice } from "@/lib/utils";
 import {
   ExternalLink, ThumbsUp, ThumbsDown, Award,
   ChevronRight, Check, X, Zap, Share2,
@@ -34,11 +34,6 @@ interface ReviewData {
   affiliate_url: string | null; cta_text: string | null;
 }
 
-const parsePrice = (priceStr: string): number => {
-  if (!priceStr) return 0;
-  const match = priceStr.replace(/,/g, '').match(/\d+/);
-  return match ? parseInt(match[0], 10) : 0;
-};
 
 // Hardcoded fallback data for when DB is empty
 const fallbackData: Record<string, ReviewData> = {
@@ -157,7 +152,7 @@ export default function ReviewDetail() {
       "offers": {
         "@type": "Offer",
         "priceCurrency": "THB",
-        "price": parsePrice(review.price),
+        "price": parseThaiPrice(review.price),
         "availability": "https://schema.org/InStock",
         "url": currentUrl
       }
