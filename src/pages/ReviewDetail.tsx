@@ -331,9 +331,9 @@ export default function ReviewDetail() {
         </div>
 
         {/* Hero Section */}
-        <div className="grid grid-cols-1 md:grid-cols-[50fr_50fr] gap-6 md:gap-12 mb-12 md:mb-20 items-start">
-          {/* Product Image Dominates Mobile Hero */}
-          <div className="relative md:sticky md:top-24">
+        <div className="grid grid-cols-1 md:grid-cols-[60fr_40fr] gap-6 md:gap-16 mb-12 md:mb-24 items-start">
+          {/* Product Image Dominates Hero */}
+          <div className="relative md:sticky md:top-24 p-0">
             <ImageGallery
               mainImage={review.image_url || ""}
               images={review.images}
