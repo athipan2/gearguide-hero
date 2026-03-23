@@ -61,31 +61,28 @@ export function ImageGallery({
         <DialogTrigger asChild>
           <div
             className={cn(
-              "relative w-full bg-white overflow-hidden",
-              "h-[60vh] md:h-auto md:aspect-[4/3]",
-              "-mx-3 md:mx-0",
-              isCompact
-                ? "rounded-none md:rounded-2xl shadow-xl"
-                : "rounded-none md:rounded-[2rem] shadow-2xl"
+              "relative w-screen left-1/2 right-1/2 -translate-x-1/2 md:w-full md:left-auto md:right-auto md:translate-x-0 bg-white overflow-hidden group",
+              "min-h-[300px] md:min-h-[500px] h-auto",
+              "rounded-none md:rounded-3xl shadow-2xl transition-transform duration-500 hover:scale-[1.02] cursor-zoom-in"
             )}
           >
             <img
               src={allImages[0]}
               alt={alt}
-              className="w-full h-full object-contain"
+              className="w-full h-full object-cover"
               loading="eager"
             />
 
-            {/* Zoom */}
-            <div className="absolute inset-0 flex items-center justify-center bg-black/0 hover:bg-black/5 transition">
-              <ZoomIn className="opacity-0 hover:opacity-100 text-white w-8 h-8" />
+            {/* Zoom Icon overlay */}
+            <div className="absolute inset-0 flex items-center justify-center bg-black/0 hover:bg-black/5 transition-colors">
+              <ZoomIn className="opacity-0 group-hover:opacity-100 text-white w-8 h-8 drop-shadow-lg" />
             </div>
 
             {/* Badge */}
             {badge && (
               <div
                 className={cn(
-                  "absolute top-4 left-4 px-4 py-1.5 text-xs font-bold rounded-full shadow-lg z-20",
+                  "absolute top-4 left-4 px-4 py-1.5 text-xs font-bold rounded-full shadow-lg z-20 flex items-center gap-1.5",
                   badgeClassName || "bg-primary text-white"
                 )}
               >
@@ -114,37 +111,36 @@ export function ImageGallery({
   // ✅ MULTIPLE IMAGES
   // =========================
   return (
-    <div className="w-full space-y-4">
+    <div className="w-full space-y-6">
       {/* HERO */}
       <div
         className={cn(
-          "relative w-full bg-white overflow-hidden group",
-          "h-[60vh] md:h-auto md:aspect-[4/3]",
-          "-mx-3 md:mx-0",
-          isCompact
-            ? "rounded-none md:rounded-2xl shadow-xl"
-            : "rounded-none md:rounded-[2rem] shadow-2xl"
+          "relative w-screen left-1/2 right-1/2 -translate-x-1/2 md:w-full md:left-auto md:right-auto md:translate-x-0 bg-white overflow-hidden group",
+          "min-h-[300px] md:min-h-[500px] h-auto",
+          "rounded-none md:rounded-3xl shadow-2xl transition-transform duration-500 hover:scale-[1.02]"
         )}
       >
-        {/* swipe hint */}
-        <div className="absolute inset-y-0 left-0 w-10 bg-gradient-to-r from-black/5 to-transparent z-10 md:hidden" />
-        <div className="absolute inset-y-0 right-0 w-10 bg-gradient-to-l from-black/5 to-transparent z-10 md:hidden" />
+        {/* swipe hint gradient edges */}
+        <div className="absolute inset-y-0 left-0 w-16 bg-gradient-to-r from-black/10 to-transparent z-10 md:hidden pointer-events-none" />
+        <div className="absolute inset-y-0 right-0 w-16 bg-gradient-to-l from-black/10 to-transparent z-10 md:hidden pointer-events-none" />
 
         <div ref={emblaRef} className="overflow-hidden h-full">
           <div className="flex h-full">
             {allImages.map((img, i) => (
-              <div key={i} className="flex-[0_0_100%] h-full">
+              <div key={i} className="flex-[0_0_100%] h-full relative">
                 <Dialog>
                   <DialogTrigger asChild>
                     <img
                       src={img}
                       alt={`${alt}-${i}`}
-                      className="w-full h-full object-contain cursor-zoom-in"
+                      className="w-full h-full object-cover cursor-zoom-in"
                       loading={i === 0 ? "eager" : "lazy"}
                     />
                   </DialogTrigger>
 
                   <DialogContent className="bg-black/90 backdrop-blur-sm border-none max-w-[95vw] max-h-[95vh] p-0 flex items-center justify-center">
+                    <DialogTitle className="sr-only">{alt} - {i + 1}</DialogTitle>
+                    <DialogDescription className="sr-only">viewing product image {i + 1}</DialogDescription>
                     <img
                       src={img}
                       className="max-w-full max-h-[90vh] object-contain"
@@ -160,7 +156,7 @@ export function ImageGallery({
         {badge && (
           <div
             className={cn(
-              "absolute top-4 left-4 px-4 py-1.5 text-xs font-bold rounded-full shadow-lg z-20",
+              "absolute top-4 left-4 px-4 py-1.5 text-xs font-bold rounded-full shadow-lg z-20 flex items-center gap-1.5",
               badgeClassName || "bg-primary text-white"
             )}
           >
@@ -169,47 +165,47 @@ export function ImageGallery({
           </div>
         )}
 
-        {/* arrows */}
+        {/* arrows (Desktop) */}
         <Button
           size="icon"
-          variant="ghost"
+          variant="secondary"
           onClick={scrollPrev}
-          className="hidden md:flex absolute left-3 top-1/2 -translate-y-1/2"
+          className="hidden md:flex absolute left-4 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-white/80 hover:bg-white text-primary rounded-full shadow-xl"
         >
-          <ChevronLeft />
+          <ChevronLeft className="h-6 w-6" />
         </Button>
 
         <Button
           size="icon"
-          variant="ghost"
+          variant="secondary"
           onClick={scrollNext}
-          className="hidden md:flex absolute right-3 top-1/2 -translate-y-1/2"
+          className="hidden md:flex absolute right-4 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-white/80 hover:bg-white text-primary rounded-full shadow-xl"
         >
-          <ChevronRight />
+          <ChevronRight className="h-6 w-6" />
         </Button>
 
         {/* counter */}
-        <div className="absolute bottom-4 right-4 bg-black/60 text-white text-xs px-3 py-1 rounded-full">
+        <div className="absolute bottom-6 right-6 bg-black/60 backdrop-blur-md text-white text-[10px] md:text-xs font-bold px-4 py-1.5 rounded-full tracking-widest z-20">
           {selectedIndex + 1} / {allImages.length}
         </div>
       </div>
 
       {/* THUMBNAILS */}
-      <div className="flex gap-3 overflow-x-auto pb-2">
+      <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
         {allImages.map((img, i) => (
           <button
             key={i}
             onClick={() => scrollTo(i)}
             className={cn(
-              "w-20 h-20 rounded-xl overflow-hidden border-2 bg-white",
+              "relative w-20 h-20 md:w-24 md:h-24 rounded-2xl overflow-hidden border-2 bg-white transition-all duration-300 shrink-0",
               i === selectedIndex
-                ? "border-primary scale-105 shadow"
-                : "opacity-60"
+                ? "border-accent scale-110 shadow-lg z-10 opacity-100"
+                : "border-transparent opacity-40 hover:opacity-80 hover:scale-105"
             )}
           >
             <img
               src={img}
-              className="w-full h-full object-contain"
+              className="w-full h-full object-cover"
               loading="lazy"
             />
           </button>
