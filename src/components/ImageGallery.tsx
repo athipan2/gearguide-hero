@@ -132,6 +132,7 @@ export function ImageGallery({ mainImage, images, alt, badge, badgeClassName, ba
           size="icon"
           className="absolute left-3 top-1/2 -translate-y-1/2 bg-background/70 backdrop-blur-sm hover:bg-background/90 opacity-0 md:group-hover:opacity-100 transition-opacity rounded-full hidden md:flex z-20"
           onClick={scrollPrev}
+          aria-label="รูปภาพก่อนหน้า"
         >
           <ChevronLeft className="h-5 w-5" />
         </Button>
@@ -140,6 +141,7 @@ export function ImageGallery({ mainImage, images, alt, badge, badgeClassName, ba
           size="icon"
           className="absolute right-3 top-1/2 -translate-y-1/2 bg-background/70 backdrop-blur-sm hover:bg-background/90 opacity-0 md:group-hover:opacity-100 transition-opacity rounded-full hidden md:flex z-20"
           onClick={scrollNext}
+          aria-label="รูปภาพถัดไป"
         >
           <ChevronRight className="h-5 w-5" />
         </Button>
