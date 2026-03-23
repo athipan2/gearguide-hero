@@ -96,8 +96,8 @@ function RatingBar({ label, score }: { label: string; score: number }) {
     <div className="space-y-1.5 md:space-y-2.5 group">
       <div className="flex justify-between items-end gap-2">
         <div className="flex flex-col">
-          <span className="text-[11px] md:text-xs font-bold uppercase tracking-widest text-slate-500 group-hover:text-primary transition-colors">{label}</span>
-          <span className="text-[10px] text-slate-400 font-medium leading-tight mt-0.5 hidden md:block">{ratingExplanations[label] || "คะแนนตามเกณฑ์มาตรฐานการทดสอบ"}</span>
+          <span className="text-xs md:text-sm font-bold uppercase tracking-widest text-slate-500 group-hover:text-primary transition-colors">{label}</span>
+          <span className="text-xs text-slate-400 font-medium leading-tight mt-0.5 hidden md:block">{ratingExplanations[label] || "คะแนนตามเกณฑ์มาตรฐานการทดสอบ"}</span>
         </div>
         <span className="text-sm font-bold text-primary tabular-nums">{score.toFixed(1)}</span>
       </div>
@@ -296,14 +296,14 @@ export default function ReviewDetail() {
         )}
       </Button>
       {showMicrocopy && (
-        <div className="flex flex-col items-center gap-0.5">
+        <div className="flex flex-col items-center gap-1">
           <p className={cn(
-            "text-[10px] text-center font-bold uppercase tracking-[0.2em]",
+            "text-xs text-center font-bold uppercase tracking-[0.2em]",
             isSticky ? "text-accent/80" : "text-accent animate-pulse"
           )}>
             {stabilizedMicrocopy}
           </p>
-          <span className="text-[9px] text-slate-400 font-bold uppercase tracking-widest">อัปเดตราคาล่าสุดวันนี้ • มีรีวิวจริง</span>
+          <span className="text-xs text-slate-400 font-bold uppercase tracking-widest">อัปเดตราคาล่าสุดวันนี้ • มีรีวิวจริง</span>
         </div>
       )}
     </div>
@@ -331,7 +331,7 @@ export default function ReviewDetail() {
         </div>
 
         {/* Hero Section */}
-        <div className="grid grid-cols-1 md:grid-cols-[45fr_55fr] gap-6 md:gap-12 mb-12 md:mb-20 items-start">
+        <div className="grid grid-cols-1 md:grid-cols-[50fr_50fr] gap-6 md:gap-12 mb-12 md:mb-20 items-start">
           {/* Product Image Dominates Mobile Hero */}
           <div className="relative md:sticky md:top-24">
             <ImageGallery
@@ -359,7 +359,7 @@ export default function ReviewDetail() {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <span className="h-px w-8 bg-accent" />
-                  <p className="text-[10px] md:text-xs font-bold text-accent uppercase tracking-[0.3em]">{review.brand} • {review.category}</p>
+                  <p className="text-xs md:text-sm font-bold text-accent uppercase tracking-[0.3em]">{review.brand} • {review.category}</p>
                 </div>
                 <div className="flex items-center gap-3">
                   <Button
@@ -389,18 +389,18 @@ export default function ReviewDetail() {
                 <div className="bg-white rounded-[2rem] p-6 border border-primary/5 shadow-xl shadow-primary/5 space-y-6">
                   <div className="flex items-center justify-between border-b border-slate-100 pb-5">
                     <div className="flex flex-col">
-                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">SCORE GAUGE</span>
+                      <span className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">SCORE GAUGE</span>
                       <div className="flex items-center gap-2">
                         <span className="text-4xl font-heading font-bold text-primary">{review.overall_rating}</span>
                         <div className="flex flex-col">
                           <RatingStars rating={review.overall_rating} />
-                          <span className="text-[9px] font-bold text-primary/40 uppercase mt-0.5">({userRating?.count || 120} USERS)</span>
+                          <span className="text-xs font-bold text-primary/40 uppercase mt-0.5">({userRating?.count || 120} USERS)</span>
                         </div>
                       </div>
                     </div>
                     <div className="h-12 w-px bg-slate-100" />
                     <div className="flex flex-col items-end">
-                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">EST. PRICE</span>
+                      <span className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">EST. PRICE</span>
                       <span className="text-3xl font-heading font-bold text-primary tracking-tighter italic-prohibited">{review.price}</span>
                     </div>
                   </div>
@@ -432,7 +432,7 @@ export default function ReviewDetail() {
               </h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <div className="space-y-4">
-                  <p className="text-[10px] font-bold text-accent uppercase tracking-[0.2em]">✅ เหมาะสำหรับ</p>
+                  <p className="text-xs font-bold text-accent uppercase tracking-[0.2em]">✅ เหมาะสำหรับ</p>
                   <ul className="space-y-3">
                     <li className="flex items-start gap-3 text-sm font-medium text-white/90">
                       <Check className="h-4 w-4 text-accent mt-0.5 shrink-0" />
@@ -445,7 +445,7 @@ export default function ReviewDetail() {
                   </ul>
                 </div>
                 <div className="space-y-4">
-                  <p className="text-[10px] font-bold text-rose-400 uppercase tracking-[0.2em]">❌ ไม่เหมาะสำหรับ</p>
+                  <p className="text-xs font-bold text-rose-400 uppercase tracking-[0.2em]">❌ ไม่เหมาะสำหรับ</p>
                   <ul className="space-y-3">
                     <li className="flex items-start gap-3 text-sm font-medium text-white/70">
                       <X className="h-4 w-4 text-rose-400 mt-0.5 shrink-0" />
@@ -510,7 +510,7 @@ export default function ReviewDetail() {
                   </div>
                   <div>
                     <h3 className="font-heading font-semibold text-emerald-900 uppercase tracking-[0.3em] text-xs mb-1">จุดเด่นที่ประทับใจ</h3>
-                    <p className="text-emerald-700/60 font-bold text-[10px] uppercase tracking-widest">ทำไมเราถึงชอบรุ่นนี้</p>
+                    <p className="text-emerald-700/60 font-bold text-xs uppercase tracking-widest">ทำไมเราถึงชอบรุ่นนี้</p>
                   </div>
                 </div>
                 <ul className="space-y-4 md:space-y-6">
@@ -521,7 +521,7 @@ export default function ReviewDetail() {
                       </div>
                       <div className="flex flex-col">
                         <span>{p}</span>
-                        {p.length < 30 && <span className="text-[10px] text-slate-400 font-medium uppercase tracking-tight mt-0.5">ประสิทธิภาพดีเยี่ยม</span>}
+                        {p.length < 30 && <span className="text-xs text-slate-400 font-medium uppercase tracking-tight mt-0.5">ประสิทธิภาพดีเยี่ยม</span>}
                       </div>
                     </li>
                   ))}
@@ -536,7 +536,7 @@ export default function ReviewDetail() {
                   </div>
                   <div>
                     <h3 className="font-heading font-semibold text-rose-900 uppercase tracking-[0.3em] text-xs mb-1">ข้อควรพิจารณา</h3>
-                    <p className="text-rose-700/60 font-bold text-[10px] uppercase tracking-widest">จุดที่อาจไม่เหมาะกับคุณ</p>
+                    <p className="text-rose-700/60 font-bold text-xs uppercase tracking-widest">จุดที่อาจไม่เหมาะกับคุณ</p>
                   </div>
                 </div>
                 <ul className="space-y-4 md:space-y-6">
@@ -547,7 +547,7 @@ export default function ReviewDetail() {
                       </div>
                       <div className="flex flex-col">
                         <span>{c}</span>
-                        {c.length < 30 && <span className="text-[10px] text-slate-400 font-medium uppercase tracking-tight mt-0.5">ควรตรวจสอบก่อนซื้อ</span>}
+                        {c.length < 30 && <span className="text-xs text-slate-400 font-medium uppercase tracking-tight mt-0.5">ควรตรวจสอบก่อนซื้อ</span>}
                       </div>
                     </li>
                   ))}
@@ -708,10 +708,10 @@ export default function ReviewDetail() {
                   <CTAButton variant="hero" className="w-full h-16 rounded-xl shadow-xl shadow-accent/20 bg-accent text-white border-none text-xl hover:scale-[1.02] transition-transform" isSidebar />
 
                   <div className="flex flex-col gap-3 pt-2">
-                    <div className="flex items-center gap-2 text-[10px] font-bold text-emerald-600 uppercase tracking-widest">
+                    <div className="flex items-center gap-2 text-xs font-bold text-emerald-600 uppercase tracking-widest">
                       <Check className="w-4 h-4" /> ตรวจสอบราคาล่าสุดอัตโนมัติ
                     </div>
-                    <div className="flex items-center gap-2 text-[10px] font-bold text-primary/40 uppercase tracking-widest">
+                    <div className="flex items-center gap-2 text-xs font-bold text-primary/40 uppercase tracking-widest">
                       <Users className="w-4 h-4" /> {userRating ? `มีผู้เข้าชมแล้ว ${userRating.count * 15}+ คน` : 'มีผู้เข้าชมแล้ว 1,200+ คน'}
                     </div>
                   </div>
@@ -771,11 +771,11 @@ export default function ReviewDetail() {
         <div className="flex flex-col gap-3">
           <div className="flex items-center justify-between px-2">
             <div className="flex flex-col">
-              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">ราคาล่าสุด</span>
+              <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">ราคาล่าสุด</span>
               <span className="text-xl font-heading font-bold text-primary italic-prohibited">{review.price}</span>
             </div>
             <div className="flex items-center gap-1 bg-accent/10 px-3 py-1 rounded-full">
-              <span className="text-[10px] font-bold text-accent uppercase tracking-widest">เช็คส่วนลดเพิ่ม</span>
+              <span className="text-xs font-bold text-accent uppercase tracking-widest">เช็คส่วนลดเพิ่ม</span>
             </div>
           </div>
           <CTAButton

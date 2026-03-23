@@ -96,7 +96,7 @@ export function ProductCard({ name, brand, image, rating, price, badge, pros, co
           <Button
             variant="outline"
             size="sm"
-            className="w-full border-primary/20 hover:bg-primary/5 text-[10px] md:text-xs font-bold uppercase tracking-sporty h-10 md:h-9 rounded-lg px-1 md:px-2"
+            className="w-full border-primary/20 hover:bg-primary/5 text-xs font-bold uppercase tracking-sporty h-10 md:h-9 rounded-lg px-1 md:px-2"
             onClick={() => {
               useComparisonStore.getState().addItem({
                 name, brand, image, rating, price, slug, weight, drop,
@@ -110,14 +110,14 @@ export function ProductCard({ name, brand, image, rating, price, badge, pros, co
           </Button>
 
           {slug ? (
-            <Button variant="outline" size="sm" className="w-full text-[10px] md:text-xs font-bold uppercase tracking-sporty h-10 md:h-9 rounded-lg px-1 md:px-2" asChild>
+            <Button variant="outline" size="sm" className="w-full text-xs font-bold uppercase tracking-sporty h-10 md:h-9 rounded-lg px-1 md:px-2" asChild>
               <Link to={`/review/${slug}`}>REVIEW</Link>
             </Button>
           ) : (
-            <Button variant="outline" size="sm" className="w-full text-[10px] md:text-xs font-bold uppercase tracking-sporty h-10 md:h-9 rounded-lg px-1 md:px-2">REVIEW</Button>
+            <Button variant="outline" size="sm" className="w-full text-xs font-bold uppercase tracking-sporty h-10 md:h-9 rounded-lg px-1 md:px-2">REVIEW</Button>
           )}
 
-          <Button variant="cta" size="sm" className="col-span-2 lg:col-span-1 text-[10px] md:text-xs font-bold uppercase tracking-sporty h-11 md:h-9 rounded-lg px-1 md:px-2" asChild={!!affiliateUrl}>
+          <Button variant="cta" size="sm" className="col-span-2 lg:col-span-1 text-xs font-bold uppercase tracking-sporty h-11 md:h-9 rounded-lg px-1 md:px-2" asChild={!!affiliateUrl}>
             {affiliateUrl ? (
               <a href={affiliateUrl} target="_blank" rel="noopener noreferrer nofollow">
                 ดูราคา

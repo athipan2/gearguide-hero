@@ -46,7 +46,7 @@ export function ImageGallery({ mainImage, images, alt, badge, badgeClassName, ba
       <Dialog>
         <DialogTrigger asChild>
           <div className={cn(
-            "relative overflow-hidden bg-white aspect-square md:aspect-[4/3] max-h-[60vh] md:max-h-none cursor-zoom-in group p-4",
+            "relative overflow-hidden bg-white aspect-square md:aspect-[4/3] max-h-[70vh] md:max-h-none cursor-zoom-in group p-1 md:p-4",
             "-mx-3 md:mx-0", // Force edge-to-edge on mobile
             isCompact ? "rounded-none md:rounded-2xl shadow-xl" : "rounded-none md:rounded-[2rem] shadow-2xl"
           )}>
@@ -60,7 +60,7 @@ export function ImageGallery({ mainImage, images, alt, badge, badgeClassName, ba
               <ZoomIn className="text-white opacity-0 group-hover:opacity-100 transition-opacity w-8 h-8" />
             </div>
             {badge && (
-              <div className={`absolute top-4 left-4 md:top-6 md:left-6 px-5 py-2 md:px-6 md:py-2.5 rounded-full text-[10px] md:text-xs font-bold uppercase tracking-widest flex items-center gap-2 shadow-xl z-20 ${badgeClassName || "bg-primary text-primary-foreground"}`}>
+              <div className={`absolute top-4 left-4 md:top-6 md:left-6 px-5 py-2 md:px-6 md:py-2.5 rounded-full text-xs font-bold uppercase tracking-widest flex items-center gap-2 shadow-xl z-20 ${badgeClassName || "bg-primary text-primary-foreground"}`}>
                 {badgeIcon}
                 {badge}
               </div>
@@ -82,10 +82,10 @@ export function ImageGallery({ mainImage, images, alt, badge, badgeClassName, ba
     <div className={cn(isCompact ? "space-y-3 md:space-y-2" : "space-y-4 md:space-y-3", "w-full")}>
       {/* Main carousel */}
       <div className={cn(
-        "relative overflow-hidden bg-white aspect-square md:aspect-[4/3] max-h-[60vh] md:max-h-none group w-full",
+        "relative overflow-hidden bg-white aspect-square md:aspect-[4/3] max-h-[70vh] md:max-h-none group w-full",
         "-mx-3 md:mx-0", // Force edge-to-edge on mobile
         isCompact ? "rounded-none md:rounded-2xl shadow-xl" : "rounded-none md:rounded-[2rem] shadow-2xl",
-        "p-4"
+        "p-1 md:p-4"
       )}>
         {/* Swipe Hint - Gradient edges */}
         <div className="absolute inset-y-0 left-0 w-12 bg-gradient-to-r from-black/5 to-transparent z-10 pointer-events-none md:hidden" />
@@ -120,7 +120,7 @@ export function ImageGallery({ mainImage, images, alt, badge, badgeClassName, ba
         </div>
 
         {badge && (
-          <div className={`absolute top-4 left-4 md:top-6 md:left-6 px-5 py-2 md:px-6 md:py-2.5 rounded-full text-[10px] md:text-xs font-bold uppercase tracking-widest flex items-center gap-2 shadow-xl z-20 ${badgeClassName || "bg-primary text-primary-foreground"}`}>
+          <div className={`absolute top-4 left-4 md:top-6 md:left-6 px-5 py-2 md:px-6 md:py-2.5 rounded-full text-xs font-bold uppercase tracking-widest flex items-center gap-2 shadow-xl z-20 ${badgeClassName || "bg-primary text-primary-foreground"}`}>
             {badgeIcon}
             {badge}
           </div>
@@ -147,7 +147,7 @@ export function ImageGallery({ mainImage, images, alt, badge, badgeClassName, ba
         </Button>
 
         {/* Counter */}
-        <div className="absolute bottom-4 right-4 bg-primary/90 backdrop-blur-md text-white text-[10px] md:text-xs font-bold px-3 py-1 md:px-4 md:py-1.5 rounded-full z-20 border border-white/10 tracking-widest">
+        <div className="absolute bottom-4 right-4 bg-primary/90 backdrop-blur-md text-white text-xs font-bold px-3 py-1 md:px-4 md:py-1.5 rounded-full z-20 border border-white/10 tracking-widest">
           {selectedIndex + 1} / {allImages.length}
         </div>
       </div>
@@ -162,7 +162,7 @@ export function ImageGallery({ mainImage, images, alt, badge, badgeClassName, ba
             onClick={() => scrollTo(i)}
             className={cn(
               "shrink-0 overflow-hidden border-2 transition-all snap-start bg-white p-1",
-              "w-16 h-16 md:w-24 md:h-24 rounded-xl md:rounded-2xl",
+              "w-20 h-20 md:w-28 md:h-28 rounded-xl md:rounded-2xl",
               i === selectedIndex
                 ? "border-primary ring-2 md:ring-4 ring-primary/10 scale-105 shadow-lg z-10 opacity-100"
                 : "border-transparent opacity-60 hover:opacity-100 hover:scale-105"
