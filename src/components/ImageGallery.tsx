@@ -71,7 +71,7 @@ export function ImageGallery({
               alt={alt}
               className="w-full h-full object-cover"
               loading="eager"
-              // @ts-ignore
+              // @ts-expect-error - fetchPriority is a valid but sometimes unrecognized React attribute
               fetchPriority="high"
             />
 
@@ -138,7 +138,7 @@ export function ImageGallery({
                       alt={`${alt}-${i}`}
                       className="w-full h-full object-cover cursor-zoom-in"
                       loading={i === 0 ? "eager" : "lazy"}
-                      // @ts-ignore
+                      // @ts-expect-error - fetchPriority is a valid but sometimes unrecognized React attribute
                       fetchPriority={i === 0 ? "high" : undefined}
                     />
                   </DialogTrigger>
