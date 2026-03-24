@@ -7,13 +7,13 @@
 @layer base {
   :root {
     --background: 45 23% 94%;
-    --foreground: 0 0% 18%;
+    --foreground: 145 32% 4%;
 
     --card: 0 0% 100%;
-    --card-foreground: 0 0% 18%;
+    --card-foreground: 145 32% 4%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 18%;
+    --popover-foreground: 145 32% 4%;
 
     --primary: 145 32% 18%;
     --primary-foreground: 45 23% 94%;
@@ -99,10 +99,8 @@
   }
 
   body {
-    @apply bg-background text-foreground overflow-x-hidden antialiased;
+    @apply bg-background text-foreground overflow-x-hidden antialiased text-base leading-relaxed;
     font-family: var(--font-body);
-    font-size: 15px;
-    line-height: 1.6;
     min-height: 100vh;
     min-height: 100dvh;
   }

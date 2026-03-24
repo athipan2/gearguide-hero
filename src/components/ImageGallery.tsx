@@ -204,7 +204,7 @@ export function ImageGallery({
             key={i}
             onClick={() => scrollTo(i)}
             className={cn(
-              "relative w-20 h-20 md:w-24 md:h-24 rounded-2xl overflow-hidden border-2 bg-white transition-all duration-300 shrink-0 p-0",
+              "relative w-20 h-20 md:w-24 md:h-24 rounded-xl md:rounded-2xl overflow-hidden border-2 bg-white transition-all duration-300 shrink-0 p-0",
               i === selectedIndex
                 ? "border-accent scale-110 shadow-lg z-10 opacity-100"
                 : "border-transparent opacity-40 hover:opacity-80 hover:scale-105"

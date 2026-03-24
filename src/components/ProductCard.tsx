@@ -34,13 +34,10 @@ export function ProductCard({ name, brand, image, rating, price, badge, pros, co
   const drop = specs?.find(s => s.label.toLowerCase().includes('drop'))?.value;
 
   return (
-    <div className="group bg-card rounded-2xl border-2 border-transparent overflow-hidden hover-card-sporty hover:border-primary/5">
+    <div className="group bg-card rounded-2xl md:rounded-3xl border border-neutral-200 overflow-hidden shadow-sm hover:shadow-md transition-all duration-200">
       {/* Image */}
       <div className="relative aspect-[4/3] bg-muted overflow-hidden">
-        <img src={image} alt={name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 ease-out" loading="lazy" />
-
-        {/* Technical Grid Overlay on Hover */}
-        <div className="absolute inset-0 bg-grid opacity-0 group-hover:opacity-20 transition-opacity duration-500 pointer-events-none" />
+        <img src={image} alt={name} className="w-full h-full object-cover" loading="lazy" />
 
         <div className="absolute top-3 left-3 flex flex-col gap-2">
           {isNew && (
@@ -75,17 +72,17 @@ export function ProductCard({ name, brand, image, rating, price, badge, pros, co
         <div className="grid grid-cols-2 gap-3 text-xs py-0.5">
           <div className="space-y-2">
             {pros.slice(0, 2).map((p) => (
-              <div key={p} className="flex items-start gap-1.5 text-badge-recommended/80">
+              <div key={p} className="flex items-start gap-1.5 text-emerald-600">
                 <ThumbsUp className="h-3.5 w-3.5 mt-0.5 shrink-0" />
-                <span className="text-muted-foreground/90 line-clamp-2 leading-relaxed font-medium">{p}</span>
+                <span className="text-slate-600 line-clamp-2 leading-relaxed font-medium">{p}</span>
               </div>
             ))}
           </div>
           <div className="space-y-2">
             {cons.slice(0, 2).map((c) => (
-              <div key={c} className="flex items-start gap-1.5 text-destructive/70">
+              <div key={c} className="flex items-start gap-1.5 text-rose-500">
                 <ThumbsDown className="h-3.5 w-3.5 mt-0.5 shrink-0" />
-                <span className="text-muted-foreground/90 line-clamp-2 leading-relaxed font-medium">{c}</span>
+                <span className="text-slate-600 line-clamp-2 leading-relaxed font-medium">{c}</span>
               </div>
             ))}
           </div>
@@ -100,6 +97,7 @@ export function ProductCard({ name, brand, image, rating, price, badge, pros, co
             onClick={() => {
               useComparisonStore.getState().addItem({
                 name, brand, image, rating, price, slug, weight, drop,
+                badge,
                 specs,
                 aspectRatings: ratings
               });
@@ -117,7 +115,7 @@ export function ProductCard({ name, brand, image, rating, price, badge, pros, co
             <Button variant="outline" size="sm" className="w-full text-xs font-bold uppercase tracking-sporty h-10 md:h-9 rounded-lg px-1 md:px-2">REVIEW</Button>
           )}
 
-          <Button variant="cta" size="sm" className="col-span-2 lg:col-span-1 text-xs font-bold uppercase tracking-sporty h-11 md:h-9 rounded-lg px-1 md:px-2" asChild={!!affiliateUrl}>
+          <Button variant="cta" size="sm" className="col-span-2 lg:col-span-1 text-xs font-bold uppercase tracking-sporty h-11 md:h-9 rounded-lg px-1 md:px-2 bg-accent text-white" asChild={!!affiliateUrl}>
             {affiliateUrl ? (
               <a href={affiliateUrl} target="_blank" rel="noopener noreferrer nofollow">
                 ดูราคา
