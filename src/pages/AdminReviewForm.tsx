@@ -9,11 +9,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
-import { Save, ArrowLeft, Plus, X } from "lucide-react";
-
-interface RatingItem { label: string; score: number }
-interface SpecItem { label: string; value: string }
-interface SectionItem { title: string; body: string }
+import { Save, ArrowLeft, Plus, X, MoveUp, MoveDown } from "lucide-react";
+import { ReviewSectionData, SpecItem, ReviewRating, SectionType } from "@/types/review";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const defaultForm = {
   name: "", brand: "", category: "", price: "", slug: "",
@@ -22,6 +20,16 @@ const defaultForm = {
   intro: "", verdict: "", published: false,
 };
 
+const sectionTypes: { label: string; value: SectionType }[] = [
+  { label: "Hero", value: "hero" },
+  { label: "Technical Specs", value: "specs" },
+  { label: "Pros & Cons", value: "pros_cons" },
+  { label: "Who is this for?", value: "who_is_this_for" },
+  { label: "Gallery", value: "gallery" },
+  { label: "Comparison", value: "comparison" },
+  { label: "Verdict Card", value: "verdict" },
+  { label: "Content Section", value: "content" },
+];
 
 export default function AdminReviewForm() {
   const { id } = useParams();
@@ -31,11 +39,11 @@ export default function AdminReviewForm() {
   const { user } = useAuth();
 
   const [form, setForm] = useState(defaultForm);
-  const [ratings, setRatings] = useState<RatingItem[]>([{ label: "", score: 0 }]);
-  const [specs, setSpecs] = useState<SpecItem[]>([{ label: "", value: "" }]);
+  const [ratings, setRatings] = useState<ReviewRating[]>([{ label: "", score: 0 }]);
+  const [specs, setSpecs] = useState<SpecItem[]>([{ label: "", value: "", highlight: false }]);
   const [pros, setPros] = useState<string[]>([""]);
   const [cons, setCons] = useState<string[]>([""]);
-  const [sections, setSections] = useState<SectionItem[]>([{ title: "", body: "" }]);
+  const [sections, setSections] = useState<ReviewSectionData[]>([]);
   const [images, setImages] = useState<string[]>([]);
   const [saving, setSaving] = useState(false);
 
@@ -50,14 +58,24 @@ export default function AdminReviewForm() {
             affiliate_url: data.affiliate_url || "", cta_text: data.cta_text || "ดูราคาล่าสุด",
             intro: data.intro || "", verdict: data.verdict || "", published: data.published,
           });
-          setRatings((data.ratings as unknown as RatingItem[]) || []);
+          setRatings((data.ratings as unknown as ReviewRating[]) || []);
           setSpecs((data.specs as unknown as SpecItem[]) || []);
           setPros((data.pros as unknown as string[]) || [""]);
           setCons((data.cons as unknown as string[]) || [""]);
-          setSections((data.sections as unknown as SectionItem[]) || []);
+          setSections((data.sections as unknown as ReviewSectionData[]) || []);
           setImages((data.images as unknown as string[]) || []);
         }
       });
+    } else {
+      // Default sections for new review
+      setSections([
+        { type: 'hero' },
+        { type: 'who_is_this_for' },
+        { type: 'pros_cons' },
+        { type: 'content', title: "Performance", body: "" },
+        { type: 'comparison' },
+        { type: 'verdict' }
+      ]);
     }
   }, [id, isEdit]);
 
@@ -70,12 +88,12 @@ export default function AdminReviewForm() {
     const payload = {
       ...form,
       overall_rating: Math.round(form.overall_rating * 10) / 10,
-      ratings: JSON.parse(JSON.stringify(ratings.filter((r) => r.label).map(r => ({ ...r, score: Math.round(r.score * 10) / 10 })))),
-      specs: JSON.parse(JSON.stringify(specs.filter((s) => s.label))),
-      pros: JSON.parse(JSON.stringify(pros.filter(Boolean))),
-      cons: JSON.parse(JSON.stringify(cons.filter(Boolean))),
-      sections: JSON.parse(JSON.stringify(sections.filter((s) => s.title))),
-      images: JSON.parse(JSON.stringify(images.filter(Boolean))),
+      ratings: ratings.filter((r) => r.label).map(r => ({ ...r, score: Math.round(r.score * 10) / 10 })),
+      specs: specs.filter((s) => s.label),
+      pros: pros.filter(Boolean),
+      cons: cons.filter(Boolean),
+      sections: sections,
+      images: images.filter(Boolean),
       ...(isEdit ? {} : { created_by: user?.id }),
     };
 
@@ -101,20 +119,28 @@ export default function AdminReviewForm() {
     return name
       .toLowerCase()
       .trim()
-      .replace(/[^\w\s-]/g, '') // Remove non-word characters (except spaces and dashes)
-      .replace(/[\s_]+/g, '-')  // Replace spaces and underscores with dashes
-      .replace(/^-+|-+$/g, ''); // Remove leading and trailing dashes
+      .replace(/[^\w\s-]/g, '')
+      .replace(/[\s_]+/g, '-')
+      .replace(/^-+|-+$/g, '');
   };
 
   const updateField = (key: string, value: string | number | boolean) => {
     setForm((f) => {
       const next = { ...f, [key]: value };
-      // Auto-generate slug if name changes and it's a new review
       if (key === 'name' && !isEdit && !f.slug) {
         next.slug = generateSlug(value as string);
       }
       return next;
     });
+  };
+
+  const moveSection = (index: number, direction: 'up' | 'down') => {
+    const newSections = [...sections];
+    const targetIndex = direction === 'up' ? index - 1 : index + 1;
+    if (targetIndex >= 0 && targetIndex < newSections.length) {
+      [newSections[index], newSections[targetIndex]] = [newSections[targetIndex], newSections[index]];
+      setSections(newSections);
+    }
   };
 
   return (
@@ -129,7 +155,6 @@ export default function AdminReviewForm() {
       </div>
 
       <div className="grid lg:grid-cols-3 gap-6">
-        {/* Main form */}
         <div className="lg:col-span-2 space-y-6">
           {/* Basic info */}
           <div className="bg-card border rounded-xl p-5 space-y-4">
@@ -170,82 +195,101 @@ export default function AdminReviewForm() {
                 <Label>คะแนนรวม</Label>
                 <Input type="number" step="0.1" min="0" max="5" value={form.overall_rating} onChange={(e) => updateField("overall_rating", parseFloat(e.target.value) || 0)} />
               </div>
-              <div className="space-y-2">
-                <Label>Badge</Label>
-                <Input value={form.badge} onChange={(e) => updateField("badge", e.target.value)} placeholder="Top Pick / แนะนำ / คุ้มค่าที่สุด" />
-              </div>
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <Label>URL รูปภาพหลัก</Label>
-                  {form.image_url && (
-                    <button
-                      type="button"
-                      onClick={() => updateField("image_url", "")}
-                      className="text-xs text-destructive hover:underline"
-                    >
-                      ลบรูป
-                    </button>
-                  )}
-                </div>
-                <div className="flex gap-2">
-                  <Input
-                    value={form.image_url}
-                    onChange={(e) => updateField("image_url", e.target.value)}
-                    placeholder="https://..."
-                    className="flex-1"
-                  />
-                  {form.image_url && (
-                    <img
-                      src={form.image_url}
-                      alt="preview"
-                      className="h-10 w-10 rounded object-cover border shrink-0"
-                      onError={(e) => (e.currentTarget.style.display = 'none')}
-                    />
-                  )}
-                </div>
-              </div>
             </div>
           </div>
 
-          {/* Additional Images */}
-          <div className="bg-card border rounded-xl p-5 space-y-4">
+          {/* Dynamic Sections Renderer Control */}
+          <div className="bg-card border rounded-xl p-5 space-y-6">
             <div className="flex items-center justify-between">
-              <h2 className="font-heading font-semibold text-foreground">รูปภาพเพิ่มเติม</h2>
-              <Button variant="ghost" size="sm" onClick={() => setImages([...images, ""])}>
-                <Plus className="h-4 w-4 mr-1" /> เพิ่มรูป
+              <h2 className="font-heading font-semibold text-foreground">โครงสร้างหน้า (Layout Sections)</h2>
+              <Button variant="outline" size="sm" onClick={() => setSections([...sections, { type: 'content', title: "New Section" }])}>
+                <Plus className="h-4 w-4 mr-1" /> เพิ่ม Section
               </Button>
             </div>
-            {images.length === 0 && (
-              <p className="text-sm text-muted-foreground">ยังไม่มีรูปภาพเพิ่มเติม กดปุ่ม "เพิ่มรูป" เพื่อเพิ่ม URL รูปภาพ</p>
-            )}
-            {images.map((img, i) => (
-              <div key={i} className="flex gap-2 items-center">
-                <Input
-                  placeholder="https://..."
-                  value={img}
-                  onChange={(e) => { const n = [...images]; n[i] = e.target.value; setImages(n); }}
-                  className="flex-1"
-                />
-                {img && (
-                  <img src={img} alt={`preview ${i}`} className="h-10 w-10 rounded object-cover border shrink-0" />
-                )}
-                <Button variant="ghost" size="icon" onClick={() => setImages(images.filter((_, j) => j !== i))}>
-                  <X className="h-4 w-4" />
-                </Button>
-              </div>
-            ))}
-          </div>
 
-          {/* Intro & Verdict */}
-          <div className="bg-card border rounded-xl p-5 space-y-4">
-            <h2 className="font-heading font-semibold text-foreground">เนื้อหา</h2>
-            <div className="space-y-2">
-              <Label>บทนำ</Label>
-              <Textarea value={form.intro} onChange={(e) => updateField("intro", e.target.value)} rows={3} />
-            </div>
-            <div className="space-y-2">
-              <Label>สรุป (Verdict)</Label>
-              <Textarea value={form.verdict} onChange={(e) => updateField("verdict", e.target.value)} rows={3} />
+            <div className="space-y-4">
+              {sections.map((section, i) => (
+                <div key={i} className="border rounded-lg p-4 bg-slate-50/50 space-y-4">
+                  <div className="flex items-center justify-between gap-4">
+                    <div className="flex items-center gap-2">
+                      <div className="flex flex-col gap-1">
+                        <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => moveSection(i, 'up')} disabled={i === 0}>
+                          <MoveUp className="h-3 w-3" />
+                        </Button>
+                        <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => moveSection(i, 'down')} disabled={i === sections.length - 1}>
+                          <MoveDown className="h-3 w-3" />
+                        </Button>
+                      </div>
+                      <div className="space-y-1">
+                        <Label className="text-[10px] uppercase font-bold text-slate-400">Type</Label>
+                        <Select
+                          value={section.type}
+                          onValueChange={(val: SectionType) => {
+                            const next = [...sections];
+                            next[i].type = val;
+                            setSections(next);
+                          }}
+                        >
+                          <SelectTrigger className="w-[180px] h-8 text-xs">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {sectionTypes.map(t => (
+                              <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+
+                    <Button variant="ghost" size="icon" className="text-destructive h-8 w-8" onClick={() => setSections(sections.filter((_, j) => j !== i))}>
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+
+                  {section.type === 'content' && (
+                    <div className="space-y-3 pt-2">
+                      <div className="space-y-1">
+                        <Label className="text-xs">หัวข้อ</Label>
+                        <Input
+                          value={section.title || ""}
+                          onChange={(e) => {
+                            const next = [...sections];
+                            next[i].title = e.target.value;
+                            setSections(next);
+                          }}
+                          className="h-8"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <Label className="text-xs">เนื้อหา</Label>
+                        <Textarea
+                          value={section.body || ""}
+                          onChange={(e) => {
+                            const next = [...sections];
+                            next[i].body = e.target.value;
+                            setSections(next);
+                          }}
+                          rows={4}
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  {section.type === 'hero' && (
+                    <p className="text-[10px] text-slate-400 italic"> renders Image Gallery, Title, Score and Price anchor.</p>
+                  )}
+                  {section.type === 'specs' && (
+                    <p className="text-[10px] text-slate-400 italic"> renders Technical specs grid (Mobile only by default in renderer).</p>
+                  )}
+                  {section.type === 'pros_cons' && (
+                    <p className="text-[10px] text-slate-400 italic"> renders Pros and Cons lists.</p>
+                  )}
+                  {section.type === 'who_is_this_for' && (
+                    <p className="text-[10px] text-slate-400 italic"> renders 'Suitable for' block based on specs and 'Not recommended' based on cons.</p>
+                  )}
+                </div>
+              ))}
             </div>
           </div>
 
@@ -269,8 +313,8 @@ export default function AdminReviewForm() {
           {/* Specs */}
           <div className="bg-card border rounded-xl p-5 space-y-4">
             <div className="flex items-center justify-between">
-              <h2 className="font-heading font-semibold text-foreground">สเปค</h2>
-              <Button variant="ghost" size="sm" onClick={() => setSpecs([...specs, { label: "", value: "" }])}>
+              <h2 className="font-heading font-semibold text-foreground">สเปค (Technical Specs)</h2>
+              <Button variant="ghost" size="sm" onClick={() => setSpecs([...specs, { label: "", value: "", highlight: false }])}>
                 <Plus className="h-4 w-4 mr-1" /> เพิ่ม
               </Button>
             </div>
@@ -278,6 +322,14 @@ export default function AdminReviewForm() {
               <div key={i} className="flex gap-2 items-center">
                 <Input placeholder="หัวข้อ" value={s.label} onChange={(e) => { const n = [...specs]; n[i].label = e.target.value; setSpecs(n); }} className="flex-1" />
                 <Input placeholder="ค่า" value={s.value} onChange={(e) => { const n = [...specs]; n[i].value = e.target.value; setSpecs(n); }} className="flex-1" />
+                <div className="flex items-center gap-1 shrink-0 px-2">
+                  <Label className="text-[10px]">Highlight</Label>
+                  <Switch
+                    checked={s.highlight}
+                    onCheckedChange={(v) => { const n = [...specs]; n[i].highlight = v; setSpecs(n); }}
+                    className="scale-75"
+                  />
+                </div>
                 <Button variant="ghost" size="icon" onClick={() => setSpecs(specs.filter((_, j) => j !== i))}><X className="h-4 w-4" /></Button>
               </div>
             ))}
@@ -287,7 +339,7 @@ export default function AdminReviewForm() {
           <div className="grid sm:grid-cols-2 gap-4">
             <div className="bg-card border rounded-xl p-5 space-y-3">
               <div className="flex items-center justify-between">
-                <h2 className="font-heading font-semibold text-badge-recommended">ข้อดี</h2>
+                <h2 className="font-heading font-semibold text-emerald-600">ข้อดี</h2>
                 <Button variant="ghost" size="sm" onClick={() => setPros([...pros, ""])}><Plus className="h-4 w-4" /></Button>
               </div>
               {pros.map((p, i) => (
@@ -299,7 +351,7 @@ export default function AdminReviewForm() {
             </div>
             <div className="bg-card border rounded-xl p-5 space-y-3">
               <div className="flex items-center justify-between">
-                <h2 className="font-heading font-semibold text-destructive">ข้อเสีย</h2>
+                <h2 className="font-heading font-semibold text-rose-500">ข้อเสีย</h2>
                 <Button variant="ghost" size="sm" onClick={() => setCons([...cons, ""])}><Plus className="h-4 w-4" /></Button>
               </div>
               {cons.map((c, i) => (
@@ -309,25 +361,6 @@ export default function AdminReviewForm() {
                 </div>
               ))}
             </div>
-          </div>
-
-          {/* Sections */}
-          <div className="bg-card border rounded-xl p-5 space-y-4">
-            <div className="flex items-center justify-between">
-              <h2 className="font-heading font-semibold text-foreground">เนื้อหารีวิว (Sections)</h2>
-              <Button variant="ghost" size="sm" onClick={() => setSections([...sections, { title: "", body: "" }])}>
-                <Plus className="h-4 w-4 mr-1" /> เพิ่ม
-              </Button>
-            </div>
-            {sections.map((s, i) => (
-              <div key={i} className="space-y-2 border-b pb-4 last:border-0">
-                <div className="flex gap-2">
-                  <Input placeholder="หัวข้อ" value={s.title} onChange={(e) => { const n = [...sections]; n[i].title = e.target.value; setSections(n); }} className="flex-1" />
-                  <Button variant="ghost" size="icon" onClick={() => setSections(sections.filter((_, j) => j !== i))}><X className="h-4 w-4" /></Button>
-                </div>
-                <Textarea placeholder="เนื้อหา" value={s.body} onChange={(e) => { const n = [...sections]; n[i].body = e.target.value; setSections(n); }} rows={3} />
-              </div>
-            ))}
           </div>
         </div>
 
@@ -349,6 +382,15 @@ export default function AdminReviewForm() {
               <Input value={form.cta_text} onChange={(e) => updateField("cta_text", e.target.value)} />
             </div>
 
+            <div className="space-y-2 pt-2 border-t">
+              <Label>บทนำ (Intro)</Label>
+              <Textarea value={form.intro} onChange={(e) => updateField("intro", e.target.value)} rows={3} className="text-sm" />
+            </div>
+            <div className="space-y-2">
+              <Label>สรุป (Verdict Text)</Label>
+              <Textarea value={form.verdict} onChange={(e) => updateField("verdict", e.target.value)} rows={3} className="text-sm" />
+            </div>
+
             <Button onClick={handleSave} disabled={saving} className="w-full h-12 lg:h-10">
               <Save className="mr-2 h-4 w-4" />
               {saving ? "กำลังบันทึก..." : "บันทึก"}
@@ -357,7 +399,6 @@ export default function AdminReviewForm() {
         </div>
       </div>
 
-      {/* Mobile Sticky Footer */}
       <div className="lg:hidden fixed bottom-0 left-0 right-0 p-4 bg-background/80 backdrop-blur-md border-t z-50 flex gap-2">
         <Button variant="outline" className="flex-1 h-12" onClick={() => navigate("/admin/reviews")}>
           ยกเลิก
@@ -367,7 +408,7 @@ export default function AdminReviewForm() {
           {saving ? "บันทึก..." : "บันทึกการเปลี่ยนแปลง"}
         </Button>
       </div>
-      <div className="h-20 lg:hidden" /> {/* Spacer for sticky footer */}
+      <div className="h-20 lg:hidden" />
     </AdminLayout>
   );
 }
