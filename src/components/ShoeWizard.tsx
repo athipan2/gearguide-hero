@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { useComparisonStore } from "@/lib/comparison-store";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { getOptimizedImageUrl } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
 
 type Step = "category_select" | "entry" | "express_brand" | "express_details" | "consult_goal" | "consult_feeling" | "consult_foot" | "result";
@@ -491,7 +492,7 @@ export function ShoeWizard({ onClose }: { onClose: () => void }) {
                     )}
 
                     <div className="w-full md:w-40 h-40 rounded-2xl overflow-hidden shrink-0">
-                      <img src={rec.image_url} alt={rec.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                      <img src={getOptimizedImageUrl(rec.image_url, 'card')} alt={rec.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
                     </div>
 
                     <div className="flex-1 flex flex-col">
