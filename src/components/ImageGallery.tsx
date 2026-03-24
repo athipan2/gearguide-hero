@@ -59,11 +59,11 @@ export function ImageGallery({
     return (
       <Dialog>
         <DialogTrigger asChild>
+          {/* TASK 1 & 6: Premium Image Container with Mobile Full-Bleed */}
           <div
             className={cn(
               "relative w-screen left-1/2 right-1/2 -translate-x-1/2 md:w-full md:left-auto md:right-auto md:translate-x-0 bg-white overflow-hidden group",
-              "min-h-[300px] md:min-h-[500px] h-auto",
-              "rounded-none md:rounded-3xl shadow-2xl transition-transform duration-500 hover:scale-[1.02] cursor-zoom-in"
+              "w-full min-h-[350px] md:min-h-[550px] rounded-none md:rounded-3xl shadow-2xl transition-transform duration-500 hover:scale-[1.02] cursor-zoom-in p-0"
             )}
           >
             <img
@@ -71,6 +71,8 @@ export function ImageGallery({
               alt={alt}
               className="w-full h-full object-cover"
               loading="eager"
+              // @ts-expect-error - fetchPriority is a valid but sometimes unrecognized React attribute
+              fetchPriority="high"
             />
 
             {/* Zoom Icon overlay */}
@@ -98,9 +100,10 @@ export function ImageGallery({
           <DialogTitle className="sr-only">{alt}</DialogTitle>
           <DialogDescription className="sr-only">zoom image</DialogDescription>
 
+          {/* FIX 1: Zoomed images use object-contain to prevent cropping */}
           <img
             src={allImages[0]}
-            className="max-w-full max-h-[90vh] object-contain"
+            className="w-full h-full max-h-[85vh] object-contain"
           />
         </DialogContent>
       </Dialog>
@@ -111,13 +114,13 @@ export function ImageGallery({
   // ✅ MULTIPLE IMAGES
   // =========================
   return (
-    <div className="w-full space-y-6">
+    <div className="w-full space-y-8">
       {/* HERO */}
+      {/* TASK 1 & 6: Premium Image Container with Mobile Full-Bleed */}
       <div
         className={cn(
-          "relative w-screen left-1/2 right-1/2 -translate-x-1/2 md:w-full md:left-auto md:right-auto md:translate-x-0 bg-white overflow-hidden group",
-          "min-h-[300px] md:min-h-[500px] h-auto",
-          "rounded-none md:rounded-3xl shadow-2xl transition-transform duration-500 hover:scale-[1.02]"
+          "relative w-screen left-1/2 right-1/2 -translate-x-1/2 md:w-full md:left-auto md:right-auto md:translate-x-0 bg-white overflow-hidden group p-0",
+          "w-full min-h-[350px] md:min-h-[550px] rounded-none md:rounded-3xl shadow-2xl transition-transform duration-500 hover:scale-[1.02]"
         )}
       >
         {/* swipe hint gradient edges */}
@@ -135,15 +138,18 @@ export function ImageGallery({
                       alt={`${alt}-${i}`}
                       className="w-full h-full object-cover cursor-zoom-in"
                       loading={i === 0 ? "eager" : "lazy"}
+                      // @ts-expect-error - fetchPriority is a valid but sometimes unrecognized React attribute
+                      fetchPriority={i === 0 ? "high" : undefined}
                     />
                   </DialogTrigger>
 
                   <DialogContent className="bg-black/90 backdrop-blur-sm border-none max-w-[95vw] max-h-[95vh] p-0 flex items-center justify-center">
                     <DialogTitle className="sr-only">{alt} - {i + 1}</DialogTitle>
                     <DialogDescription className="sr-only">viewing product image {i + 1}</DialogDescription>
+                    {/* FIX 1: Zoomed images use object-contain to prevent cropping */}
                     <img
                       src={img}
-                      className="max-w-full max-h-[90vh] object-contain"
+                      className="w-full h-full max-h-[85vh] object-contain"
                     />
                   </DialogContent>
                 </Dialog>
@@ -191,13 +197,14 @@ export function ImageGallery({
       </div>
 
       {/* THUMBNAILS */}
-      <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
+      {/* TASK 4: Spacing system fix gap-4 -> gap-6 */}
+      <div className="flex gap-6 overflow-x-auto pb-4 scrollbar-hide">
         {allImages.map((img, i) => (
           <button
             key={i}
             onClick={() => scrollTo(i)}
             className={cn(
-              "relative w-20 h-20 md:w-24 md:h-24 rounded-2xl overflow-hidden border-2 bg-white transition-all duration-300 shrink-0",
+              "relative w-20 h-20 md:w-24 md:h-24 rounded-2xl overflow-hidden border-2 bg-white transition-all duration-300 shrink-0 p-0",
               i === selectedIndex
                 ? "border-accent scale-110 shadow-lg z-10 opacity-100"
                 : "border-transparent opacity-40 hover:opacity-80 hover:scale-105"

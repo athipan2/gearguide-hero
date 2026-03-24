@@ -320,18 +320,24 @@ export default function ReviewDetail() {
       />
       <Navbar />
 
-      <article className="max-w-[800px] mx-auto pb-12 md:pb-16 px-3 md:px-0">
+      {/* Task 2: Expanded global layout for premium feel */}
+      <article className="max-w-[1400px] mx-auto pb-12 md:pb-16 px-4 md:px-6 lg:px-8">
         {/* Breadcrumb - Desktop Only */}
-        <div className="hidden md:flex items-center gap-2 text-xs font-bold uppercase tracking-[0.2em] text-slate-400 py-8">
-          <Link to="/" className="hover:text-primary transition-colors">HOME</Link>
-          <ChevronRight className="h-3 w-3" />
-          <span className="hover:text-primary transition-colors cursor-pointer">{review.category}</span>
-          <ChevronRight className="h-3 w-3" />
-          <span className="text-primary">{review.name}</span>
+        {/* TASK 5: Readability constraint for breadcrumb */}
+        <div className="max-w-[800px] mx-auto md:mx-0">
+          <div className="hidden md:flex items-center gap-4 text-xs font-bold uppercase tracking-[0.2em] text-slate-400 py-12">
+            <Link to="/" className="hover:text-primary transition-colors">HOME</Link>
+            <ChevronRight className="h-3 w-3" />
+            <span className="hover:text-primary transition-colors cursor-pointer">{review.category}</span>
+            <ChevronRight className="h-3 w-3" />
+            <span className="text-primary">{review.name}</span>
+          </div>
         </div>
 
         {/* Hero Section */}
-        <div className="grid grid-cols-1 md:grid-cols-[60fr_40fr] gap-6 md:gap-16 mb-12 md:mb-24 items-start">
+        {/* TASK 3 & 4: Refactored hero grid and spacing (60/40 Split, wider gaps) */}
+        {/* FIX 3: Add items-start to hero grid */}
+        <div className="grid grid-cols-1 md:grid-cols-[60%_40%] gap-12 md:gap-16 mb-24 md:mb-32 items-start">
           {/* Product Image Dominates Hero */}
           <div className="relative md:sticky md:top-24 p-0">
             <ImageGallery
@@ -353,9 +359,11 @@ export default function ReviewDetail() {
             </div>
           </div>
 
+          {/* TASK 4: Premium spacing for hero product info */}
+          {/* FIX 3: Consistent vertical spacing in right panel */}
           <div className="flex flex-col space-y-8 md:space-y-12">
             {/* Mobile-First Title Block */}
-            <div className="space-y-4">
+            <div className="space-y-6 md:space-y-8">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <span className="h-px w-8 bg-accent" />
@@ -380,13 +388,15 @@ export default function ReviewDetail() {
                 </div>
               </div>
 
-              <h1 className="font-heading text-4xl md:text-6xl font-semibold text-primary leading-[1.1] tracking-tighter uppercase break-words">
+              {/* TASK 7 / FIX 4: Scaled hero title for dominance */}
+              <h1 className="font-heading text-5xl md:text-6xl font-bold text-primary leading-[1] tracking-tighter uppercase break-words">
                 {review.name}
               </h1>
 
               {/* Decision Anchor: Score + Price + Quick Verdict */}
-              <div className="grid grid-cols-1 gap-4 pt-2">
-                <div className="bg-white rounded-[2rem] p-6 border border-primary/5 shadow-xl shadow-primary/5 space-y-6">
+              {/* TASK 4: Spacing upgrade gap-6 -> gap-8 */}
+              <div className="grid grid-cols-1 gap-8 pt-4">
+                <div className="bg-white rounded-[2rem] p-8 border border-primary/5 shadow-xl shadow-primary/5 space-y-12">
                   <div className="flex items-center justify-between border-b border-slate-100 pb-5">
                     <div className="flex flex-col">
                       <span className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">SCORE GAUGE</span>
@@ -405,7 +415,7 @@ export default function ReviewDetail() {
                     </div>
                   </div>
 
-                  <div className="space-y-4">
+                  <div className="space-y-6">
                     <div className="flex items-start gap-3">
                       <div className="mt-1 h-5 w-5 rounded-full bg-accent/10 flex items-center justify-center shrink-0">
                         <Zap className="h-3 w-3 text-accent fill-accent" />
@@ -424,14 +434,16 @@ export default function ReviewDetail() {
             </div>
 
             {/* "เหมาะกับใคร?" - Decision Block */}
-            <div className="bg-primary text-white rounded-[2rem] p-6 md:p-8 shadow-2xl shadow-primary/20 relative overflow-hidden group">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 blur-3xl rounded-full" />
-              <h3 className="font-heading text-lg md:text-xl font-bold mb-6 flex items-center gap-3">
-                <span className="w-2 h-6 bg-accent rounded-full" />
+            <div className="bg-primary text-white rounded-[3rem] p-8 md:p-12 shadow-2xl shadow-primary/20 relative overflow-hidden group">
+              <div className="absolute top-0 right-0 w-48 h-48 bg-white/5 blur-3xl rounded-full" />
+              {/* TASK 7: Scale section title */}
+              <h3 className="font-heading text-2xl md:text-3xl font-bold mb-12 flex items-center gap-4">
+                <span className="w-2.5 h-8 bg-accent rounded-full" />
                 เหมาะกับคุณไหม?
               </h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                <div className="space-y-4">
+              {/* TASK 4: gap-8 -> gap-12 */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-12">
+                <div className="space-y-8">
                   <p className="text-xs font-bold text-accent uppercase tracking-[0.2em]">✅ เหมาะสำหรับ</p>
                   <ul className="space-y-3">
                     <li className="flex items-start gap-3 text-sm font-medium text-white/90">
@@ -460,13 +472,15 @@ export default function ReviewDetail() {
               </div>
             </div>
 
-            <div className="prose prose-slate max-w-none">
-              <p className="text-lg md:text-xl font-medium text-slate-600 leading-relaxed">
+            {/* TASK 5: Readability constraint for intro text */}
+            <div className="prose prose-slate max-w-[800px]">
+              <p className="text-xl md:text-2xl font-medium text-slate-600 leading-relaxed">
                 {review.intro}
               </p>
             </div>
 
-            <div className="flex flex-wrap gap-4 pt-2">
+            {/* TASK 4: Increased gap for premium feel */}
+            <div className="flex flex-wrap gap-8 pt-4">
               <Button
                 variant="outline"
                 size="lg"
@@ -498,13 +512,14 @@ export default function ReviewDetail() {
           </div>
         </div>
 
-        <div className="grid lg:grid-cols-3 gap-4 md:gap-14 px-3 md:px-0">
-          <div className="lg:col-span-2 space-y-8 md:space-y-20">
+        {/* TASK 4: Systematic spacing upgrade for layout and blocks (gap-16 -> gap-24) */}
+        <div className="grid lg:grid-cols-3 gap-12 md:gap-24 px-3 md:px-0">
+          <div className="lg:col-span-2 space-y-24 md:space-y-32">
             {/* Pros / Cons */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 md:gap-16">
               <div className="bg-emerald-50/20 border border-emerald-100/30 rounded-3xl p-6 md:p-10 transition-all duration-500 group relative overflow-hidden shadow-sm hover:shadow-md">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 blur-3xl rounded-full -translate-y-1/2 translate-x-1/2" />
-                <div className="flex items-center gap-4 mb-8 md:mb-10">
+                <div className="flex items-center gap-6 mb-12 md:mb-16">
                   <div className="h-12 w-12 rounded-xl bg-emerald-500 flex items-center justify-center shadow-lg shadow-emerald-500/20">
                     <ThumbsUp className="h-6 w-6 text-white" />
                   </div>
@@ -556,14 +571,16 @@ export default function ReviewDetail() {
             </div>
 
             {/* Sections */}
-            <div className="space-y-8 md:space-y-24">
+            <div className="space-y-24 md:space-y-32">
               {review.sections.map((s) => (
-                <div key={s.title} className="group bg-white/40 md:bg-transparent p-6 md:p-0 rounded-3xl border border-primary/5 md:border-none shadow-sm md:shadow-none">
-                  <h2 className="font-heading text-xl md:text-3xl font-semibold text-primary uppercase tracking-tighter flex items-center gap-4 mb-6 md:mb-8 leading-none group-hover:translate-x-2 transition-transform duration-700">
-                    <span className="h-8 md:h-10 w-2.5 bg-accent rounded-full shadow-lg shadow-accent/20" />
+                <div key={s.title} className="group bg-white/40 md:bg-transparent p-8 md:p-0 rounded-3xl border border-primary/5 md:border-none shadow-sm md:shadow-none">
+                  {/* TASK 7 / FIX 4: Scaled section title for better hierarchy */}
+                  <h2 className="font-heading text-2xl md:text-3xl font-semibold text-primary uppercase tracking-tighter flex items-center gap-6 mb-8 md:mb-12 leading-none group-hover:translate-x-2 transition-transform duration-700">
+                    <span className="h-10 md:h-12 w-3 bg-accent rounded-full shadow-lg shadow-accent/20" />
                     {s.title}
                   </h2>
-                  <div className="md:border-l-[4px] border-primary/10 md:pl-10">
+                  {/* TASK 5: Readability constraint for section content */}
+                  <div className="md:border-l-[4px] border-primary/10 md:pl-16 max-w-[800px]">
                     {s.body.split('\n').filter(line => line.trim()).map((paragraph, idx) => {
                       if (paragraph.trim().startsWith('-') || paragraph.trim().startsWith('•')) {
                         return (
@@ -588,9 +605,10 @@ export default function ReviewDetail() {
 
             {/* Comparison Hook */}
             <div className="bg-white rounded-3xl p-8 border border-primary/5 shadow-sm relative overflow-hidden group">
-              <div className="flex flex-col md:flex-row items-center justify-between gap-6 relative z-10">
+              <div className="flex flex-col md:flex-row items-center justify-between gap-8 relative z-10">
                 <div className="space-y-2 text-center md:text-left">
-                  <h3 className="font-heading text-xl font-bold text-primary">เทียบกับรุ่นอื่นในหมวดเดียวกัน?</h3>
+                  {/* Task 7: Scaled hook title for visual impact */}
+                  <h3 className="font-heading text-2xl font-bold text-primary">เทียบกับรุ่นอื่นในหมวดเดียวกัน?</h3>
                   <p className="text-sm text-slate-500 font-medium">ดูข้อแตกต่างด้านสเปคและราคาก่อนตัดสินใจ</p>
                 </div>
                 <Button
@@ -627,16 +645,17 @@ export default function ReviewDetail() {
               <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-[0.05] pointer-events-none" />
 
               <div className="relative z-10 max-w-5xl mx-auto text-center">
-                <div className="inline-flex items-center gap-2 px-6 py-3 bg-white/5 backdrop-blur-2xl border border-white/10 text-white rounded-full text-xs font-bold uppercase tracking-[0.4em] mb-8 md:mb-12">
+                <div className="inline-flex items-center gap-2 px-6 py-3 bg-white/5 backdrop-blur-2xl border border-white/10 text-white rounded-full text-xs font-bold uppercase tracking-[0.4em] mb-12 md:mb-16">
                   <Zap className="h-4 w-4 fill-accent text-accent animate-pulse" />
                   THE ULTIMATE VERDICT
                 </div>
 
-                <h2 className="font-heading text-2xl md:text-4xl lg:text-5xl font-semibold text-white mb-10 md:mb-16 leading-[1.1] tracking-tighter">
+                {/* Task 7 / FIX 4: Scaled verdict typography for dominance */}
+                <h2 className="font-heading text-3xl md:text-5xl font-bold text-white mb-10 md:mb-16 leading-[1.1] tracking-tighter">
                   "{review.verdict}"
                 </h2>
 
-                <div className="flex flex-col md:flex-row items-center justify-center gap-6">
+                <div className="flex flex-col md:flex-row items-center justify-center gap-8">
                   <CTAButton variant="hero" className="h-12 md:h-16 px-10 md:px-16 rounded-full text-base md:text-xl w-full md:w-auto shadow-2xl shadow-accent/40 bg-accent text-white border-none hover:scale-105 active:scale-95 transition-all duration-500" />
 
                   <div className="flex items-center gap-5 text-white/40 text-xs font-bold uppercase tracking-[0.3em]">
@@ -650,15 +669,15 @@ export default function ReviewDetail() {
           </div>
 
           {/* Sidebar */}
-          <aside className="space-y-8">
-            <div className="sticky top-24 space-y-8">
+          <aside className="space-y-16">
+            <div className="sticky top-24 space-y-16">
               {/* Ratings Sidebar Block */}
-              <div className="bg-white/50 backdrop-blur-md border border-primary/5 rounded-3xl p-6 shadow-sm">
-                <h3 className="font-heading font-bold text-primary text-xs uppercase tracking-[0.3em] flex items-center gap-2 mb-6">
-                  <div className="w-1.5 h-3 bg-accent rounded-full" />
+              <div className="bg-white/50 backdrop-blur-md border border-primary/5 rounded-3xl p-8 shadow-sm">
+                <h3 className="font-heading font-bold text-primary text-xs uppercase tracking-[0.3em] flex items-center gap-2 mb-8">
+                  <div className="w-2 h-4 bg-accent rounded-full" />
                   รายละเอียดคะแนน
                 </h3>
-                <div className="space-y-6">
+                <div className="space-y-8">
                   {review.ratings.map((r) => (
                     <RatingBar key={r.label} label={r.label} score={r.score} />
                   ))}
@@ -666,9 +685,9 @@ export default function ReviewDetail() {
               </div>
 
               {/* Specs Sidebar Block */}
-              <div className="bg-white border border-primary/5 rounded-3xl p-6 shadow-sm">
-                <h3 className="font-heading font-bold text-primary text-xs uppercase tracking-[0.3em] flex items-center gap-2 mb-6">
-                  <div className="w-1.5 h-3 bg-accent rounded-full" />
+              <div className="bg-white border border-primary/5 rounded-3xl p-8 shadow-sm">
+                <h3 className="font-heading font-bold text-primary text-xs uppercase tracking-[0.3em] flex items-center gap-2 mb-8">
+                  <div className="w-2 h-4 bg-accent rounded-full" />
                   KEY SPECS
                 </h3>
                 <div className="grid gap-3">
@@ -693,7 +712,7 @@ export default function ReviewDetail() {
               </div>
 
               {/* Price & CTA Sidebar Block */}
-              <div className="bg-white border-2 border-accent/20 rounded-3xl p-8 shadow-2xl shadow-accent/5 space-y-6 relative overflow-hidden group/sidebar">
+              <div className="bg-white border-2 border-accent/20 rounded-3xl p-8 shadow-2xl shadow-accent/5 space-y-8 relative overflow-hidden group/sidebar">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-accent/5 blur-3xl rounded-full group-hover/sidebar:scale-150 transition-transform duration-700" />
 
                 <div className="relative">
@@ -704,7 +723,7 @@ export default function ReviewDetail() {
                   </div>
                 </div>
 
-                <div className="space-y-4 relative">
+                <div className="space-y-6 relative">
                   <CTAButton variant="hero" className="w-full h-16 rounded-xl shadow-xl shadow-accent/20 bg-accent text-white border-none text-xl hover:scale-[1.02] transition-transform" isSidebar />
 
                   <div className="flex flex-col gap-3 pt-2">
@@ -720,9 +739,9 @@ export default function ReviewDetail() {
 
               {/* Dynamic Top in Category Block */}
               {topInCategory.length > 0 && (
-                <div className="bg-primary rounded-3xl p-6 text-white relative overflow-hidden shadow-xl shadow-primary/20 group">
+                <div className="bg-primary rounded-3xl p-8 text-white relative overflow-hidden shadow-xl shadow-primary/20 group">
                   <TrendingUp className="absolute -top-6 -right-6 h-24 w-24 opacity-10 rotate-12 transition-transform duration-700 group-hover:rotate-45" />
-                  <div className="relative z-10 space-y-4">
+                  <div className="relative z-10 space-y-8">
                     <h4 className="font-heading font-bold text-xl leading-tight">TOP 3 ในหมวดนี้</h4>
                     <div className="space-y-3">
                       {topInCategory.map((item, idx) => (
@@ -747,29 +766,33 @@ export default function ReviewDetail() {
         </div>
 
         {/* Comments Section */}
+        {/* TASK 4 & 5: Increased top margin and readability constraint */}
         {review.id && (
-          <div className="mt-16">
+          <div className="mt-32 max-w-[800px]">
             <CommentSection reviewId={review.id} isCompact={true} />
           </div>
         )}
       </article>
 
       {/* Related Reviews */}
-      <RelatedReviews
-        currentReview={{
-          id: review.id,
-          category: review.category,
-          overall_rating: review.overall_rating,
-          price: review.price,
-          slug: slug || ""
-        }}
-        isCompact={true}
-      />
+      <div className="mt-24 md:mt-32">
+        <RelatedReviews
+          currentReview={{
+            id: review.id,
+            category: review.category,
+            overall_rating: review.overall_rating,
+            price: review.price,
+            slug: slug || ""
+          }}
+          isCompact={true}
+        />
+      </div>
 
       {/* Mobile sticky CTA - Enhanced with Orange Contrast & Animation */}
-      <div className="md:hidden fixed bottom-0 inset-x-0 bg-white/95 backdrop-blur-2xl border-t border-primary/10 px-4 pt-4 z-50 pb-[max(1.5rem,env(safe-area-inset-bottom))] shadow-[0_-20px-50px_rgba(0,0,0,0.15)]">
+      {/* FIX 5: Sticky bottom CTA with full width button */}
+      <div className="md:hidden fixed bottom-0 inset-x-0 bg-white/95 backdrop-blur-2xl border-t border-primary/10 z-50 pb-[max(1rem,env(safe-area-inset-bottom))] shadow-[0_-20px-50px_rgba(0,0,0,0.15)]">
         <div className="flex flex-col gap-3">
-          <div className="flex items-center justify-between px-2">
+          <div className="flex items-center justify-between px-6 pt-2">
             <div className="flex flex-col">
               <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">ราคาล่าสุด</span>
               <span className="text-xl font-heading font-bold text-primary italic-prohibited">{review.price}</span>
@@ -778,11 +801,13 @@ export default function ReviewDetail() {
               <span className="text-xs font-bold text-accent uppercase tracking-widest">เช็คส่วนลดเพิ่ม</span>
             </div>
           </div>
-          <CTAButton
-            className="w-full h-14 rounded-2xl font-bold text-lg uppercase tracking-wider shadow-xl shadow-accent/20"
-            showMicrocopy={true}
-            isSticky={true}
-          />
+          <div className="px-4 pb-2">
+            <CTAButton
+              className="w-full h-14 rounded-xl font-bold text-lg uppercase tracking-wider shadow-xl shadow-accent/20"
+              showMicrocopy={true}
+              isSticky={true}
+            />
+          </div>
         </div>
       </div>
 
