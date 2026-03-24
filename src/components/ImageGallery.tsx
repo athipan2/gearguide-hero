@@ -9,7 +9,7 @@ import {
   DialogTitle,
   DialogDescription
 } from "@/components/ui/dialog";
-import { cn } from "@/lib/utils";
+import { cn, getOptimizedImageUrl } from "@/lib/utils";
 
 interface ImageGalleryProps {
   mainImage: string;
@@ -67,7 +67,7 @@ export function ImageGallery({
             )}
           >
             <img
-              src={allImages[0]}
+              src={getOptimizedImageUrl(allImages[0], 'hero')}
               alt={alt}
               className="w-full h-full object-cover"
               loading="eager"
@@ -102,7 +102,7 @@ export function ImageGallery({
 
           {/* FIX 1: Zoomed images use object-contain to prevent cropping */}
           <img
-            src={allImages[0]}
+            src={getOptimizedImageUrl(allImages[0], 'full')}
             className="w-full h-full max-h-[85vh] object-contain"
           />
         </DialogContent>
@@ -134,7 +134,7 @@ export function ImageGallery({
                 <Dialog>
                   <DialogTrigger asChild>
                     <img
-                      src={img}
+                      src={getOptimizedImageUrl(img, 'hero')}
                       alt={`${alt}-${i}`}
                       className="w-full h-full object-cover cursor-zoom-in"
                       loading={i === 0 ? "eager" : "lazy"}
@@ -148,7 +148,7 @@ export function ImageGallery({
                     <DialogDescription className="sr-only">viewing product image {i + 1}</DialogDescription>
                     {/* FIX 1: Zoomed images use object-contain to prevent cropping */}
                     <img
-                      src={img}
+                      src={getOptimizedImageUrl(img, 'full')}
                       className="w-full h-full max-h-[85vh] object-contain"
                     />
                   </DialogContent>
@@ -211,7 +211,7 @@ export function ImageGallery({
             )}
           >
             <img
-              src={img}
+              src={getOptimizedImageUrl(img, 'thumbnail')}
               className="w-full h-full object-cover"
               loading="lazy"
             />

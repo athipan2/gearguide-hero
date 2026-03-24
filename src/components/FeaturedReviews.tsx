@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { FastFilters } from "./FastFilters";
 import { Link } from "react-router-dom";
 import { ProductCardSkeleton } from "./ReviewSkeleton";
+import { getOptimizedImageUrl } from "@/lib/utils";
 
 const fallbackProducts = [
   {
@@ -87,7 +88,7 @@ export function FeaturedReviews() {
             (data as unknown as ReviewData[]).map((r) => ({
               name: r.name,
               brand: r.brand,
-              image: r.image_url || "",
+              image: getOptimizedImageUrl(r.image_url, 'card') || "",
               rating: Number(r.overall_rating),
               price: r.price,
               badge: r.badge || undefined,

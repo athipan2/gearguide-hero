@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Upload, Trash2, Copy, Search, Image as ImageIcon, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
+import { getOptimizedImageUrl } from "@/lib/utils";
 
 interface MediaItem {
   id: string;
@@ -195,7 +196,7 @@ export default function AdminMedia() {
                       <div className="w-12 h-12 rounded overflow-hidden bg-muted border">
                         {m.mime_type?.startsWith("image/") ? (
                           <img
-                            src={getPublicUrl(m.file_path)}
+                            src={getOptimizedImageUrl(getPublicUrl(m.file_path), 'thumbnail')}
                             alt={m.file_name}
                             className="w-full h-full object-cover"
                             loading="lazy"

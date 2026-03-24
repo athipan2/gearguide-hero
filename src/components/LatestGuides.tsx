@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Link } from "react-router-dom";
 import { Clock, ArrowRight } from "lucide-react";
+import { getOptimizedImageUrl } from "@/lib/utils";
 
 interface Article {
   id: string;
@@ -80,7 +81,7 @@ export function LatestGuides() {
           >
             <div className="aspect-video overflow-hidden">
               <img
-                src={article.image_url || ""}
+                src={getOptimizedImageUrl(article.image_url, 'card')}
                 alt={article.title}
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
               />
