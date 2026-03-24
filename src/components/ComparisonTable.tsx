@@ -141,10 +141,17 @@ export function ComparisonTable() {
         {/* Header Section with VS */}
         <div className="relative grid grid-cols-2 md:grid-cols-[1fr_auto_1fr] items-stretch gap-3 md:gap-8 mb-8 md:mb-12">
           {/* Product 1 */}
-          <div className="relative group bg-white rounded-2xl md:rounded-3xl p-3 md:p-8 shadow-xl border border-primary/5 text-center flex flex-col justify-between">
+          <div className="relative group bg-white rounded-2xl md:rounded-3xl p-3 md:p-8 shadow-xl border border-primary/5 text-center flex flex-col justify-between overflow-hidden">
+            {item1.badge && (
+              <div className="absolute top-3 left-3 md:top-6 md:left-6 z-20">
+                <span className="bg-primary text-white text-[8px] md:text-xs font-bold px-2 py-1 md:px-3 md:py-1 rounded-full uppercase tracking-wider shadow-md">
+                  {item1.badge}
+                </span>
+              </div>
+            )}
             <button
               onClick={() => removeItem(item1.name)}
-              className="absolute -top-2 -right-2 p-1.5 md:p-2 bg-destructive text-white rounded-full shadow-lg hover:scale-110 transition-transform z-30"
+              className="absolute -top-1 -right-1 md:top-2 md:right-2 p-1.5 md:p-2 bg-destructive/90 backdrop-blur-sm text-white rounded-full shadow-lg hover:scale-110 transition-transform z-30"
             >
               <X className="h-3 w-3 md:h-4 md:w-4" />
             </button>
@@ -173,10 +180,17 @@ export function ComparisonTable() {
 
           {/* Product 2 / Add Slot */}
           {item2 ? (
-            <div className="relative group bg-white rounded-2xl md:rounded-3xl p-3 md:p-8 shadow-xl border border-primary/5 text-center flex flex-col justify-between">
+            <div className="relative group bg-white rounded-2xl md:rounded-3xl p-3 md:p-8 shadow-xl border border-primary/5 text-center flex flex-col justify-between overflow-hidden">
+              {item2.badge && (
+                <div className="absolute top-3 left-3 md:top-6 md:left-6 z-20">
+                  <span className="bg-accent text-white text-[8px] md:text-xs font-bold px-2 py-1 md:px-3 md:py-1 rounded-full uppercase tracking-wider shadow-md">
+                    {item2.badge}
+                  </span>
+                </div>
+              )}
               <button
                 onClick={() => removeItem(item2.name)}
-                className="absolute -top-2 -right-2 p-1.5 md:p-2 bg-destructive text-white rounded-full shadow-lg hover:scale-110 transition-transform z-30"
+                className="absolute -top-1 -right-1 md:top-2 md:right-2 p-1.5 md:p-2 bg-destructive/90 backdrop-blur-sm text-white rounded-full shadow-lg hover:scale-110 transition-transform z-30"
               >
                 <X className="h-3 w-3 md:h-4 md:w-4" />
               </button>

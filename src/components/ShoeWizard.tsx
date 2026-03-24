@@ -106,6 +106,7 @@ export function ShoeWizard({ onClose }: { onClose: () => void }) {
             rating: rec.rating,
             price: rec.price,
             slug: rec.slug,
+            badge: index === 0 ? "Top Pick" : undefined,
             weight: rec.weight,
             drop: rec.drop,
             aspectRatings: rec.ratings
@@ -143,7 +144,7 @@ export function ShoeWizard({ onClose }: { onClose: () => void }) {
         ].slice(0, 3);
         setRecommendations(fallback);
 
-        fallback.forEach(rec => {
+        fallback.forEach((rec, index) => {
           useComparisonStore.getState().addItem({
             name: rec.name,
             brand: rec.brand,
@@ -151,6 +152,7 @@ export function ShoeWizard({ onClose }: { onClose: () => void }) {
             rating: rec.rating,
             price: rec.price,
             slug: rec.slug,
+            badge: index === 0 ? "Top Pick" : undefined,
             weight: rec.weight,
             drop: rec.drop
           });
@@ -165,7 +167,7 @@ export function ShoeWizard({ onClose }: { onClose: () => void }) {
     }
   };
 
-  const handleAddToCompare = (rec: Recommendation) => {
+  const handleAddToCompare = (rec: Recommendation, index?: number) => {
     useComparisonStore.getState().addItem({
       name: rec.name,
       brand: rec.brand,
@@ -173,6 +175,7 @@ export function ShoeWizard({ onClose }: { onClose: () => void }) {
       rating: rec.rating,
       price: rec.price,
       slug: rec.slug,
+      badge: index === 0 ? "Top Pick" : undefined,
       weight: rec.weight,
       drop: rec.drop,
       aspectRatings: rec.ratings
@@ -510,7 +513,7 @@ export function ShoeWizard({ onClose }: { onClose: () => void }) {
                             variant="outline"
                             size="sm"
                             className="rounded-full h-10 w-10 p-0"
-                            onClick={() => handleAddToCompare(rec)}
+                            onClick={() => handleAddToCompare(rec, index)}
                             title="เพิ่มลงตารางเปรียบเทียบ"
                           >
                             <Scale className="h-4 w-4" />

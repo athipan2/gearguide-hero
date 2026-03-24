@@ -10,6 +10,7 @@ interface Product {
   weight?: string;
   drop?: string;
   slug?: string;
+  badge?: string;
   specs?: { label: string; value: string }[];
   aspectRatings?: { label: string; score: number }[];
 }
