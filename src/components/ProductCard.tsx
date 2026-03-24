@@ -4,6 +4,7 @@ import { ExternalLink, ThumbsUp, ThumbsDown, Plus } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useComparisonStore } from "@/lib/comparison-store";
 import { toast } from "sonner";
+import { getOptimizedImageUrl } from "@/lib/utils";
 
 interface ProductCardProps {
   name: string;
@@ -37,7 +38,12 @@ export function ProductCard({ name, brand, image, rating, price, badge, pros, co
     <div className="group bg-card rounded-2xl md:rounded-3xl border border-neutral-200 overflow-hidden shadow-sm hover:shadow-md transition-all duration-200">
       {/* Image */}
       <div className="relative aspect-[4/3] bg-muted overflow-hidden">
-        <img src={image} alt={name} className="w-full h-full object-cover" loading="lazy" />
+        <img
+          src={getOptimizedImageUrl(image, 'card')}
+          alt={name}
+          className="w-full h-full object-cover"
+          loading="lazy"
+        />
 
         <div className="absolute top-3 left-3 flex flex-col gap-2">
           {isNew && (

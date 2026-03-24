@@ -6,7 +6,7 @@ import {
   Ruler, Weight, Star, LucideIcon, Plus
 } from "lucide-react";
 import { useComparisonStore } from "@/lib/comparison-store";
-import { cn } from "@/lib/utils";
+import { cn, getOptimizedImageUrl } from "@/lib/utils";
 import { Link } from "react-router-dom";
 
 const getSpecIcon = (label: string) => {
@@ -158,7 +158,7 @@ export function ComparisonTable() {
             <div>
               <div className="relative mb-3 md:mb-4">
                 <img
-                  src={item1.image}
+                  src={getOptimizedImageUrl(item1.image, 'card')}
                   alt={item1.name}
                   className="w-full aspect-[4/3] object-cover rounded-xl md:rounded-2xl shadow-inner group-hover:scale-105 transition-transform duration-500"
                 />
@@ -197,7 +197,7 @@ export function ComparisonTable() {
               <div>
                 <div className="relative mb-3 md:mb-4">
                   <img
-                    src={item2.image}
+                    src={getOptimizedImageUrl(item2.image, 'card')}
                     alt={item2.name}
                     className="w-full aspect-[4/3] object-cover rounded-xl md:rounded-2xl shadow-inner group-hover:scale-105 transition-transform duration-500"
                   />

@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { CommentSection } from "@/components/CommentSection";
 import { Button } from "@/components/ui/button";
 import { Loader2, ArrowLeft, Calendar, User } from "lucide-react";
+import { getOptimizedImageUrl } from "@/lib/utils";
 
 interface Article {
   id: string;
@@ -154,7 +155,7 @@ export default function ArticleDetail() {
         {article.image_url && (
           <div className="rounded-2xl md:rounded-[2rem] overflow-hidden mb-8 md:mb-16 aspect-[16/9] md:aspect-[21/9] shadow-2xl relative">
             <img
-              src={article.image_url}
+              src={getOptimizedImageUrl(article.image_url, 'hero')}
               alt={article.title}
               className="w-full h-full object-cover"
             />
