@@ -24,7 +24,7 @@ export interface ReviewSectionData {
   body?: string;
   items?: string[] | SpecItem[];
   type: SectionType;
-  props?: Record<string, any>;
+  props?: Record<string, unknown>;
 }
 
 export interface ReviewData {
