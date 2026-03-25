@@ -3,10 +3,14 @@ export type SectionType =
   | 'specs'
   | 'pros_cons'
   | 'who_is_this_for'
+  | 'quick_decision'
+  | 'score_breakdown'
   | 'gallery'
   | 'comparison'
   | 'verdict'
-  | 'content';
+  | 'content'
+  | 'deep_dive'
+  | 'real_world_test';
 
 export interface SpecItem {
   label: string;
@@ -47,4 +51,12 @@ export interface ReviewData {
   sections: ReviewSectionData[];
   affiliate_url: string | null;
   cta_text: string | null;
+  // New fields for high-detail refactor
+  shopee_url?: string | null;
+  lazada_url?: string | null;
+  test_conditions?: {
+    terrain: string;
+    weather: string;
+    distance: string;
+  };
 }

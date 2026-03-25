@@ -1,56 +1,117 @@
-import { Zap, ExternalLink } from "lucide-react";
+import { ReviewData } from "@/types/review";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import { ShoppingBag, ExternalLink, Award, ChevronRight } from "lucide-react";
 
 interface ReviewVerdictProps {
   verdict: string;
-  affiliateUrl?: string | null;
+  affiliateUrl: string | null;
   ctaText?: string | null;
+  review?: ReviewData;
 }
 
-export const ReviewVerdict = ({ verdict, affiliateUrl, ctaText = "ดูราคาล่าสุด" }: ReviewVerdictProps) => {
+export const ReviewVerdict = ({ verdict, affiliateUrl, ctaText, review }: ReviewVerdictProps) => {
   return (
-    <div className="bg-primary rounded-3xl md:rounded-[2.5rem] p-6 md:p-16 shadow-[0_30px_60px_-15px_rgba(10,26,10,0.5)] relative overflow-hidden group border border-white/5">
-      <div className="absolute top-0 right-0 w-[40rem] h-[40rem] bg-accent/10 blur-[120px] -translate-y-1/2 translate-x-1/2 pointer-events-none" />
-      <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-[0.05] pointer-events-none" />
+    <section className="bg-primary p-6 md:p-12 rounded-none md:rounded-[2.5rem] text-white space-y-8 md:space-y-12 overflow-hidden relative group">
+      {/* Decorative Blur BG */}
+      <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-accent/20 blur-[100px] rounded-full -mr-64 -mt-64 group-hover:scale-110 transition-transform duration-[2000ms]" />
+      <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-emerald-500/10 blur-[80px] rounded-full -ml-48 -mb-48" />
 
-      <div className="relative z-10 max-w-5xl mx-auto text-center">
-        <div className="inline-flex items-center gap-2 px-6 py-3 bg-white/5 backdrop-blur-2xl border border-white/10 text-white rounded-full text-xs font-bold uppercase tracking-[0.4em] mb-12 md:mb-16">
-          <Zap className="h-4 w-4 fill-accent text-accent animate-pulse" />
-          THE ULTIMATE VERDICT
+      <div className="relative z-10 space-y-4">
+        <h2 className="font-heading text-2xl md:text-4xl font-bold uppercase tracking-tighter italic-prohibited flex items-center gap-3 md:gap-4">
+          <span className="h-10 md:h-12 w-3 bg-accent rounded-full shadow-lg shadow-accent/20" />
+          The Final Verdict
+        </h2>
+        <p className="text-white/60 text-sm md:text-lg font-medium max-w-xl">
+          สรุปส่งท้ายจากทีมงาน GearTrail เพื่อช่วยคุณตัดสินใจก้าวสุดท้าย
+        </p>
+      </div>
+
+      <div className="relative z-10 grid md:grid-cols-[1fr_400px] gap-8 md:gap-16 items-start">
+        <div className="space-y-8">
+          <p className="text-xl md:text-3xl font-medium leading-relaxed md:leading-[1.4] text-white">
+            "{verdict}"
+          </p>
+
+          <div className="flex flex-wrap gap-4 md:gap-8">
+             <div className="flex flex-col">
+              <span className="text-4xl md:text-6xl font-heading font-bold text-accent tracking-tighter italic-prohibited">{review?.overall_rating.toFixed(1)}</span>
+              <span className="text-[10px] md:text-xs font-bold text-white/40 uppercase tracking-[0.3em] mt-1">Overall Rating</span>
+             </div>
+             <div className="h-16 w-px bg-white/10 hidden sm:block" />
+             <div className="flex flex-col">
+              <span className="text-4xl md:text-6xl font-heading font-bold text-white tracking-tighter italic-prohibited">{review?.price}</span>
+              <span className="text-[10px] md:text-xs font-bold text-white/40 uppercase tracking-[0.3em] mt-1">Target Price</span>
+             </div>
+          </div>
         </div>
 
-        <h2 className="font-heading text-3xl md:text-5xl font-bold text-white mb-10 md:mb-16 leading-[1.1] tracking-tighter">
-          "{verdict}"
-        </h2>
+        <div className="bg-white/5 backdrop-blur-md border border-white/10 p-8 md:p-12 rounded-[2rem] md:rounded-[3rem] space-y-8">
+          <div className="space-y-2">
+            <div className="flex items-center gap-2">
+              <Award className="h-5 w-5 text-accent" />
+              <span className="text-xs md:text-sm font-bold text-accent uppercase tracking-widest leading-none">GearTrail Choice</span>
+            </div>
+            <h3 className="font-heading text-xl md:text-2xl font-bold text-white uppercase tracking-tight italic-prohibited">Grab Your Pair Now</h3>
+          </div>
 
-        <div className="flex flex-col md:flex-row items-center justify-center gap-8">
-          <Button
-            variant="hero"
-            size="lg"
-            className="h-12 md:h-16 px-10 md:px-16 rounded-full text-base md:text-xl w-full md:w-auto shadow-2xl shadow-accent/40 bg-accent text-white border-none hover:scale-105 active:scale-95 transition-all duration-500"
-            asChild={!!affiliateUrl}
-          >
-            {affiliateUrl ? (
-              <a href={affiliateUrl} target="_blank" rel="noopener noreferrer nofollow" className="flex items-center gap-2">
-                {ctaText}
-                <ExternalLink className="h-5 w-5" />
-              </a>
-            ) : (
-              <div className="flex items-center gap-2">
-                {ctaText}
-                <ExternalLink className="h-5 w-5" />
-              </div>
+          <div className="flex flex-col gap-4">
+            {review?.shopee_url && (
+              <Button
+                variant="hero"
+                size="lg"
+                className="h-14 md:h-16 rounded-2xl bg-[#EE4D2D] hover:bg-[#EE4D2D]/90 text-white border-none text-lg font-bold shadow-2xl shadow-[#EE4D2D]/30"
+                asChild
+              >
+                <a href={review.shopee_url} target="_blank" rel="noopener noreferrer nofollow">
+                  <ShoppingBag className="w-5 h-5 mr-3" />
+                  CHECK ON SHOPEE
+                  <ChevronRight className="w-5 h-5 ml-auto" />
+                </a>
+              </Button>
             )}
-          </Button>
 
-          <div className="flex items-center gap-5 text-white/40 text-xs font-bold uppercase tracking-[0.3em]">
-            <div className="h-px w-10 bg-white/10" />
-            GearTrail Certified
-            <div className="h-px w-10 bg-white/10" />
+            {review?.lazada_url && (
+              <Button
+                variant="outline"
+                size="lg"
+                className="h-14 md:h-16 rounded-2xl border-2 border-white/20 hover:bg-white/5 text-white text-lg font-bold"
+                asChild
+              >
+                <a href={review.lazada_url} target="_blank" rel="noopener noreferrer nofollow">
+                  CHECK ON LAZADA
+                  <ExternalLink className="w-5 h-5 ml-3" />
+                  <ChevronRight className="w-5 h-5 ml-auto opacity-40" />
+                </a>
+              </Button>
+            )}
+
+            {!review?.shopee_url && !review?.lazada_url && affiliateUrl && (
+              <Button
+                variant="hero"
+                size="lg"
+                className="h-14 md:h-16 rounded-2xl bg-accent hover:bg-accent/90 text-white border-none text-lg font-bold shadow-2xl shadow-accent/30"
+                asChild
+              >
+                <a href={affiliateUrl} target="_blank" rel="noopener noreferrer nofollow">
+                  {ctaText || "BUY NOW"}
+                  <ExternalLink className="w-5 h-5 ml-3" />
+                  <ChevronRight className="w-5 h-5 ml-auto" />
+                </a>
+              </Button>
+            )}
+          </div>
+
+          <div className="flex items-center gap-2 text-[10px] md:text-xs font-bold text-white/40 uppercase tracking-widest justify-center">
+            <Check className="w-4 h-4 text-emerald-500" /> อัปเดตราคาล่าสุดวันนี้
           </div>
         </div>
       </div>
-    </div>
+    </section>
   );
 };
+
+const Check = ({ className }: { className?: string }) => (
+  <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+  </svg>
+);
