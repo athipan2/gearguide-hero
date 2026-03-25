@@ -163,8 +163,12 @@ export default function AdminReviewForm() {
 
       updateField("image_url", publicUrl);
       toast({ title: "อัปโหลดรูปหน้าปกสำเร็จ" });
-    } catch (error: any) {
-      toast({ title: "อัปโหลดรูปหน้าปกไม่สำเร็จ", description: error.message, variant: "destructive" });
+    } catch (error) {
+      toast({
+        title: "อัปโหลดรูปหน้าปกไม่สำเร็จ",
+        description: error instanceof Error ? error.message : "เกิดข้อผิดพลาดไม่ทราบสาเหตุ",
+        variant: "destructive"
+      });
     } finally {
       setUploadingCover(false);
     }
@@ -201,8 +205,12 @@ export default function AdminReviewForm() {
 
       setImages(prev => [...prev, ...newUrls]);
       toast({ title: `อัปโหลด ${newUrls.length} รูปสำเร็จ` });
-    } catch (error: any) {
-      toast({ title: "เกิดข้อผิดพลาดในการอัปโหลด", description: error.message, variant: "destructive" });
+    } catch (error) {
+      toast({
+        title: "เกิดข้อผิดพลาดในการอัปโหลด",
+        description: error instanceof Error ? error.message : "เกิดข้อผิดพลาดไม่ทราบสาเหตุ",
+        variant: "destructive"
+      });
     } finally {
       setUploadingGallery(false);
     }
