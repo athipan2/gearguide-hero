@@ -9,9 +9,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
-import { Save, ArrowLeft, Plus, X, MoveUp, MoveDown } from "lucide-react";
+import { Save, ArrowLeft, Plus, X, MoveUp, MoveDown, Upload, Image as ImageIcon, Loader2 } from "lucide-react";
 import { ReviewSectionData, SpecItem, ReviewRating, SectionType } from "@/types/review";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { resizeImage, IMAGE_VARIANTS } from "@/lib/image-utils";
+import { getOptimizedImageUrl } from "@/lib/utils";
 
 const defaultForm = {
   name: "", brand: "", category: "", price: "", slug: "",
@@ -46,6 +48,8 @@ export default function AdminReviewForm() {
   const [sections, setSections] = useState<ReviewSectionData[]>([]);
   const [images, setImages] = useState<string[]>([]);
   const [saving, setSaving] = useState(false);
+  const [uploadingCover, setUploadingCover] = useState(false);
+  const [uploadingGallery, setUploadingGallery] = useState(false);
 
   useEffect(() => {
     if (isEdit) {
@@ -134,6 +138,84 @@ export default function AdminReviewForm() {
     });
   };
 
+  const handleCoverUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !user) return;
+
+    setUploadingCover(true);
+    try {
+      // 1. Resize image
+      const resizedBlob = await resizeImage(file, IMAGE_VARIANTS.hero);
+
+      // 2. Upload to Supabase
+      const ext = file.name.split(".").pop();
+      const path = `reviews/${Date.now()}-cover.${ext}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from("review-media")
+        .upload(path, resizedBlob, { contentType: 'image/jpeg' });
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from("review-media")
+        .getPublicUrl(path);
+
+      updateField("image_url", publicUrl);
+      toast({ title: "อัปโหลดรูปหน้าปกสำเร็จ" });
+    } catch (error) {
+      toast({
+        title: "อัปโหลดรูปหน้าปกไม่สำเร็จ",
+        description: error instanceof Error ? error.message : "เกิดข้อผิดพลาดไม่ทราบสาเหตุ",
+        variant: "destructive"
+      });
+    } finally {
+      setUploadingCover(false);
+    }
+  };
+
+  const handleGalleryUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files?.length || !user) return;
+
+    setUploadingGallery(true);
+    const newUrls: string[] = [];
+
+    try {
+      for (const file of Array.from(files)) {
+        const resizedBlob = await resizeImage(file, IMAGE_VARIANTS.hero);
+        const ext = file.name.split(".").pop();
+        const path = `reviews/${Date.now()}-gallery-${Math.random().toString(36).slice(2)}.${ext}`;
+
+        const { error: uploadError } = await supabase.storage
+          .from("review-media")
+          .upload(path, resizedBlob, { contentType: 'image/jpeg' });
+
+        if (uploadError) {
+          toast({ title: `อัปโหลด ${file.name} ไม่สำเร็จ`, variant: "destructive" });
+          continue;
+        }
+
+        const { data: { publicUrl } } = supabase.storage
+          .from("review-media")
+          .getPublicUrl(path);
+
+        newUrls.push(publicUrl);
+      }
+
+      setImages(prev => [...prev, ...newUrls]);
+      toast({ title: `อัปโหลด ${newUrls.length} รูปสำเร็จ` });
+    } catch (error) {
+      toast({
+        title: "เกิดข้อผิดพลาดในการอัปโหลด",
+        description: error instanceof Error ? error.message : "เกิดข้อผิดพลาดไม่ทราบสาเหตุ",
+        variant: "destructive"
+      });
+    } finally {
+      setUploadingGallery(false);
+    }
+  };
+
   const moveSection = (index: number, direction: 'up' | 'down') => {
     const newSections = [...sections];
     const targetIndex = direction === 'up' ? index - 1 : index + 1;
@@ -156,6 +238,95 @@ export default function AdminReviewForm() {
 
       <div className="grid lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-6">
+          {/* Media Info */}
+          <div className="bg-card border rounded-xl p-5 space-y-4">
+            <h2 className="font-heading font-semibold text-foreground">สื่อบันทึก (Images)</h2>
+            <div className="grid sm:grid-cols-2 gap-6">
+              {/* Cover Image */}
+              <div className="space-y-3">
+                <Label>รูปหน้าปก (Cover Image) *</Label>
+                {form.image_url ? (
+                  <div className="relative aspect-[4/3] rounded-lg overflow-hidden border bg-muted">
+                    <img
+                      src={getOptimizedImageUrl(form.image_url, 'card')}
+                      alt="Cover preview"
+                      className="w-full h-full object-cover"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => updateField("image_url", "")}
+                      className="absolute top-2 right-2 p-1.5 bg-black/60 text-white rounded-full hover:bg-black/80 transition-colors"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                  </div>
+                ) : (
+                  <label className="flex flex-col items-center justify-center aspect-[4/3] rounded-lg border-2 border-dashed border-muted-foreground/25 hover:border-primary/50 hover:bg-primary/5 cursor-pointer transition-all">
+                    {uploadingCover ? (
+                      <Loader2 className="h-8 w-8 text-primary animate-spin" />
+                    ) : (
+                      <>
+                        <Upload className="h-8 w-8 text-muted-foreground mb-2" />
+                        <span className="text-xs text-muted-foreground text-center px-4">
+                          คลิกเพื่ออัปโหลดรูปหน้าปก<br />(ขนาดแนะนำ 1200x800)
+                        </span>
+                      </>
+                    )}
+                    <input
+                      type="file"
+                      className="hidden"
+                      accept="image/*"
+                      onChange={handleCoverUpload}
+                      disabled={uploadingCover}
+                    />
+                  </label>
+                )}
+              </div>
+
+              {/* Gallery Images */}
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <Label>แกลเลอรี (Gallery)</Label>
+                  <span className="text-[10px] text-muted-foreground">{images.length} รูป</span>
+                </div>
+
+                <div className="grid grid-cols-3 gap-2">
+                  {images.map((url, i) => (
+                    <div key={i} className="relative aspect-square rounded-md overflow-hidden border bg-muted group">
+                      <img
+                        src={getOptimizedImageUrl(url, 'thumbnail')}
+                        className="w-full h-full object-cover"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setImages(images.filter((_, idx) => idx !== i))}
+                        className="absolute top-1 right-1 p-1 bg-black/60 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    </div>
+                  ))}
+
+                  <label className="flex flex-col items-center justify-center aspect-square rounded-md border-2 border-dashed border-muted-foreground/25 hover:border-primary/50 hover:bg-primary/5 cursor-pointer transition-all">
+                    {uploadingGallery ? (
+                      <Loader2 className="h-5 w-5 text-primary animate-spin" />
+                    ) : (
+                      <Plus className="h-5 w-5 text-muted-foreground" />
+                    )}
+                    <input
+                      type="file"
+                      className="hidden"
+                      multiple
+                      accept="image/*"
+                      onChange={handleGalleryUpload}
+                      disabled={uploadingGallery}
+                    />
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+
           {/* Basic info */}
           <div className="bg-card border rounded-xl p-5 space-y-4">
             <h2 className="font-heading font-semibold text-foreground">ข้อมูลพื้นฐาน</h2>
