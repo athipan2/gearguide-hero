@@ -1,25 +1,7 @@
 import { ReviewData } from "@/types/review";
-import { ImageGallery } from "@/components/ImageGallery";
-import { ScoreGauge } from "@/components/ScoreGauge";
 import { RatingStars } from "@/components/RatingStars";
-import { Award, Share2, Zap, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
-import { toast } from "sonner";
-import { useMemo } from "react";
-
-const badgeColors: Record<string, string> = {
-  "แนะนำ": "bg-emerald-500 text-white",
-  "คุ้มค่าที่สุด": "bg-orange-500 text-white",
-  "Top Pick": "bg-primary text-white",
-};
-
-const microcopyOptions = [
-  "🔥 ราคาดีสุดวันนี้",
-  "⚡ อัปเดตราคาล่าสุด",
-  "🏷️ เช็คโปรโมชั่นตอนนี้",
-  "✨ การันตีของแท้ 100%"
-];
+import { ShoppingBag, ExternalLink, ChevronRight, Share2, Heart } from "lucide-react";
 
 interface ReviewHeroProps {
   review: ReviewData;
@@ -27,136 +9,145 @@ interface ReviewHeroProps {
 }
 
 export const ReviewHero = ({ review, userRating }: ReviewHeroProps) => {
-  const stabilizedMicrocopy = useMemo(() => {
-    return microcopyOptions[Math.floor(Math.random() * microcopyOptions.length)];
-  }, []);
-
-  const ctaText = review.cta_text || "ดูราคาล่าสุด";
-  const ctaProps = review.affiliate_url
-    ? { href: review.affiliate_url, target: "_blank", rel: "noopener noreferrer nofollow" }
-    : {};
-
-  const CTAButton = ({ className, isSticky = false }: { className?: string, isSticky?: boolean }) => (
-    <div className="flex flex-col gap-2 w-full">
-      <Button
-        variant="hero"
-        size="lg"
-        className={cn(
-          className,
-          "group relative overflow-hidden transition-all active:scale-95 py-4 md:py-6",
-          isSticky && "bg-accent hover:bg-accent/90 border-none shadow-accent/20"
-        )}
-        asChild={!!review.affiliate_url}
-      >
-        {review.affiliate_url ? (
-          <a {...ctaProps} className="flex items-center gap-2">
-            <span className="relative z-10 flex items-center gap-2 text-sm md:text-base">
-              {ctaText}
-              <ExternalLink className="h-5 w-5 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
-            </span>
-          </a>
-        ) : (
-          <div className="flex items-center gap-2 text-sm md:text-base">
-            {ctaText}
-            <ExternalLink className="h-5 w-5" />
-          </div>
-        )}
-      </Button>
-      {!isSticky && (
-        <div className="flex flex-col items-center gap-1">
-          <p className="text-xs text-center font-bold uppercase tracking-[0.2em] text-accent animate-pulse">
-            {stabilizedMicrocopy}
-          </p>
-          <span className="text-xs text-slate-400 font-bold uppercase tracking-widest">อัปเดตราคาล่าสุดวันนี้ • มีรีวิวจริง</span>
-        </div>
-      )}
-    </div>
-  );
-
   return (
-    <div className="grid grid-cols-1 md:grid-cols-[60%_40%] gap-8 md:gap-12 mb-16 md:mb-24 items-start">
-      <div className="relative md:sticky md:top-24 p-0">
-        <ImageGallery
-          mainImage={review.image_url || ""}
-          images={review.images}
+    <section className="relative w-full overflow-hidden bg-white">
+      {/* Hero Image Container */}
+      <div className="relative w-full h-[60vh] md:h-[70vh] lg:h-[80vh] overflow-hidden bg-slate-900">
+        <img
+          src={review.image_url || ""}
           alt={review.name}
-          badge={review.badge}
-          badgeClassName={badgeColors[review.badge || ""] || "bg-primary text-white"}
-          badgeIcon={<Award className="h-4 w-4" />}
-          isCompact={true}
+          className="w-full h-full object-cover opacity-90"
+          loading="eager"
+          // @ts-expect-error adding fetchPriority for performance
+          fetchPriority="high"
         />
-        <div className="hidden md:block absolute -bottom-10 -right-10 w-44 h-44 z-20 hover:scale-110 transition-transform duration-500">
-          <ScoreGauge
-            score={review.overall_rating}
-            className="bg-white rounded-full p-2 shadow-2xl border-4 border-[var(--background)]"
-            strokeWidth={12}
-          />
+        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
+
+        {/* Floating Badges */}
+        <div className="absolute top-6 left-6 flex flex-col gap-3 z-20">
+          {review.badge && (
+            <div className="bg-accent text-white px-4 py-2 rounded-xl text-xs md:text-sm font-bold uppercase tracking-[0.2em] shadow-2xl animate-in fade-in slide-in-from-left duration-700">
+              {review.badge}
+            </div>
+          )}
+          <div className="bg-white/10 backdrop-blur-md text-white px-4 py-2 rounded-xl text-[10px] md:text-xs font-bold uppercase tracking-[0.2em] border border-white/20">
+            TESTED 2026
+          </div>
+        </div>
+
+        {/* Action Buttons (Mobile Overlay) */}
+        <div className="absolute top-6 right-6 flex gap-3 z-20">
+          <button className="h-12 w-12 rounded-full bg-black/20 backdrop-blur-md border border-white/20 flex items-center justify-center text-white hover:bg-white hover:text-black transition-all">
+            <Heart className="h-5 w-5" />
+          </button>
+          <button className="h-12 w-12 rounded-full bg-black/20 backdrop-blur-md border border-white/20 flex items-center justify-center text-white hover:bg-white hover:text-black transition-all">
+            <Share2 className="h-5 w-5" />
+          </button>
+        </div>
+
+        {/* Hero Text Overlay (Mobile & Desktop) */}
+        <div className="absolute bottom-0 left-0 right-0 p-6 md:p-12 lg:p-20 z-20 max-w-[1400px] mx-auto w-full">
+          <div className="max-w-4xl space-y-6 md:space-y-8">
+            <div className="space-y-3 md:space-y-4">
+              <div className="flex items-center gap-3">
+                <span className="w-10 h-1 bg-accent rounded-full" />
+                <span className="text-xs md:text-base font-bold text-accent uppercase tracking-[0.3em]">{review.brand}</span>
+              </div>
+              <h1 className="font-heading text-5xl md:text-7xl lg:text-9xl font-bold text-white leading-none tracking-tighter italic-prohibited drop-shadow-2xl">
+                {review.name}
+              </h1>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-8 md:gap-12">
+              <div className="flex flex-col">
+                <div className="flex items-center gap-3">
+                  <RatingStars rating={review.overall_rating} />
+                  <span className="text-2xl md:text-3xl font-bold text-white tracking-tighter">{review.overall_rating.toFixed(1)}</span>
+                </div>
+                <span className="text-[10px] md:text-xs font-bold text-white/60 uppercase tracking-[0.2em] mt-2">
+                  {userRating ? `From ${userRating.count} user reviews` : "Expert Performance Rating"}
+                </span>
+              </div>
+
+              <div className="h-12 w-px bg-white/20 hidden sm:block" />
+
+              <div className="flex flex-col">
+                <div className="flex items-baseline gap-2">
+                   <span className="text-3xl md:text-5xl font-heading font-bold text-accent tracking-tighter italic-prohibited">{review.price}</span>
+                   <span className="text-xs md:text-sm font-bold text-white/40 line-through">฿9,900</span>
+                </div>
+                <span className="text-[10px] md:text-xs font-bold text-emerald-400 uppercase tracking-[0.2em] mt-2 flex items-center gap-2">
+                  <div className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                  Lowest Price Found Today
+                </span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
-      <div className="flex flex-col space-y-8 md:space-y-12">
-        <div className="space-y-6 md:space-y-8">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <span className="h-px w-8 bg-accent" />
-              <p className="text-xs md:text-sm font-bold text-accent uppercase tracking-[0.3em]">{review.brand} • {review.category}</p>
+      {/* Intro Section - Below Hero Image */}
+      <div className="px-6 py-12 md:px-12 md:py-20 lg:px-20 max-w-[1400px] mx-auto border-b border-slate-100">
+        <div className="grid lg:grid-cols-[1fr_400px] gap-12 md:gap-20 items-start">
+          <div className="space-y-8 md:space-y-12">
+            <p className="text-2xl md:text-4xl lg:text-5xl font-medium leading-[1.3] text-primary tracking-tight md:max-w-3xl">
+              {review.intro}
+            </p>
+
+            <div className="flex flex-col sm:flex-row gap-4 pt-4">
+              {review.shopee_url && (
+                <Button
+                  variant="hero"
+                  size="lg"
+                  className="h-16 px-10 rounded-2xl bg-[#EE4D2D] hover:bg-[#EE4D2D]/90 text-white border-none text-xl font-bold shadow-2xl shadow-[#EE4D2D]/30 flex-1 md:flex-none transform hover:scale-[1.02] transition-all"
+                  asChild
+                >
+                  <a href={review.shopee_url} target="_blank" rel="noopener noreferrer nofollow">
+                    <ShoppingBag className="w-6 h-6 mr-3" />
+                    CHECK ON SHOPEE
+                    <ChevronRight className="w-6 h-6 ml-3" />
+                  </a>
+                </Button>
+              )}
+
+              {review.lazada_url && (
+                <Button
+                  variant="outline"
+                  size="lg"
+                  className="h-16 px-10 rounded-2xl border-2 border-[#000083] text-[#000083] hover:bg-[#000083]/5 text-xl font-bold flex-1 md:flex-none"
+                  asChild
+                >
+                  <a href={review.lazada_url} target="_blank" rel="noopener noreferrer nofollow">
+                    CHECK ON LAZADA
+                    <ExternalLink className="w-6 h-6 ml-3" />
+                  </a>
+                </Button>
+              )}
             </div>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-9 w-9 rounded-full bg-white/50 backdrop-blur-sm border border-primary/5 shadow-sm hover:bg-white transition-all"
-              onClick={() => {
-                if (navigator.share) {
-                  navigator.share({ title: review.name, text: review.intro || "", url: window.location.href }).catch(() => {});
-                } else {
-                  navigator.clipboard.writeText(window.location.href);
-                  toast.success("คัดลอกลิงก์แล้ว");
-                }
-              }}
+          </div>
+
+          <div className="hidden lg:block bg-slate-50 rounded-[2.5rem] p-10 space-y-8 border border-slate-100">
+            <h3 className="font-heading font-bold text-primary text-xs uppercase tracking-[0.3em] flex items-center gap-3">
+              <div className="w-2 h-4 bg-accent rounded-full" />
+              Quick Specs
+            </h3>
+            <div className="space-y-6">
+              {review.specs.slice(0, 4).map((spec, i) => (
+                <div key={i} className="flex justify-between items-center border-b border-slate-200 pb-4 last:border-none">
+                  <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">{spec.label}</span>
+                  <span className="text-sm font-bold text-primary">{spec.value}</span>
+                </div>
+              ))}
+            </div>
+            <button
+              onClick={() => document.getElementById('specs')?.scrollIntoView({ behavior: 'smooth' })}
+              className="w-full py-4 text-xs font-bold text-accent uppercase tracking-[0.2em] hover:text-primary transition-colors flex items-center justify-center gap-2 border-t border-slate-200 pt-8"
             >
-              <Share2 className="w-4 h-4 text-primary" />
-            </Button>
-          </div>
-
-          <h1 className="font-heading text-5xl md:text-6xl font-bold text-primary leading-[1] tracking-tighter uppercase break-words">
-            {review.name}
-          </h1>
-
-          <div className="grid grid-cols-1 gap-8 pt-4">
-            <div className="bg-white rounded-[2rem] p-8 border border-primary/5 shadow-xl shadow-primary/5 space-y-12">
-              <div className="flex items-center justify-between border-b border-slate-100 pb-5">
-                <div className="flex flex-col">
-                  <span className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">SCORE GAUGE</span>
-                  <div className="flex items-center gap-2">
-                    <span className="text-4xl font-heading font-bold text-primary">{review.overall_rating}</span>
-                    <div className="flex flex-col">
-                      <RatingStars rating={review.overall_rating} />
-                      <span className="text-xs font-bold text-primary/40 uppercase mt-0.5">({userRating?.count || 120} USERS)</span>
-                    </div>
-                  </div>
-                </div>
-                <div className="h-12 w-px bg-slate-100" />
-                <div className="flex flex-col items-end">
-                  <span className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">EST. PRICE</span>
-                  <span className="text-3xl font-heading font-bold text-primary tracking-tighter italic-prohibited">{review.price}</span>
-                </div>
-              </div>
-
-              <div className="space-y-6">
-                <div className="flex items-start gap-3">
-                  <div className="mt-1 h-5 w-5 rounded-full bg-accent/10 flex items-center justify-center shrink-0">
-                    <Zap className="h-3 w-3 text-accent fill-accent" />
-                  </div>
-                  <p className="text-sm md:text-base font-bold text-slate-700 leading-snug">
-                    บทสรุป: <span className="font-medium text-slate-600">{review.verdict?.slice(0, 100)}...</span>
-                  </p>
-                </div>
-                <CTAButton className="h-14 rounded-2xl shadow-xl shadow-accent/20 bg-accent text-white border-none active:scale-95 transition-all text-base" />
-              </div>
-            </div>
+              See all specifications <ChevronRight className="h-4 w-4" />
+            </button>
           </div>
         </div>
       </div>
-    </div>
+    </section>
   );
 };
