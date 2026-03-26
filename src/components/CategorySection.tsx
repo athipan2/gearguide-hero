@@ -29,23 +29,23 @@ export function CategorySection() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
           {categories.map((cat) => (
             <Link
               key={cat.title}
               to={`/category/${encodeURIComponent(cat.slug)}`}
-              className="group relative bg-card rounded-2xl border-2 border-transparent p-8 hover-card-sporty hover:border-primary/10 overflow-hidden"
+              className="group relative bg-card rounded-2xl border-2 border-transparent p-5 md:p-8 hover-card-sporty hover:border-primary/10 overflow-hidden"
             >
               <div className="absolute top-0 right-0 w-24 h-24 bg-primary/5 -mr-8 -mt-8 rounded-full group-hover:scale-150 transition-transform duration-500" />
 
-              <div className={`w-16 h-16 rounded-2xl flex items-center justify-center mb-6 ${cat.color} transition-all duration-500 group-hover:scale-110 group-hover:rotate-[10deg] shadow-lg`}>
-                <cat.icon className="h-8 w-8" />
+              <div className={`w-12 h-12 md:w-16 md:h-16 rounded-xl md:rounded-2xl flex items-center justify-center mb-4 md:mb-6 ${cat.color} transition-all duration-500 group-hover:scale-110 group-hover:rotate-[10deg] shadow-lg`}>
+                <cat.icon className="h-6 w-6 md:h-8 md:w-8" />
               </div>
 
-              <h3 className="font-heading font-semibold text-lg md:text-xl text-card-foreground uppercase tracking-tight-compact">{cat.title}</h3>
-              <div className="flex items-center gap-2 mt-2">
-                <span className="text-[10px] md:text-xs font-bold text-muted-foreground/60 tracking-sporty uppercase">{cat.count} ARTICLES</span>
-                <div className="flex-1 h-px bg-muted" />
+              <h3 className="font-heading font-semibold text-sm md:text-xl text-card-foreground uppercase tracking-tight-compact leading-tight mb-1">{cat.title}</h3>
+              <div className="flex items-center gap-2 mt-1 md:mt-2">
+                <span className="text-[8px] md:text-xs font-bold text-muted-foreground/60 tracking-sporty uppercase whitespace-nowrap">{cat.count} ARTICLES</span>
+                <div className="flex-1 h-px bg-muted hidden sm:block" />
               </div>
 
               {/* Decorative technical corner */}
