@@ -1,8 +1,9 @@
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "@/hooks/useTranslation";
+import { TranslationKeys } from "@/lib/translations";
 
 interface FilterOption {
-  labelKey: string;
+  labelKey: TranslationKeys | "";
   value: string;
   staticLabel?: string;
 }
@@ -37,7 +38,7 @@ export function FastFilters() {
               size="sm"
               className="rounded-full px-5 whitespace-nowrap"
             >
-              {opt.labelKey ? t(opt.labelKey as any) : opt.staticLabel}
+              {opt.labelKey ? t(opt.labelKey) : opt.staticLabel}
             </Button>
           ))}
         </div>
@@ -53,7 +54,7 @@ export function FastFilters() {
               size="sm"
               className="rounded-full px-5 whitespace-nowrap"
             >
-              {t(opt.labelKey as any)}
+              {opt.labelKey ? t(opt.labelKey) : ""}
             </Button>
           ))}
         </div>

@@ -5,6 +5,7 @@ import { Footer } from "@/components/Footer";
 import { SEOHead } from "@/components/SEOHead";
 import { ProductCard } from "@/components/ProductCard";
 import { useTranslation } from "@/hooks/useTranslation";
+import { TranslationKeys } from "@/lib/translations";
 import { supabase } from "@/integrations/supabase/client";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
@@ -113,7 +114,7 @@ function FilterContent({
   );
 }
 
-const CATEGORY_META: Record<string, { label: string; description: string }> = {
+const CATEGORY_META: Record<string, { label: TranslationKeys; description: TranslationKeys }> = {
   "รองเท้าวิ่งถนน": { label: "nav.shoes", description: "category.road_desc" },
   "อุปกรณ์วิ่งเทรล": { label: "nav.gear", description: "category.trail_desc" },
   "camping-gear": { label: "nav.camping", description: "category.camping_desc" },
@@ -124,13 +125,18 @@ type SortOption = "newest" | "rating-desc" | "price-asc" | "price-desc";
 
 interface ReviewItem {
   name: string;
+  name_en?: string;
   brand: string;
   image_url: string | null;
   overall_rating: number;
   price: string;
+  price_en?: string;
   badge: string | null;
+  badge_en?: string;
   pros: unknown;
+  pros_en?: unknown;
   cons: unknown;
+  cons_en?: unknown;
   specs: unknown;
   ratings?: { label: string; score: number }[];
   slug: string;
@@ -325,8 +331,8 @@ export default function CategoryPage() {
   }, [reviews, searchQuery, selectedBrands, priceRange, sortBy, minRating]);
 
   const meta = category ? CATEGORY_META[decodeURIComponent(category)] : null;
-  const pageTitle = meta ? t(meta.label as any) : t("common.all_products");
-  const pageDescription = meta ? t(meta.description as any) : (isEn ? "Reviews of all products, real tests, latest updates" : "รีวิวสินค้าทั้งหมด ทดสอบจริง อัปเดตล่าสุด");
+  const pageTitle = meta ? t(meta.label) : t("common.all_products");
+  const pageDescription = meta ? t(meta.description) : (isEn ? "Reviews of all products, real tests, latest updates" : "รีวิวสินค้าทั้งหมด ทดสอบจริง อัปเดตล่าสุด");
 
   return (
     <div className="min-h-screen bg-background">
@@ -448,7 +454,7 @@ export default function CategoryPage() {
                   {t("common.showing").replace("{count}", filtered.length.toString())}
                 </p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-                  {filtered.map((r: any) => (
+                  {filtered.map((r) => (
                     <ProductCard
                       key={r.slug}
                       name={r.name}
@@ -467,7 +473,7 @@ export default function CategoryPage() {
                       specs={Array.isArray(r.specs) ? (r.specs as { label: string; value: string }[]) : []}
                       slug={r.slug}
                       affiliateUrl={r.affiliate_url}
-                      ratings={r.ratings}
+                      ratings={r.ratings as { label: string; score: number }[]}
                     />
                   ))}
                 </div>
