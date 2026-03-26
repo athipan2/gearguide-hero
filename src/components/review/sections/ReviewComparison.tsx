@@ -68,7 +68,9 @@ export const ReviewComparison = ({ review }: ReviewComparisonProps) => {
               <div className="flex-1 space-y-4">
                 <div className="space-y-1">
                   <p className="text-[10px] font-bold text-accent uppercase tracking-widest">{item.brand}</p>
-                  <h3 className="font-heading font-bold text-lg md:text-xl text-primary leading-tight line-clamp-2 h-10 md:h-12 italic-prohibited">{item.name}</h3>
+                  <h3 className="font-heading font-bold text-lg md:text-xl text-primary leading-tight line-clamp-2 h-10 md:h-12 italic-prohibited">
+                    {(language === 'en' && item.name_en) ? item.name_en : item.name}
+                  </h3>
                 </div>
 
                 <div className="flex items-center gap-3">
@@ -80,22 +82,24 @@ export const ReviewComparison = ({ review }: ReviewComparisonProps) => {
                    <div className="flex items-start gap-2 text-emerald-600">
                     <Check className="h-3.5 w-3.5 mt-0.5" />
                     <span className="text-[10px] md:text-xs font-bold text-slate-500 uppercase tracking-widest leading-none">
-                      {t("common.key_advantage")}: {item.pros[0]}
+                      {t("common.key_advantage")}: {(language === 'en' && item.pros_en) ? item.pros_en[0] : item.pros[0]}
                     </span>
                    </div>
                    <div className="flex items-start gap-2 text-rose-500">
                     <X className="h-3.5 w-3.5 mt-0.5" />
                     <span className="text-[10px] md:text-xs font-bold text-slate-500 uppercase tracking-widest leading-none">
-                      {t("common.weakness")}: {item.cons[0]}
+                      {t("common.weakness")}: {(language === 'en' && item.cons_en) ? item.cons_en[0] : item.cons[0]}
                     </span>
                    </div>
                 </div>
 
                 <div className="flex items-center justify-between gap-4 pt-2">
-                  <span className="text-lg md:text-xl font-heading font-bold text-primary italic-prohibited">{item.price}</span>
+                  <span className="text-lg md:text-xl font-heading font-bold text-primary italic-prohibited">
+                    {(language === 'en' && item.price_en) ? item.price_en : item.price}
+                  </span>
                   <Link to={`/review/${item.slug}`}>
                     <Button variant="ghost" className="rounded-full h-10 px-6 text-xs font-bold uppercase tracking-widest hover:bg-primary/5 text-primary">
-                      Details
+                      {t("common.read_more")}
                       <ChevronRight className="h-4 w-4 ml-1" />
                     </Button>
                   </Link>
