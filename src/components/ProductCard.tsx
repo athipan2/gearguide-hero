@@ -37,11 +37,11 @@ export function ProductCard({ name, brand, image, rating, price, badge, pros, co
   return (
     <div className="group bg-card rounded-2xl md:rounded-3xl border border-neutral-200 overflow-hidden shadow-sm hover:shadow-md transition-all duration-200">
       {/* Image */}
-      <div className="relative aspect-[4/3] bg-muted overflow-hidden">
+      <div className="relative aspect-[4/3] md:aspect-square lg:aspect-[4/3] bg-muted overflow-hidden">
         <img
           src={getOptimizedImageUrl(image, 'card')}
           alt={name}
-          className="w-full h-full object-cover"
+          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
           loading="lazy"
         />
 
@@ -60,18 +60,18 @@ export function ProductCard({ name, brand, image, rating, price, badge, pros, co
       </div>
 
       {/* Content */}
-      <div className="p-4 md:p-5 space-y-4">
-        <div className="space-y-1">
+      <div className="p-5 md:p-6 space-y-5">
+        <div className="space-y-2">
           <div className="flex items-center gap-2">
-            <span className="w-4 h-0.5 bg-accent" />
-            <p className="text-xs font-bold text-muted-foreground uppercase tracking-sporty">{brand}</p>
+            <span className="w-6 h-0.5 bg-accent rounded-full" />
+            <p className="text-[10px] md:text-xs font-bold text-muted-foreground uppercase tracking-sporty">{brand}</p>
           </div>
-          <h3 className="font-heading font-semibold text-base md:text-lg text-card-foreground line-clamp-2 uppercase tracking-tight group-hover:text-primary transition-colors leading-snug">{name}</h3>
+          <h3 className="font-heading font-semibold text-lg md:text-xl text-card-foreground line-clamp-2 uppercase tracking-tight group-hover:text-primary transition-colors leading-snug">{name}</h3>
         </div>
 
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 sm:gap-0 border-y border-muted py-2.5">
+        <div className="flex items-center justify-between border-y border-neutral-100 py-4">
           <RatingStars rating={rating} />
-          <span className="font-heading font-semibold text-lg md:text-xl text-primary">{price}</span>
+          <span className="font-heading font-bold text-xl md:text-2xl text-primary italic-prohibited">{price}</span>
         </div>
 
         {/* Pros / Cons */}
