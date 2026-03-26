@@ -59,3 +59,60 @@ export const getOptimizedImageUrl = (url: string | null | undefined, variant: Im
     return url;
   }
 };
+
+/**
+ * Translates common Thai technical terms and labels to English
+ * for fallback when explicit English data is missing.
+ */
+export const translateData = (text: string | null | undefined, language: 'th' | 'en'): string => {
+  if (!text || language === 'th') return text || '';
+
+  const dictionary: Record<string, string> = {
+    // Specs
+    "น้ำหนัก": "Weight",
+    "ระยะดรอป": "Drop",
+    "ความสูงพื้น": "Stack Height",
+    "วัสดุ": "Material",
+    "หน้ากว้าง": "Width",
+    "ประเภทเท้า": "Foot Type",
+    "ระยะทาง": "Distance",
+    "การยึดเกาะ": "Grip",
+    "ความทนทาน": "Durability",
+    "การระบายอากาศ": "Breathability",
+    "ความนุ่ม": "Cushioning",
+    "การส่งแรง": "Energy Return",
+
+    // Values
+    "ปกติ": "Standard",
+    "กว้าง": "Wide",
+    "เทรล": "Trail",
+    "ถนน": "Road",
+    "แข่งขัน": "Racing",
+    "ซ้อม": "Training",
+    "เท้าแบน": "Flat Foot",
+    "อุ้งเท้าปกติ": "Neutral",
+    "อุ้งเท้าสูง": "High Arch",
+
+    // Ratings
+    "ความสบาย": "Comfort",
+    "ความเบา": "Lightweight",
+    "ความคุ้มค่า": "Value",
+    "ความเด้ง": "Bounce/Response",
+    "ความมั่นคง": "Stability",
+    "ราคา": "Price",
+    "คะแนน": "Score"
+  };
+
+  // Check for exact match
+  if (dictionary[text]) return dictionary[text];
+
+  // Check for partial matches or common patterns
+  let translated = text;
+  Object.entries(dictionary).forEach(([th, en]) => {
+    if (translated.includes(th)) {
+      translated = translated.replace(new RegExp(th, 'g'), en);
+    }
+  });
+
+  return translated;
+};

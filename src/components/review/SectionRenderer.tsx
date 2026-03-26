@@ -9,6 +9,7 @@ import { ScoreBreakdown } from "./sections/ScoreBreakdown";
 import { RealWorldTest } from "./sections/RealWorldTest";
 import { DeepDive } from "./sections/DeepDive";
 import { useTranslation } from "@/hooks/useTranslation";
+import { translateData } from "@/lib/utils";
 
 interface SectionRendererProps {
   section: ReviewSectionData;
@@ -51,8 +52,14 @@ export const SectionRenderer = ({ section, review, userRating }: SectionRenderer
       );
     }
 
-    case 'score_breakdown':
-      return <ScoreBreakdown ratings={(isEn && review.ratings_en) ? review.ratings_en : review.ratings} />;
+    case 'score_breakdown': {
+      const ratings = (isEn && review.ratings_en) ? review.ratings_en : review.ratings;
+      const translatedRatings = ratings?.map(r => ({
+        ...r,
+        label: isEn ? translateData(r.label, 'en') : r.label
+      }));
+      return <ScoreBreakdown ratings={translatedRatings} />;
+    }
 
     case 'gallery':
       return <ReviewGallery images={review.images} name={(isEn && review.name_en) ? review.name_en : review.name} />;
@@ -64,24 +71,36 @@ export const SectionRenderer = ({ section, review, userRating }: SectionRenderer
     }
 
     case 'real_world_test': {
-      const conditions = (section.props as ReviewData['test_conditions']) || review.test_conditions;
+      const conditions = (isEn && review.test_conditions_en)
+        ? review.test_conditions_en
+        : (section.props as ReviewData['test_conditions']) || review.test_conditions;
+
+      const performance = (isEn && review.verdict_en) ? review.verdict_en : review.verdict;
+
       return (
         <RealWorldTest
-          terrain={conditions?.terrain || "Road / Trail"}
-          weather={conditions?.weather || "Dry / Sunny"}
-          distance={conditions?.distance || "50km+ Test"}
-          performance={review.verdict || ""}
+          terrain={conditions?.terrain || (isEn ? "Road / Trail" : "ถนน / เทรล")}
+          weather={conditions?.weather || (isEn ? "Dry / Sunny" : "แดดจัด / พื้นแห้ง")}
+          distance={conditions?.distance || (isEn ? "50km+ Test" : "ทดสอบ 50 กม.+")}
+          performance={performance || ""}
         />
       );
     }
 
-    case 'specs':
+    case 'specs': {
+      const specs = (isEn && review.specs_en) ? review.specs_en : review.specs;
+      const translatedSpecs = specs?.map(s => ({
+        ...s,
+        label: isEn ? translateData(s.label, 'en') : s.label,
+        value: isEn ? translateData(s.value, 'en') : s.value
+      }));
       return (
         <ReviewSpecs
-          specs={(isEn && review.specs_en) ? review.specs_en : review.specs}
+          specs={translatedSpecs || []}
           title={(isEn && section.title_en) ? section.title_en : section.title}
         />
       );
+    }
 
     case 'comparison':
       return <ReviewComparison review={review} />;

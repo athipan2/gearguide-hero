@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 import { useComparisonStore } from "@/lib/comparison-store";
 import { useTranslation } from "@/hooks/useTranslation";
 import { toast } from "sonner";
-import { getOptimizedImageUrl } from "@/lib/utils";
+import { getOptimizedImageUrl, translateData } from "@/lib/utils";
 
 interface ProductCardProps {
   name: string;
@@ -131,16 +131,25 @@ export function ProductCard({
             size="sm"
             className="w-full border-primary/20 hover:bg-primary/5 text-xs font-bold uppercase tracking-sporty h-10 md:h-9 rounded-lg px-1 md:px-2"
             onClick={() => {
+              const translatedSpecs = specs?.map(s => ({
+                ...s,
+                label: isEn ? translateData(s.label, 'en') : s.label,
+                value: isEn ? translateData(s.value, 'en') : s.value
+              }));
+              const translatedRatings = ratings?.map(r => ({
+                ...r,
+                label: isEn ? translateData(r.label, 'en') : r.label
+              }));
               useComparisonStore.getState().addItem({
                 name: displayName, brand, image, rating, price: displayPrice, slug, weight, drop,
                 badge: displayBadge,
-                specs,
-                aspectRatings: ratings
+                specs: translatedSpecs,
+                aspectRatings: translatedRatings
               });
               toast.success(isEn ? `Added ${displayName} to comparison` : `เพิ่ม ${displayName} เข้าสู่การเปรียบเทียบ`);
             }}
           >
-            {isEn ? 'COMPARE' : 'เปรียบเทียบ'}
+            {t("nav.compare_btn")}
           </Button>
 
           {slug ? (

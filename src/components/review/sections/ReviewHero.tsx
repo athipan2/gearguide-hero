@@ -1,6 +1,7 @@
 import { ReviewData } from "@/types/review";
 import { RatingStars } from "@/components/RatingStars";
 import { Button } from "@/components/ui/button";
+import { translateData } from "@/lib/utils";
 import { ShoppingBag, ExternalLink, ChevronRight, Share2, Heart } from "lucide-react";
 import { useTranslation } from "@/hooks/useTranslation";
 
@@ -142,8 +143,12 @@ export const ReviewHero = ({ review, userRating }: ReviewHeroProps) => {
             <div className="space-y-6">
               {((isEn && review.specs_en) ? review.specs_en : review.specs).slice(0, 4).map((spec, i) => (
                 <div key={i} className="flex justify-between items-center border-b border-slate-200 pb-4 last:border-none">
-                  <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">{spec.label}</span>
-                  <span className="text-sm font-bold text-primary">{spec.value}</span>
+                  <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">
+                    {isEn ? translateData(spec.label, 'en') : spec.label}
+                  </span>
+                  <span className="text-sm font-bold text-primary">
+                    {isEn ? translateData(spec.value, 'en') : spec.value}
+                  </span>
                 </div>
               ))}
             </div>

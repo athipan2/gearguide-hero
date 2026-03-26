@@ -72,4 +72,9 @@ export interface ReviewData {
     weather: string;
     distance: string;
   };
+  test_conditions_en?: {
+    terrain: string;
+    weather: string;
+    distance: string;
+  };
 }

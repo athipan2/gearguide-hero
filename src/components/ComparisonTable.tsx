@@ -7,7 +7,7 @@ import {
 } from "lucide-react";
 import { useComparisonStore } from "@/lib/comparison-store";
 import { useTranslation } from "@/hooks/useTranslation";
-import { cn, getOptimizedImageUrl } from "@/lib/utils";
+import { cn, getOptimizedImageUrl, translateData } from "@/lib/utils";
 import { Link } from "react-router-dom";
 
 const getSpecIcon = (label: string) => {
@@ -31,7 +31,8 @@ const getRatingIcon = (label: string) => {
 
 export function ComparisonTable() {
   const { selectedItems, removeItem, clear } = useComparisonStore();
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
+  const isEn = language === 'en';
 
   const item1 = selectedItems[0];
   const item2 = selectedItems[1];
@@ -250,7 +251,7 @@ export function ComparisonTable() {
             {allRatingLabels.map(label => (
               <ComparisonRow
                 key={label}
-                label={label}
+                label={isEn ? translateData(label, 'en') : label}
                 value1={item1.aspectRatings?.find(r => r.label === label)?.score}
                 value2={item2?.aspectRatings?.find(r => r.label === label)?.score}
                 icon={getRatingIcon(label)}
@@ -272,9 +273,9 @@ export function ComparisonTable() {
             {allSpecLabels.map(label => (
               <ComparisonRow
                 key={label}
-                label={label}
-                value1={item1.specs?.find(s => s.label === label)?.value}
-                value2={item2?.specs?.find(s => s.label === label)?.value}
+                label={isEn ? translateData(label, 'en') : label}
+                value1={isEn ? translateData(item1.specs?.find(s => s.label === label)?.value, 'en') : item1.specs?.find(s => s.label === label)?.value}
+                value2={isEn ? translateData(item2?.specs?.find(s => s.label === label)?.value, 'en') : item2?.specs?.find(s => s.label === label)?.value}
                 icon={getSpecIcon(label)}
               />
             ))}
