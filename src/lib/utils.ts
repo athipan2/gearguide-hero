@@ -47,18 +47,10 @@ export const getOptimizedImageUrl = (url: string | null | undefined, variant: Im
 
     // 2. Handle Supabase Storage URLs
     // Supabase format: https://[project-ref].supabase.co/storage/v1/object/public/[bucket]/[path]
-    // Transformation: https://[project-ref].supabase.co/storage/v1/render/image/public/[bucket]/[path]?width=...
+    // NOTE: Image transformation (/render/image/) is a Pro feature in Supabase.
+    // For Free Tier, we must return the original public URL to avoid 404/403 errors.
     if (url.includes('/storage/v1/object/public/')) {
-      const renderUrl = url.replace('/storage/v1/object/public/', '/storage/v1/render/image/public/');
-      const optimizedUrl = new URL(renderUrl);
-      optimizedUrl.searchParams.set('width', specs.w.toString());
-      if (specs.h) optimizedUrl.searchParams.set('height', specs.h.toString());
-      optimizedUrl.searchParams.set('resize', specs.fit);
-      optimizedUrl.searchParams.set('quality', specs.q.toString());
-      // Supabase transformation is often a Pro feature. If it returns 404/403,
-      // the browser will show nothing. However, most modern apps use a fallback
-      // or check if it's enabled. Here we'll assume it's desired.
-      return optimizedUrl.toString();
+      return url;
     }
 
     return url;
