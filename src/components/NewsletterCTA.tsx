@@ -1,7 +1,10 @@
 import { Button } from "@/components/ui/button";
 import { Mail } from "lucide-react";
+import { useTranslation } from "@/hooks/useTranslation";
 
 export function NewsletterCTA() {
+  const { t } = useTranslation();
+
   return (
     <section className="container mx-auto px-4 py-12 md:py-20">
       <div className="bg-gradient-to-br from-primary via-[#1a3324] to-black rounded-[2.5rem] p-8 md:p-20 text-center shadow-2xl relative overflow-hidden group isolate">
@@ -14,18 +17,18 @@ export function NewsletterCTA() {
             <Mail className="h-8 w-8 md:h-10 md:w-10 text-cta" />
           </div>
           <h2 className="font-heading text-2xl md:text-4xl font-semibold text-primary-foreground mb-4 tracking-tight-compact uppercase">
-            ไม่พลาดรีวิวใหม่
+            {t("home.newsletter_title")}
           </h2>
           <p className="text-primary-foreground/70 mb-8 md:mb-10 max-w-lg mx-auto text-base md:text-lg leading-relaxed">
-            รับรีวิวอุปกรณ์ล่าสุด ดีลราคาพิเศษ และ Best Of 2026 ส่งตรงถึงอินบ็อกซ์คุณ
+            {t("home.newsletter_subtitle")}
           </p>
           <div className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto p-1.5 bg-white/5 rounded-2xl backdrop-blur-md border border-white/10">
             <input
               type="email"
-              placeholder="อีเมลของคุณ"
+              placeholder={t("home.newsletter_placeholder")}
               className="flex-1 rounded-xl px-5 py-3 bg-transparent text-primary-foreground placeholder:text-primary-foreground/40 focus:outline-none"
             />
-            <Button variant="cta" size="lg" className="rounded-xl shadow-xl">สมัครเลย</Button>
+            <Button variant="cta" size="lg" className="rounded-xl shadow-xl">{t("home.newsletter_btn")}</Button>
           </div>
         </div>
       </div>

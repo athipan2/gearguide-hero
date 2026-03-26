@@ -4,6 +4,8 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { SEOHead } from "@/components/SEOHead";
 import { ProductCard } from "@/components/ProductCard";
+import { useTranslation } from "@/hooks/useTranslation";
+import { TranslationKeys } from "@/lib/translations";
 import { supabase } from "@/integrations/supabase/client";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
@@ -39,11 +41,13 @@ function FilterContent({
   hasActiveFilters,
   clearFilters,
 }: FilterContentProps) {
+  const { t } = useTranslation();
+
   return (
     <>
       {/* Brand filter */}
       <div>
-        <h3 className="font-heading font-semibold text-sm text-foreground mb-3">แบรนด์</h3>
+        <h3 className="font-heading font-semibold text-sm text-foreground mb-3">{t("common.brand")}</h3>
         <div className="flex flex-wrap gap-2">
           {allBrands.map((brand) => (
             <Badge
@@ -56,14 +60,14 @@ function FilterContent({
             </Badge>
           ))}
           {allBrands.length === 0 && (
-            <p className="text-xs text-muted-foreground">ไม่มีแบรนด์</p>
+            <p className="text-xs text-muted-foreground">{t("common.no_brands")}</p>
           )}
         </div>
       </div>
 
       {/* Rating Filter */}
       <div>
-        <h3 className="font-heading font-semibold text-sm text-foreground mb-3">คะแนนรีวิว</h3>
+        <h3 className="font-heading font-semibold text-sm text-foreground mb-3">{t("common.rating")}</h3>
         <div className="space-y-2">
           {[4.5, 4, 3.5, 3].map((rating) => (
             <label key={rating} className="flex items-center gap-2 cursor-pointer group">
@@ -75,7 +79,7 @@ function FilterContent({
                 onChange={() => setMinRating(rating)}
               />
               <span className="text-sm text-muted-foreground group-hover:text-foreground">
-                {rating}+ ดาว
+                {rating}+ {t("common.stars")}
               </span>
             </label>
           ))}
@@ -84,7 +88,7 @@ function FilterContent({
 
       {/* Price range */}
       <div>
-        <h3 className="font-heading font-semibold text-sm text-foreground mb-3">ช่วงราคา</h3>
+        <h3 className="font-heading font-semibold text-sm text-foreground mb-3">{t("common.price_range")}</h3>
         <Slider
           min={0}
           max={maxPrice}
@@ -103,31 +107,36 @@ function FilterContent({
       {hasActiveFilters && (
         <Button variant="ghost" size="sm" className="w-full" onClick={clearFilters}>
           <X className="h-3 w-3 mr-1" />
-          ล้างตัวกรอง
+          {t("common.clear_filters")}
         </Button>
       )}
     </>
   );
 }
 
-const CATEGORY_META: Record<string, { label: string; description: string }> = {
-  "รองเท้าวิ่งถนน": { label: "รองเท้าวิ่งถนน", description: "รีวิวรองเท้าวิ่งถนนจากแบรนด์ชั้นนำ ทดสอบจริง" },
-  "อุปกรณ์วิ่งเทรล": { label: "อุปกรณ์วิ่งเทรล", description: "รีวิวอุปกรณ์วิ่งเทรล เดินป่า ทดสอบจริง" },
-  "camping-gear": { label: "Camping Gear", description: "รีวิวอุปกรณ์แคมป์ปิ้ง เต็นท์ ถุงนอน" },
-  "นาฬิกา-gps": { label: "นาฬิกา GPS", description: "รีวิวนาฬิกา GPS สำหรับวิ่งและกิจกรรมกลางแจ้ง" },
+const CATEGORY_META: Record<string, { label: TranslationKeys; description: TranslationKeys }> = {
+  "รองเท้าวิ่งถนน": { label: "nav.shoes", description: "category.road_desc" },
+  "อุปกรณ์วิ่งเทรล": { label: "nav.gear", description: "category.trail_desc" },
+  "camping-gear": { label: "nav.camping", description: "category.camping_desc" },
+  "นาฬิกา-gps": { label: "wizard.cat_watch", description: "category.watch_desc" },
 };
 
 type SortOption = "newest" | "rating-desc" | "price-asc" | "price-desc";
 
 interface ReviewItem {
   name: string;
+  name_en?: string;
   brand: string;
   image_url: string | null;
   overall_rating: number;
   price: string;
+  price_en?: string;
   badge: string | null;
+  badge_en?: string;
   pros: unknown;
+  pros_en?: unknown;
   cons: unknown;
+  cons_en?: unknown;
   specs: unknown;
   ratings?: { label: string; score: number }[];
   slug: string;
@@ -183,6 +192,8 @@ const fallbackReviews: ReviewItem[] = [
 export default function CategoryPage() {
   const { category } = useParams<{ category: string }>();
   const [searchParams, setSearchParams] = useSearchParams();
+  const { t, language } = useTranslation();
+  const isEn = language === 'en';
 
   const [reviews, setReviews] = useState<ReviewItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -213,7 +224,7 @@ export default function CategoryPage() {
       setLoading(true);
       let query = supabase
         .from("reviews")
-        .select("name, brand, image_url, overall_rating, price, badge, pros, cons, specs, ratings, slug, affiliate_url, category, created_at")
+        .select("name, name_en, brand, image_url, overall_rating, price, price_en, badge, badge_en, pros, pros_en, cons, cons_en, specs, ratings, slug, affiliate_url, category, created_at")
         .eq("published", true);
 
       if (category) {
@@ -320,8 +331,8 @@ export default function CategoryPage() {
   }, [reviews, searchQuery, selectedBrands, priceRange, sortBy, minRating]);
 
   const meta = category ? CATEGORY_META[decodeURIComponent(category)] : null;
-  const pageTitle = meta?.label || "สินค้าทั้งหมด";
-  const pageDescription = meta?.description || "รีวิวสินค้าทั้งหมด ทดสอบจริง อัปเดตล่าสุด";
+  const pageTitle = meta ? t(meta.label) : t("common.all_products");
+  const pageDescription = meta ? t(meta.description) : (isEn ? "Reviews of all products, real tests, latest updates" : "รีวิวสินค้าทั้งหมด ทดสอบจริง อัปเดตล่าสุด");
 
   return (
     <div className="min-h-screen bg-background">
@@ -338,7 +349,7 @@ export default function CategoryPage() {
           className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors mb-6"
         >
           <ArrowLeft className="h-4 w-4" />
-          กลับสู่หน้าหลัก
+          {t("review.back_home")}
         </Link>
         {/* Header */}
         <div className="mb-8">
@@ -351,7 +362,7 @@ export default function CategoryPage() {
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="ค้นหาชื่อสินค้าหรือแบรนด์..."
+              placeholder={t("common.search_placeholder")}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-10"
@@ -359,13 +370,13 @@ export default function CategoryPage() {
           </div>
           <Select value={sortBy} onValueChange={(v) => setSortBy(v as SortOption)}>
             <SelectTrigger className="w-full sm:w-[200px]">
-              <SelectValue placeholder="เรียงลำดับ" />
+              <SelectValue placeholder={t("common.sort_by")} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="newest">ใหม่ล่าสุด</SelectItem>
-              <SelectItem value="rating-desc">คะแนนสูงสุด</SelectItem>
-              <SelectItem value="price-asc">ราคาต่ำ → สูง</SelectItem>
-              <SelectItem value="price-desc">ราคาสูง → ต่ำ</SelectItem>
+              <SelectItem value="newest">{t("common.sort_newest")}</SelectItem>
+              <SelectItem value="rating-desc">{t("common.sort_rating")}</SelectItem>
+              <SelectItem value="price-asc">{t("common.sort_price_asc")}</SelectItem>
+              <SelectItem value="price-desc">{t("common.sort_price_desc")}</SelectItem>
             </SelectContent>
           </Select>
           <Sheet open={showFilters} onOpenChange={setShowFilters}>
@@ -381,7 +392,7 @@ export default function CategoryPage() {
             </SheetTrigger>
             <SheetContent side="left" className="w-[300px] sm:w-[400px]">
               <SheetHeader className="mb-6">
-                <SheetTitle>ตัวกรองสินค้า</SheetTitle>
+                <SheetTitle>{t("common.filters")}</SheetTitle>
               </SheetHeader>
               <div className="space-y-6">
                 <FilterContent
@@ -430,34 +441,39 @@ export default function CategoryPage() {
               </div>
             ) : filtered.length === 0 ? (
               <div className="text-center py-20">
-                <p className="text-muted-foreground text-lg">ไม่พบสินค้าที่ตรงกับเงื่อนไข</p>
+                <p className="text-muted-foreground text-lg">{t("common.no_products")}</p>
                 {hasActiveFilters && (
                   <Button variant="link" className="mt-2" onClick={clearFilters}>
-                    ล้างตัวกรองทั้งหมด
+                    {t("common.clear_filters")}
                   </Button>
                 )}
               </div>
             ) : (
               <>
                 <p className="text-sm text-muted-foreground mb-4">
-                  แสดง {filtered.length} รายการ
+                  {t("common.showing").replace("{count}", filtered.length.toString())}
                 </p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
                   {filtered.map((r) => (
                     <ProductCard
                       key={r.slug}
                       name={r.name}
+                      name_en={r.name_en}
                       brand={r.brand}
                       image={r.image_url || ""}
                       rating={Number(r.overall_rating)}
                       price={r.price}
+                      price_en={r.price_en}
                       badge={r.badge || undefined}
+                      badge_en={r.badge_en}
                       pros={Array.isArray(r.pros) ? (r.pros as string[]) : []}
+                      pros_en={Array.isArray(r.pros_en) ? (r.pros_en as string[]) : undefined}
                       cons={Array.isArray(r.cons) ? (r.cons as string[]) : []}
+                      cons_en={Array.isArray(r.cons_en) ? (r.cons_en as string[]) : undefined}
                       specs={Array.isArray(r.specs) ? (r.specs as { label: string; value: string }[]) : []}
                       slug={r.slug}
                       affiliateUrl={r.affiliate_url}
-                      ratings={r.ratings}
+                      ratings={r.ratings as { label: string; score: number }[]}
                     />
                   ))}
                 </div>

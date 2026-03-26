@@ -3,18 +3,20 @@ import { Footer } from "@/components/Footer";
 import { ComparisonTable } from "@/components/ComparisonTable";
 import { SEOHead } from "@/components/SEOHead";
 import { useComparisonStore } from "@/lib/comparison-store";
+import { useTranslation } from "@/hooks/useTranslation";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { ArrowLeft, Scale } from "lucide-react";
 
 const ComparePage = () => {
   const { selectedItems } = useComparisonStore();
+  const { t } = useTranslation();
 
   return (
     <div className="min-h-screen bg-background bg-noise">
       <SEOHead
-        title="เปรียบเทียบสเปคอุปกรณ์ — GearTrail"
-        description="เปรียบเทียบสเปคและราคารองเท้าวิ่ง อุปกรณ์เทรล และอุปกรณ์แคมป์ปิ้งแบบเจาะลึก"
+        title={t("compare.title")}
+        description={t("compare.desc")}
         canonical="https://gearguide-hero.lovable.app/compare"
       />
       <Navbar />
@@ -22,7 +24,7 @@ const ComparePage = () => {
         <div className="container mx-auto px-4 mb-4 md:mb-8">
           <Link to="/" className="inline-flex items-center text-xs md:text-sm font-medium text-muted-foreground hover:text-primary transition-colors mb-4 md:mb-6">
             <ArrowLeft className="mr-2 h-4 w-4" />
-            กลับหน้าหลัก
+            {t("common.back_home")}
           </Link>
 
           <div className="flex flex-col gap-1 md:gap-2">
@@ -31,7 +33,7 @@ const ComparePage = () => {
               Comparison Center
             </div>
             <h1 className="font-heading text-3xl md:text-6xl font-semibold text-primary tracking-tighter uppercase leading-tight">
-              เปรียบเทียบสเปค
+              {t("compare.heading")}
             </h1>
           </div>
         </div>

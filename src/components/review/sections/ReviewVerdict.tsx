@@ -1,6 +1,7 @@
 import { ReviewData } from "@/types/review";
 import { Button } from "@/components/ui/button";
 import { ShoppingBag, ExternalLink, Award, ChevronRight } from "lucide-react";
+import { useTranslation } from "@/hooks/useTranslation";
 
 interface ReviewVerdictProps {
   verdict: string;
@@ -10,6 +11,8 @@ interface ReviewVerdictProps {
 }
 
 export const ReviewVerdict = ({ verdict, affiliateUrl, ctaText, review }: ReviewVerdictProps) => {
+  const { t, language } = useTranslation();
+
   return (
     <section className="bg-primary p-6 md:p-12 rounded-none md:rounded-[2.5rem] text-white space-y-8 md:space-y-12 overflow-hidden relative group">
       {/* Decorative Blur BG */}
@@ -19,10 +22,10 @@ export const ReviewVerdict = ({ verdict, affiliateUrl, ctaText, review }: Review
       <div className="relative z-10 space-y-4">
         <h2 className="font-heading text-2xl md:text-4xl font-bold uppercase tracking-tighter italic-prohibited flex items-center gap-3 md:gap-4">
           <span className="h-10 md:h-12 w-3 bg-accent rounded-full shadow-lg shadow-accent/20" />
-          The Final Verdict
+          {t("review.verdict")}
         </h2>
         <p className="text-white/60 text-sm md:text-lg font-medium max-w-xl">
-          สรุปส่งท้ายจากทีมงาน GearTrail เพื่อช่วยคุณตัดสินใจก้าวสุดท้าย
+          {t("common.verdict_subtitle")}
         </p>
       </div>
 
@@ -35,12 +38,16 @@ export const ReviewVerdict = ({ verdict, affiliateUrl, ctaText, review }: Review
           <div className="flex flex-wrap gap-4 md:gap-8">
              <div className="flex flex-col">
               <span className="text-4xl md:text-6xl font-heading font-bold text-accent tracking-tighter italic-prohibited">{review?.overall_rating.toFixed(1)}</span>
-              <span className="text-[10px] md:text-xs font-bold text-white/40 uppercase tracking-[0.3em] mt-1">Overall Rating</span>
+              <span className="text-[10px] md:text-xs font-bold text-white/40 uppercase tracking-[0.3em] mt-1">
+                {t("common.overall_rating")}
+              </span>
              </div>
              <div className="h-16 w-px bg-white/10 hidden sm:block" />
              <div className="flex flex-col">
               <span className="text-4xl md:text-6xl font-heading font-bold text-white tracking-tighter italic-prohibited">{review?.price}</span>
-              <span className="text-[10px] md:text-xs font-bold text-white/40 uppercase tracking-[0.3em] mt-1">Target Price</span>
+              <span className="text-[10px] md:text-xs font-bold text-white/40 uppercase tracking-[0.3em] mt-1">
+                {t("common.target_price")}
+              </span>
              </div>
           </div>
         </div>
@@ -49,9 +56,9 @@ export const ReviewVerdict = ({ verdict, affiliateUrl, ctaText, review }: Review
           <div className="space-y-2">
             <div className="flex items-center gap-2">
               <Award className="h-5 w-5 text-accent" />
-              <span className="text-xs md:text-sm font-bold text-accent uppercase tracking-widest leading-none">GearTrail Choice</span>
+              <span className="text-xs md:text-sm font-bold text-accent uppercase tracking-widest leading-none">{t("review.choice")}</span>
             </div>
-            <h3 className="font-heading text-xl md:text-2xl font-bold text-white uppercase tracking-tight italic-prohibited">Grab Your Pair Now</h3>
+            <h3 className="font-heading text-xl md:text-2xl font-bold text-white uppercase tracking-tight italic-prohibited">{t("review.grab_pair")}</h3>
           </div>
 
           <div className="flex flex-col gap-4">
@@ -102,7 +109,7 @@ export const ReviewVerdict = ({ verdict, affiliateUrl, ctaText, review }: Review
           </div>
 
           <div className="flex items-center gap-2 text-[10px] md:text-xs font-bold text-white/40 uppercase tracking-widest justify-center">
-            <Check className="w-4 h-4 text-emerald-500" /> อัปเดตราคาล่าสุดวันนี้
+            <Check className="w-4 h-4 text-emerald-500" /> {t("common.price_update")}
           </div>
         </div>
       </div>

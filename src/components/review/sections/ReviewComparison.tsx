@@ -5,6 +5,7 @@ import { Scale, ChevronRight, Check, X } from "lucide-react";
 import { RatingStars } from "@/components/RatingStars";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useTranslation } from "@/hooks/useTranslation";
 
 interface ReviewComparisonProps {
   review: ReviewData;
@@ -12,12 +13,13 @@ interface ReviewComparisonProps {
 
 export const ReviewComparison = ({ review }: ReviewComparisonProps) => {
   const [similar, setSimilar] = useState<ReviewData[]>([]);
+  const { t, language } = useTranslation();
 
   useEffect(() => {
     const fetchSimilar = async () => {
       const { data } = await supabase
         .from("reviews")
-        .select("*")
+        .select("id, slug, name, name_en, brand, category, category_en, price, price_en, image_url, badge, badge_en, overall_rating, pros, pros_en, cons, cons_en")
         .eq("category", review.category)
         .eq("published", true)
         .neq("slug", review.slug)
@@ -38,16 +40,16 @@ export const ReviewComparison = ({ review }: ReviewComparisonProps) => {
         <div className="space-y-4">
           <h2 className="font-heading text-2xl md:text-3xl font-bold text-primary flex items-center gap-3">
             <span className="w-8 h-1 bg-accent rounded-full" />
-            Product Comparison
+            {t("review.comparison")}
           </h2>
           <p className="text-sm md:text-base text-slate-500 font-medium">
-            เปรียบเทียบกับรุ่นที่ใกล้เคียงที่สุดในตลาด เพื่อหาคู่ที่ใช่สำหรับคุณ
+            {t("common.comparison_subtitle")}
           </p>
         </div>
         <Link to="/compare">
           <Button variant="outline" className="rounded-full gap-2 text-xs font-bold uppercase tracking-widest h-12 px-8 border-2 hover:bg-primary/5">
             <Scale className="h-4 w-4" />
-            Compare More
+            {t("common.compare_more")}
             <ChevronRight className="h-4 w-4" />
           </Button>
         </Link>
@@ -66,7 +68,9 @@ export const ReviewComparison = ({ review }: ReviewComparisonProps) => {
               <div className="flex-1 space-y-4">
                 <div className="space-y-1">
                   <p className="text-[10px] font-bold text-accent uppercase tracking-widest">{item.brand}</p>
-                  <h3 className="font-heading font-bold text-lg md:text-xl text-primary leading-tight line-clamp-2 h-10 md:h-12 italic-prohibited">{item.name}</h3>
+                  <h3 className="font-heading font-bold text-lg md:text-xl text-primary leading-tight line-clamp-2 h-10 md:h-12 italic-prohibited">
+                    {(language === 'en' && item.name_en) ? item.name_en : item.name}
+                  </h3>
                 </div>
 
                 <div className="flex items-center gap-3">
@@ -77,19 +81,33 @@ export const ReviewComparison = ({ review }: ReviewComparisonProps) => {
                 <div className="space-y-3 py-2">
                    <div className="flex items-start gap-2 text-emerald-600">
                     <Check className="h-3.5 w-3.5 mt-0.5" />
-                    <span className="text-[10px] md:text-xs font-bold text-slate-500 uppercase tracking-widest leading-none">KEY ADVANTAGE: {item.pros[0]}</span>
+                    <span className="text-[10px] md:text-xs font-bold text-slate-500 uppercase tracking-widest leading-none">
+                      {t("common.key_advantage")}: {
+                        language === 'en'
+                          ? (item.pros_en && item.pros_en[0] ? item.pros_en[0] : (item.pros && Array.isArray(item.pros) ? translateData(item.pros[0] as string, 'en') : ''))
+                          : (item.pros && Array.isArray(item.pros) ? item.pros[0] : '')
+                      }
+                    </span>
                    </div>
                    <div className="flex items-start gap-2 text-rose-500">
                     <X className="h-3.5 w-3.5 mt-0.5" />
-                    <span className="text-[10px] md:text-xs font-bold text-slate-500 uppercase tracking-widest leading-none">WEAKNESS: {item.cons[0]}</span>
+                    <span className="text-[10px] md:text-xs font-bold text-slate-500 uppercase tracking-widest leading-none">
+                      {t("common.weakness")}: {
+                        language === 'en'
+                          ? (item.cons_en && item.cons_en[0] ? item.cons_en[0] : (item.cons && Array.isArray(item.cons) ? translateData(item.cons[0] as string, 'en') : ''))
+                          : (item.cons && Array.isArray(item.cons) ? item.cons[0] : '')
+                      }
+                    </span>
                    </div>
                 </div>
 
                 <div className="flex items-center justify-between gap-4 pt-2">
-                  <span className="text-lg md:text-xl font-heading font-bold text-primary italic-prohibited">{item.price}</span>
+                  <span className="text-lg md:text-xl font-heading font-bold text-primary italic-prohibited">
+                    {(language === 'en' && item.price_en) ? item.price_en : item.price}
+                  </span>
                   <Link to={`/review/${item.slug}`}>
                     <Button variant="ghost" className="rounded-full h-10 px-6 text-xs font-bold uppercase tracking-widest hover:bg-primary/5 text-primary">
-                      Details
+                      {t("common.read_more")}
                       <ChevronRight className="h-4 w-4 ml-1" />
                     </Button>
                   </Link>

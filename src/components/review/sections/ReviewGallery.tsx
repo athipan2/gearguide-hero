@@ -1,5 +1,6 @@
 import useEmblaCarousel from "embla-carousel-react";
 import { useState, useCallback, useEffect } from "react";
+import { useTranslation } from "@/hooks/useTranslation";
 import { cn } from "@/lib/utils";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { ChevronLeft, ChevronRight, Maximize2 } from "lucide-react";
@@ -10,6 +11,7 @@ interface ReviewGalleryProps {
 }
 
 export const ReviewGallery = ({ images, name }: ReviewGalleryProps) => {
+  const { t } = useTranslation();
   const [emblaRef, emblaApi] = useEmblaCarousel({
     loop: true,
     align: "start",
@@ -40,10 +42,10 @@ export const ReviewGallery = ({ images, name }: ReviewGalleryProps) => {
       <div className="space-y-4">
         <h2 className="font-heading text-2xl md:text-3xl font-bold text-primary flex items-center gap-3">
           <span className="w-8 h-1 bg-accent rounded-full" />
-          Detailed Gallery
+          {t("review.detailed_gallery")}
         </h2>
         <p className="text-sm md:text-base text-slate-500 font-medium">
-          ภาพถ่ายจริงจากการทดสอบ เพื่อให้เห็นรายละเอียดของวัสดุและดีไซน์
+          {t("review.gallery_subtitle")}
         </p>
       </div>
 

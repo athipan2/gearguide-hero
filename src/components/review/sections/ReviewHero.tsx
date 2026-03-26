@@ -1,7 +1,9 @@
 import { ReviewData } from "@/types/review";
 import { RatingStars } from "@/components/RatingStars";
 import { Button } from "@/components/ui/button";
+import { translateData } from "@/lib/utils";
 import { ShoppingBag, ExternalLink, ChevronRight, Share2, Heart } from "lucide-react";
+import { useTranslation } from "@/hooks/useTranslation";
 
 interface ReviewHeroProps {
   review: ReviewData;
@@ -9,6 +11,9 @@ interface ReviewHeroProps {
 }
 
 export const ReviewHero = ({ review, userRating }: ReviewHeroProps) => {
+  const { t, language } = useTranslation();
+  const isEn = language === 'en';
+
   return (
     <section className="relative w-full overflow-hidden bg-white">
       {/* Hero Image Container */}
@@ -54,7 +59,7 @@ export const ReviewHero = ({ review, userRating }: ReviewHeroProps) => {
                 <span className="text-xs md:text-base font-bold text-accent uppercase tracking-[0.3em]">{review.brand}</span>
               </div>
               <h1 className="font-heading text-5xl md:text-7xl lg:text-9xl font-bold text-white leading-none tracking-tighter italic-prohibited drop-shadow-2xl">
-                {review.name}
+                {(isEn && review.name_en) ? review.name_en : review.name}
               </h1>
             </div>
 
@@ -65,7 +70,9 @@ export const ReviewHero = ({ review, userRating }: ReviewHeroProps) => {
                   <span className="text-2xl md:text-3xl font-bold text-white tracking-tighter">{review.overall_rating.toFixed(1)}</span>
                 </div>
                 <span className="text-[10px] md:text-xs font-bold text-white/60 uppercase tracking-[0.2em] mt-2">
-                  {userRating ? `From ${userRating.count} user reviews` : "Expert Performance Rating"}
+                  {userRating
+                    ? t("review.user_count").replace("{count}", userRating.count.toString())
+                    : t("review.expert_rating")}
                 </span>
               </div>
 
@@ -73,12 +80,14 @@ export const ReviewHero = ({ review, userRating }: ReviewHeroProps) => {
 
               <div className="flex flex-col">
                 <div className="flex items-baseline gap-2">
-                   <span className="text-3xl md:text-5xl font-heading font-bold text-accent tracking-tighter italic-prohibited">{review.price}</span>
+                   <span className="text-3xl md:text-5xl font-heading font-bold text-accent tracking-tighter italic-prohibited">
+                    {(isEn && review.price_en) ? review.price_en : review.price}
+                   </span>
                    <span className="text-xs md:text-sm font-bold text-white/40 line-through">฿9,900</span>
                 </div>
                 <span className="text-[10px] md:text-xs font-bold text-emerald-400 uppercase tracking-[0.2em] mt-2 flex items-center gap-2">
                   <div className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                  Lowest Price Found Today
+                  {t("review.best_price_today")}
                 </span>
               </div>
             </div>
@@ -91,7 +100,7 @@ export const ReviewHero = ({ review, userRating }: ReviewHeroProps) => {
         <div className="grid lg:grid-cols-[1fr_400px] gap-12 md:gap-20 items-start">
           <div className="space-y-8 md:space-y-12">
             <p className="text-2xl md:text-4xl lg:text-5xl font-medium leading-[1.3] text-primary tracking-tight md:max-w-3xl">
-              {review.intro}
+              {(isEn && review.intro_en) ? review.intro_en : review.intro}
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 pt-4">
@@ -129,13 +138,17 @@ export const ReviewHero = ({ review, userRating }: ReviewHeroProps) => {
           <div className="hidden lg:block bg-slate-50 rounded-[2.5rem] p-10 space-y-8 border border-slate-100">
             <h3 className="font-heading font-bold text-primary text-xs uppercase tracking-[0.3em] flex items-center gap-3">
               <div className="w-2 h-4 bg-accent rounded-full" />
-              Quick Specs
+              {t("review.quick_specs")}
             </h3>
             <div className="space-y-6">
-              {review.specs.slice(0, 4).map((spec, i) => (
+              {((isEn && review.specs_en) ? review.specs_en : review.specs).slice(0, 4).map((spec, i) => (
                 <div key={i} className="flex justify-between items-center border-b border-slate-200 pb-4 last:border-none">
-                  <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">{spec.label}</span>
-                  <span className="text-sm font-bold text-primary">{spec.value}</span>
+                  <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">
+                    {isEn ? translateData(spec.label, 'en') : spec.label}
+                  </span>
+                  <span className="text-sm font-bold text-primary">
+                    {isEn ? translateData(spec.value, 'en') : spec.value}
+                  </span>
                 </div>
               ))}
             </div>
@@ -143,7 +156,7 @@ export const ReviewHero = ({ review, userRating }: ReviewHeroProps) => {
               onClick={() => document.getElementById('specs')?.scrollIntoView({ behavior: 'smooth' })}
               className="w-full py-4 text-xs font-bold text-accent uppercase tracking-[0.2em] hover:text-primary transition-colors flex items-center justify-center gap-2 border-t border-slate-200 pt-8"
             >
-              See all specifications <ChevronRight className="h-4 w-4" />
+              {t("review.see_all_specs")} <ChevronRight className="h-4 w-4" />
             </button>
           </div>
         </div>
