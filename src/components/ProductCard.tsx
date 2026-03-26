@@ -38,14 +38,25 @@ export function ProductCard({ name, brand, image, rating, price, badge, pros, co
     <div className="group bg-card rounded-2xl md:rounded-3xl border border-neutral-200 overflow-hidden shadow-sm hover:shadow-md transition-all duration-200">
       {/* Image */}
       <div className="relative aspect-[4/3] md:aspect-square lg:aspect-[4/3] bg-muted overflow-hidden">
-        <img
-          src={getOptimizedImageUrl(image, 'card')}
-          alt={name}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
-          loading="lazy"
-        />
+        {slug ? (
+          <Link to={`/review/${slug}`} className="block w-full h-full cursor-pointer">
+            <img
+              src={getOptimizedImageUrl(image, 'card')}
+              alt={name}
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+              loading="lazy"
+            />
+          </Link>
+        ) : (
+          <img
+            src={getOptimizedImageUrl(image, 'card')}
+            alt={name}
+            className="w-full h-full object-cover"
+            loading="lazy"
+          />
+        )}
 
-        <div className="absolute top-3 left-3 flex flex-col gap-2">
+        <div className="absolute top-3 left-3 flex flex-col gap-2 pointer-events-none">
           {isNew && (
             <div className="bg-accent text-accent-foreground px-3 py-1.5 rounded-lg text-xs font-semibold uppercase tracking-sporty shadow-xl">
               NEW
