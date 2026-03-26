@@ -1,14 +1,17 @@
 import { Footprints, Mountain, Tent, Watch } from "lucide-react";
 import { Link } from "react-router-dom";
-
-const categories = [
-  { icon: Footprints, title: "รองเท้าวิ่งถนน", count: 48, color: "bg-primary/10 text-primary", slug: "รองเท้าวิ่งถนน" },
-  { icon: Mountain, title: "อุปกรณ์วิ่งเทรล", count: 35, color: "bg-accent/10 text-accent", slug: "อุปกรณ์วิ่งเทรล" },
-  { icon: Tent, title: "Camping Gear", count: 52, color: "bg-badge-recommended/10 text-badge-recommended", slug: "camping-gear" },
-  { icon: Watch, title: "นาฬิกา GPS", count: 24, color: "bg-badge-best-value/10 text-badge-best-value", slug: "นาฬิกา-gps" },
-];
+import { useTranslation } from "@/hooks/useTranslation";
 
 export function CategorySection() {
+  const { t } = useTranslation();
+
+  const categories = [
+    { icon: Footprints, title: t("nav.shoes"), count: 48, color: "bg-primary/10 text-primary", slug: "รองเท้าวิ่งถนน" },
+    { icon: Mountain, title: t("nav.gear"), count: 35, color: "bg-accent/10 text-accent", slug: "อุปกรณ์วิ่งเทรล" },
+    { icon: Tent, title: t("nav.camping"), count: 52, color: "bg-badge-recommended/10 text-badge-recommended", slug: "camping-gear" },
+    { icon: Watch, title: t("wizard.cat_watch"), count: 24, color: "bg-badge-best-value/10 text-badge-best-value", slug: "นาฬิกา-gps" },
+  ];
+
   return (
     <section className="relative py-16 md:py-24 overflow-hidden">
       <div className="absolute inset-0 bg-dot-grid opacity-50" />
@@ -25,7 +28,7 @@ export function CategorySection() {
             </h2>
           </div>
           <p className="hidden md:block text-muted-foreground font-bold uppercase tracking-sporty text-[10px]">
-            ค้นหาตามประเภทการใช้งาน
+            {t("common.search_category")}
           </p>
         </div>
 
@@ -44,7 +47,9 @@ export function CategorySection() {
 
               <h3 className="font-heading font-semibold text-sm md:text-xl text-card-foreground uppercase tracking-tight-compact leading-tight mb-1">{cat.title}</h3>
               <div className="flex items-center gap-2 mt-1 md:mt-2">
-                <span className="text-[8px] md:text-xs font-bold text-muted-foreground/60 tracking-sporty uppercase whitespace-nowrap">{cat.count} ARTICLES</span>
+                <span className="text-[8px] md:text-xs font-bold text-muted-foreground/60 tracking-sporty uppercase whitespace-nowrap">
+                  {cat.count} {t("common.articles")}
+                </span>
                 <div className="flex-1 h-px bg-muted hidden sm:block" />
               </div>
 

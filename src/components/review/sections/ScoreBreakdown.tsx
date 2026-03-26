@@ -1,20 +1,25 @@
 import { ReviewRating } from "@/types/review";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "@/hooks/useTranslation";
 
 interface ScoreBreakdownProps {
   ratings: ReviewRating[];
 }
 
 export const ScoreBreakdown = ({ ratings }: ScoreBreakdownProps) => {
+  const { t, language } = useTranslation();
+
   return (
     <section className="bg-white p-6 md:p-8 rounded-none md:rounded-3xl border-y md:border-2 border-slate-100 shadow-sm md:shadow-none space-y-8 md:space-y-12">
       <div className="space-y-4">
         <h2 className="font-heading text-2xl md:text-3xl font-bold text-primary flex items-center gap-3">
           <span className="w-8 h-1 bg-accent rounded-full" />
-          Expert Score Breakdown
+          {t("review.score_breakdown")}
         </h2>
         <p className="text-sm md:text-base text-slate-500 font-medium">
-          คะแนนเจาะลึกในแต่ละมิติ จากการทดสอบและรวบรวมข้อมูล
+          {language === 'th'
+            ? "คะแนนเจาะลึกในแต่ละมิติ จากการทดสอบและรวบรวมข้อมูล"
+            : "Deep-dive scores for each dimension based on testing and data collection."}
         </p>
       </div>
 

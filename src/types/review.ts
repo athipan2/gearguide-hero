@@ -25,8 +25,11 @@ export interface ReviewRating {
 
 export interface ReviewSectionData {
   title?: string;
+  title_en?: string;
   body?: string;
+  body_en?: string;
   items?: string[] | SpecItem[];
+  items_en?: string[] | SpecItem[];
   type: SectionType;
   props?: Record<string, unknown>;
 }
@@ -35,19 +38,29 @@ export interface ReviewData {
   id?: string;
   slug?: string;
   name: string;
+  name_en?: string;
   brand: string;
   category: string;
+  category_en?: string;
   price: string;
+  price_en?: string;
   image_url: string | null;
   images: string[];
   badge: string | null;
+  badge_en?: string | null;
   overall_rating: number;
   ratings: ReviewRating[];
+  ratings_en?: ReviewRating[];
   specs: SpecItem[];
+  specs_en?: SpecItem[];
   pros: string[];
+  pros_en?: string[];
   cons: string[];
+  cons_en?: string[];
   verdict: string | null;
+  verdict_en?: string | null;
   intro: string | null;
+  intro_en?: string | null;
   sections: ReviewSectionData[];
   affiliate_url: string | null;
   cta_text: string | null;

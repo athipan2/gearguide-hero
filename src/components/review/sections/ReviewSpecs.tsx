@@ -2,6 +2,7 @@ import { SpecItem } from "@/types/review";
 import { cn } from "@/lib/utils";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Info, Settings } from "lucide-react";
+import { useTranslation } from "@/hooks/useTranslation";
 
 interface ReviewSpecsProps {
   specs: SpecItem[];
@@ -9,7 +10,10 @@ interface ReviewSpecsProps {
   className?: string;
 }
 
-export const ReviewSpecs = ({ specs, title = "TECHNICAL SPECIFICATIONS", className }: ReviewSpecsProps) => {
+export const ReviewSpecs = ({ specs, title, className }: ReviewSpecsProps) => {
+  const { t, language } = useTranslation();
+  const displayTitle = title || t("review.specs");
+
   return (
     <section id="specs" className={cn("bg-white p-6 md:p-12 lg:p-20 rounded-none md:rounded-[2.5rem] border-y md:border-2 border-slate-100 shadow-sm md:shadow-none space-y-8 md:space-y-12", className)}>
       <Accordion type="single" collapsible defaultValue="specs" className="w-full">
@@ -19,10 +23,10 @@ export const ReviewSpecs = ({ specs, title = "TECHNICAL SPECIFICATIONS", classNa
               <span className="w-10 h-1 bg-accent rounded-full" />
               <div className="space-y-1">
                 <h2 className="font-heading text-3xl md:text-5xl lg:text-6xl font-bold text-primary uppercase tracking-tighter italic-prohibited">
-                  {title}
+                  {displayTitle}
                 </h2>
                 <p className="text-xs md:text-base text-slate-400 font-bold uppercase tracking-[0.3em] group-hover:text-accent transition-colors">
-                  View full technical details & materials
+                  {t("common.view_full_specs")}
                 </p>
               </div>
             </div>

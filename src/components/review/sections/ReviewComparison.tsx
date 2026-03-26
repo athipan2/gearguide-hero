@@ -5,6 +5,7 @@ import { Scale, ChevronRight, Check, X } from "lucide-react";
 import { RatingStars } from "@/components/RatingStars";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useTranslation } from "@/hooks/useTranslation";
 
 interface ReviewComparisonProps {
   review: ReviewData;
@@ -12,6 +13,7 @@ interface ReviewComparisonProps {
 
 export const ReviewComparison = ({ review }: ReviewComparisonProps) => {
   const [similar, setSimilar] = useState<ReviewData[]>([]);
+  const { t, language } = useTranslation();
 
   useEffect(() => {
     const fetchSimilar = async () => {
@@ -38,16 +40,16 @@ export const ReviewComparison = ({ review }: ReviewComparisonProps) => {
         <div className="space-y-4">
           <h2 className="font-heading text-2xl md:text-3xl font-bold text-primary flex items-center gap-3">
             <span className="w-8 h-1 bg-accent rounded-full" />
-            Product Comparison
+            {t("review.comparison")}
           </h2>
           <p className="text-sm md:text-base text-slate-500 font-medium">
-            เปรียบเทียบกับรุ่นที่ใกล้เคียงที่สุดในตลาด เพื่อหาคู่ที่ใช่สำหรับคุณ
+            {t("common.comparison_subtitle")}
           </p>
         </div>
         <Link to="/compare">
           <Button variant="outline" className="rounded-full gap-2 text-xs font-bold uppercase tracking-widest h-12 px-8 border-2 hover:bg-primary/5">
             <Scale className="h-4 w-4" />
-            Compare More
+            {t("common.compare_more")}
             <ChevronRight className="h-4 w-4" />
           </Button>
         </Link>
@@ -77,11 +79,15 @@ export const ReviewComparison = ({ review }: ReviewComparisonProps) => {
                 <div className="space-y-3 py-2">
                    <div className="flex items-start gap-2 text-emerald-600">
                     <Check className="h-3.5 w-3.5 mt-0.5" />
-                    <span className="text-[10px] md:text-xs font-bold text-slate-500 uppercase tracking-widest leading-none">KEY ADVANTAGE: {item.pros[0]}</span>
+                    <span className="text-[10px] md:text-xs font-bold text-slate-500 uppercase tracking-widest leading-none">
+                      {t("common.key_advantage")}: {item.pros[0]}
+                    </span>
                    </div>
                    <div className="flex items-start gap-2 text-rose-500">
                     <X className="h-3.5 w-3.5 mt-0.5" />
-                    <span className="text-[10px] md:text-xs font-bold text-slate-500 uppercase tracking-widest leading-none">WEAKNESS: {item.cons[0]}</span>
+                    <span className="text-[10px] md:text-xs font-bold text-slate-500 uppercase tracking-widest leading-none">
+                      {t("common.weakness")}: {item.cons[0]}
+                    </span>
                    </div>
                 </div>
 

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { ProductCard } from "./ProductCard";
+import { useTranslation } from "@/hooks/useTranslation";
 import { cn } from "@/lib/utils";
 
 interface RelatedReview {
@@ -43,6 +44,7 @@ const parsePrice = (priceStr: string): number => {
 export function RelatedReviews({ currentReview, isCompact }: RelatedReviewsProps) {
   const [related, setRelated] = useState<RelatedReview[]>([]);
   const [loading, setLoading] = useState(true);
+  const { t, language } = useTranslation();
 
   useEffect(() => {
     const fetchRelated = async () => {
@@ -117,10 +119,10 @@ export function RelatedReviews({ currentReview, isCompact }: RelatedReviewsProps
           isCompact ? "text-xl md:text-2xl" : "text-2xl md:text-4xl"
         )}>
           <span className={cn("bg-accent rounded-full", isCompact ? "h-6 md:h-8 w-1.5" : "h-8 md:h-10 w-1.5")} />
-          รีวิวที่เกี่ยวข้อง
+          {t("review.related")}
         </h2>
         <p className={cn("text-muted-foreground mt-2 font-medium", isCompact ? "text-xs md:text-base" : "text-sm md:text-lg")}>
-          สินค้าที่คุณอาจจะสนใจตามความใกล้เคียงของสเปคและราคา
+          {t("review.related_subtitle")}
         </p>
       </div>
       <div className={cn(

@@ -6,6 +6,7 @@ import { SEOHead } from "@/components/SEOHead";
 import { supabase } from "@/integrations/supabase/client";
 import { CommentSection } from "@/components/CommentSection";
 import { Button } from "@/components/ui/button";
+import { useTranslation } from "@/hooks/useTranslation";
 import { Loader2, ArrowLeft, Calendar, User } from "lucide-react";
 
 interface Article {
@@ -64,6 +65,7 @@ export default function ArticleDetail() {
   const { slug } = useParams<{ slug: string }>();
   const [article, setArticle] = useState<Article | null>(null);
   const [loading, setLoading] = useState(true);
+  const { t, language } = useTranslation();
 
   useEffect(() => {
     const fetchArticle = async () => {
@@ -103,8 +105,8 @@ export default function ArticleDetail() {
       <div className="min-h-screen bg-background">
         <Navbar />
         <div className="container mx-auto px-4 py-20 text-center">
-          <h1 className="text-2xl font-semibold mb-4">ไม่พบบทความ</h1>
-          <Link to="/guides"><Button>กลับไปหน้าคู่มือ</Button></Link>
+          <h1 className="text-2xl font-semibold mb-4">{t("review.not_found_article")}</h1>
+          <Link to="/guides"><Button>{t("review.back_guides")}</Button></Link>
         </div>
         <Footer />
       </div>
@@ -123,7 +125,7 @@ export default function ArticleDetail() {
       <main className="container mx-auto px-4 py-8 max-w-4xl">
         <Link to="/guides" className="inline-flex items-center text-primary hover:text-accent mb-8 transition-colors">
           <ArrowLeft className="h-4 w-4 mr-2" />
-          กลับไปหน้าคู่มือ
+          {t("review.back_guides")}
         </Link>
 
         <header className="mb-12">
@@ -138,11 +140,11 @@ export default function ArticleDetail() {
           <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-8 text-[10px] sm:text-xs font-semibold uppercase tracking-widest text-muted-foreground border-t border-b border-primary/5 py-4">
             <div className="flex items-center gap-2">
               <User className="h-4 w-4 text-accent" />
-              <span>ทีมงาน GearTrail</span>
+              <span>{t("review.team")}</span>
             </div>
             <div className="flex items-center gap-2">
               <Calendar className="h-4 w-4 text-accent" />
-              <span>{new Date(article.created_at).toLocaleDateString('th-TH', {
+              <span>{new Date(article.created_at).toLocaleDateString(language === 'th' ? 'th-TH' : 'en-US', {
                 year: 'numeric',
                 month: 'long',
                 day: 'numeric'

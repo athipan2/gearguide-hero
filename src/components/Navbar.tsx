@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
-import { Menu, Search, Mountain, Scale } from "lucide-react";
+import { Menu, Search, Mountain, Scale, Languages } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useComparisonStore } from "@/lib/comparison-store";
+import { useTranslation } from "@/hooks/useTranslation";
 import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { SearchDialog } from "./SearchDialog";
@@ -14,14 +15,6 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 
-const navLinks = [
-  { label: "รองเท้าวิ่ง", href: "/category/รองเท้าวิ่งถนน" },
-  { label: "อุปกรณ์เทรล", href: "/category/อุปกรณ์วิ่งเทรล" },
-  { label: "แคมป์ปิ้ง", href: "/category/camping-gear" },
-  { label: "คู่มือ & เทคนิค", href: "/guides" },
-  { label: "Best Of 2026", href: "#" },
-];
-
 interface NavbarProps {
   className?: string;
   forceWhite?: boolean;
@@ -31,6 +24,15 @@ export function Navbar({ className, forceWhite }: NavbarProps) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const selectedCount = useComparisonStore((state) => state.selectedItems.length);
+  const { t, language, toggleLanguage } = useTranslation();
+
+  const navLinks = [
+    { label: t("nav.shoes"), href: "/category/รองเท้าวิ่งถนน" },
+    { label: t("nav.gear"), href: "/category/อุปกรณ์วิ่งเทรล" },
+    { label: t("nav.camping"), href: "/category/camping-gear" },
+    { label: t("nav.guides"), href: "/guides" },
+    { label: t("nav.best"), href: "#" },
+  ];
 
   useEffect(() => {
     const handleScroll = () => {
@@ -76,6 +78,16 @@ export function Navbar({ className, forceWhite }: NavbarProps) {
         <div className="hidden md:flex items-center gap-1 lg:gap-2">
           <Button
             variant="ghost"
+            size="sm"
+            className="text-primary hover:bg-primary/5 h-9 px-2 font-bold uppercase tracking-sporty text-[10px]"
+            onClick={toggleLanguage}
+          >
+            <Languages className="h-4 w-4 mr-1.5" />
+            <span>{language === 'th' ? 'EN' : 'TH'}</span>
+          </Button>
+
+          <Button
+            variant="ghost"
             size="icon"
             className="text-primary hover:bg-primary/5 h-9 w-9"
             onClick={() => setSearchOpen(true)}
@@ -90,7 +102,7 @@ export function Navbar({ className, forceWhite }: NavbarProps) {
               className="relative text-primary hover:bg-primary/5 font-bold uppercase tracking-sporty text-[10px] h-9 px-3"
             >
               <Scale className="h-4 w-4 mr-2" />
-              <span>เปรียบเทียบ</span>
+              <span>{t("nav.compare_btn")}</span>
               {selectedCount > 0 && (
                 <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-accent text-[9px] text-accent-foreground font-bold">
                   {selectedCount}
@@ -100,7 +112,7 @@ export function Navbar({ className, forceWhite }: NavbarProps) {
           </Link>
 
           <Button variant="cta" size="sm" className="hidden lg:flex h-9 text-[10px] font-bold tracking-sporty">
-            ส่งรีวิว
+            {t("nav.submit")}
           </Button>
         </div>
 
@@ -131,6 +143,16 @@ export function Navbar({ className, forceWhite }: NavbarProps) {
                   </SheetClose>
                 ))}
                 <div className="mt-4 px-6 pt-6 border-t space-y-4">
+                  <Button
+                    variant="ghost"
+                    className="w-full justify-start text-lg font-semibold uppercase tracking-widest"
+                    size="lg"
+                    onClick={toggleLanguage}
+                  >
+                    <Languages className="h-5 w-5 mr-3" />
+                    {language === 'th' ? 'English (EN)' : 'ภาษาไทย (TH)'}
+                  </Button>
+
                   <SheetClose asChild>
                     <Button
                       variant="ghost"
@@ -139,7 +161,7 @@ export function Navbar({ className, forceWhite }: NavbarProps) {
                       onClick={() => setSearchOpen(true)}
                     >
                       <Search className="h-5 w-5 mr-3" />
-                      ค้นหา
+                      {t("nav.search")}
                     </Button>
                   </SheetClose>
 
@@ -151,7 +173,7 @@ export function Navbar({ className, forceWhite }: NavbarProps) {
                         size="lg"
                       >
                         <Scale className="h-5 w-5 mr-3" />
-                        เปรียบเทียบ
+                        {t("nav.compare")}
                         {selectedCount > 0 && (
                           <span className="ml-2 flex h-6 w-6 items-center justify-center rounded-full bg-accent text-xs text-accent-foreground font-semibold">
                             {selectedCount}
@@ -162,7 +184,7 @@ export function Navbar({ className, forceWhite }: NavbarProps) {
                   </SheetClose>
 
                   <Button variant="cta" className="w-full text-lg font-semibold uppercase tracking-widest" size="lg">
-                    ส่งรีวิว
+                    {t("nav.submit")}
                   </Button>
                 </div>
               </div>
