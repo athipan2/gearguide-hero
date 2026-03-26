@@ -7,13 +7,17 @@ import { supabase } from "@/integrations/supabase/client";
 import { CommentSection } from "@/components/CommentSection";
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "@/hooks/useTranslation";
+import { translateData } from "@/lib/utils";
 import { Loader2, ArrowLeft, Calendar, User } from "lucide-react";
 
 interface Article {
   id: string;
   title: string;
+  title_en?: string;
   category: string;
+  category_en?: string;
   content: string;
+  content_en?: string;
   image_url: string | null;
   created_at: string;
 }
@@ -22,6 +26,7 @@ const fallbackArticles: Record<string, Article> = {
   "how-to-choose-running-shoes": {
     id: "1",
     title: "วิธีเลือกซื้อรองเท้าวิ่งปี 2026: คู่มือฉบับสมบูรณ์",
+    title_en: "How to Choose Running Shoes 2026: Complete Guide",
     content: `การเลือกซื้อรองเท้าวิ่งที่เหมาะกับเท้าและลักษณะการวิ่งของคุณจะช่วยลดอาการบาดเจ็บและเพิ่มประสิทธิภาพการวิ่งได้อย่างมาก
 
 1. ทราบประเภทของเท้า (Arch Type)
@@ -35,13 +40,28 @@ const fallbackArticles: Record<string, Article> = {
 
 4. เลือกระดับการรับแรงกระแทก (Cushioning)
 ตามระยะทางที่วิ่งและความชอบส่วนตัว`,
+    content_en: `Choosing the right running shoes for your feet and running style can greatly reduce injury and improve running performance.
+
+1. Know your Arch Type
+Whether you have flat feet or high arches affects shock absorption.
+
+2. Understand Pronation
+Runners whose feet roll inward too much (overpronation) may need stability shoes.
+
+3. Choose the right size
+Leave about 0.5 - 1 cm of space at the front because feet expand during long runs.
+
+4. Choose the level of cushioning
+According to the distance you run and personal preference.`,
     category: "ความรู้พื้นฐาน",
+    category_en: "Basics",
     image_url: "https://images.unsplash.com/photo-1476480862126-209bfaa8edc8?w=800&h=600&fit=crop",
     created_at: new Date().toISOString(),
   },
   "trail-running-for-beginners": {
     id: "2",
     title: "เริ่มวิ่งเทรลอย่างไรดี? 5 สิ่งที่มือใหม่ต้องรู้",
+    title_en: "How to start trail running? 5 things beginners should know",
     content: `จากถนนสู่ป่า การวิ่งเทรลมีความแตกต่างทั้งด้านอุปกรณ์และทักษะ นี่คือคู่มือเบื้องต้นสำหรับคนที่อยากลองสนามเทรลครั้งแรก
 
 1. รองเท้าเทรลเป็นหัวใจสำคัญ
@@ -55,7 +75,21 @@ const fallbackArticles: Record<string, Article> = {
 
 4. การเติมพลังงาน
 การวิ่งเทรลมักใช้เวลานานกว่าถนนในระยะทางที่เท่ากัน การวางแผนน้ำและพลังงานจึงสำคัญมาก`,
+    content_en: `From road to forest, trail running differs in both equipment and skills. Here is a basic guide for people who want to try their first trail field.
+
+1. Trail shoes are key
+Outsoles must have good grip (Lug) to prevent slipping on dirt or rocks.
+
+2. Don't overlook safety
+You should have basic equipment such as a whistle and emergency blanket when entering the forest.
+
+3. Running up and down hills
+Muscle techniques differ from running on flat roads. Recommended to use short steps.
+
+4. Energy replenishment
+Trail running often takes longer than roads at the same distance. Planning water and energy is therefore very important.`,
     category: "วิ่งเทรล",
+    category_en: "Trail Running",
     image_url: "https://images.unsplash.com/photo-1551632811-561732d1e306?w=800&h=600&fit=crop",
     created_at: new Date().toISOString(),
   }
@@ -72,7 +106,7 @@ export default function ArticleDetail() {
       setLoading(true);
       const { data, error } = await supabase
         .from("articles")
-        .select("id, title, category, content, image_url, created_at")
+        .select("id, title, title_en, category, category_en, content, content_en, image_url, created_at")
         .eq("slug", slug)
         .eq("published", true)
         .maybeSingle();
@@ -113,11 +147,15 @@ export default function ArticleDetail() {
     );
   }
 
+  const displayTitle = (language === 'en' && article.title_en) ? article.title_en : article.title;
+  const displayCategory = (language === 'en' && article.category_en) ? article.category_en : article.category;
+  const displayContent = (language === 'en' && article.content_en) ? article.content_en : article.content;
+
   return (
     <div className="min-h-screen bg-background">
       <SEOHead
-        title={`${article.title} — GearTrail`}
-        description={article.title}
+        title={`${displayTitle} — GearTrail`}
+        description={displayTitle}
         image={article.image_url || undefined}
       />
       <Navbar />
@@ -131,11 +169,11 @@ export default function ArticleDetail() {
         <header className="mb-12">
           <div className="flex items-center gap-2 mb-6">
             <span className="text-xs font-semibold text-accent uppercase tracking-[0.3em]">
-              {article.category}
+              {displayCategory}
             </span>
           </div>
           <h1 className="font-heading text-3xl md:text-6xl font-semibold text-primary mb-8 leading-[0.9] tracking-tighter uppercase">
-            {article.title}
+            {displayTitle}
           </h1>
           <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-8 text-[10px] sm:text-xs font-semibold uppercase tracking-widest text-muted-foreground border-t border-b border-primary/5 py-4">
             <div className="flex items-center gap-2">
@@ -165,7 +203,7 @@ export default function ArticleDetail() {
         )}
 
         <div className="prose prose-base md:prose-lg max-w-none prose-headings:font-heading prose-headings:font-semibold prose-p:text-muted-foreground prose-p:leading-relaxed whitespace-pre-wrap">
-          {article.content}
+          {displayContent}
         </div>
 
         {/* Comments Section */}

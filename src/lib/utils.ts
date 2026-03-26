@@ -68,6 +68,19 @@ export const translateData = (text: string | null | undefined, language: 'th' | 
   if (!text || language === 'th') return text || '';
 
   const dictionary: Record<string, string> = {
+    // Categories & Meta
+    "รองเท้าวิ่งถนน": "Road Running",
+    "อุปกรณ์วิ่งเทรล": "Trail Gear",
+    "แคมป์ปิ้ง": "Camping",
+    "ความรู้พื้นฐาน": "Basics",
+    "วิ่งเทรล": "Trail Running",
+    "นาฬิกา GPS": "GPS Watch",
+    "รีวิว": "Review",
+    "แนะนำ": "Recommended",
+    "คุ้มค่าที่สุด": "Best Value",
+    "ยอดนิยม": "Popular",
+    "ใหม่": "New",
+
     // Specs
     "น้ำหนัก": "Weight",
     "ระยะดรอป": "Drop",
@@ -81,6 +94,14 @@ export const translateData = (text: string | null | undefined, language: 'th' | 
     "การระบายอากาศ": "Breathability",
     "ความนุ่ม": "Cushioning",
     "การส่งแรง": "Energy Return",
+    "จุดเด่น": "Pros",
+    "ข้อควรระวัง": "Cons",
+    "เหมาะสำหรับ": "Suitable for",
+    "ไม่แนะนำสำหรับ": "Not recommended for",
+    "พื้นผิว": "Terrain",
+    "สภาพอากาศ": "Weather",
+    "ระยะทางทดสอบ": "Test Distance",
+    "บทสรุป": "Verdict",
 
     // Values
     "ปกติ": "Standard",
@@ -92,6 +113,11 @@ export const translateData = (text: string | null | undefined, language: 'th' | 
     "เท้าแบน": "Flat Foot",
     "อุ้งเท้าปกติ": "Neutral",
     "อุ้งเท้าสูง": "High Arch",
+    "เบาที่สุด": "Ultra-light",
+    "นุ่มพิเศษ": "Ultra-soft",
+    "แดดจัด": "Sunny",
+    "พื้นแห้ง": "Dry",
+    "ทางฝุ่น": "Dirt",
 
     // Ratings
     "ความสบาย": "Comfort",

@@ -92,7 +92,7 @@ export function ShoeWizard({ onClose }: { onClose: () => void }) {
           rating: item.rating || 4.5,
           price: item.price,
           slug: item.slug,
-          weight: item.specs?.find((s: Spec) => s.label === "น้ำหนัก")?.value,
+          weight: item.specs?.find((s: Spec) => s.label === "น้ำหนัก" || s.label === "Weight")?.value,
           drop: item.specs?.find((s: Spec) => s.label === "Drop")?.value,
           pros: item.pros,
           cons: item.cons,
@@ -101,7 +101,7 @@ export function ShoeWizard({ onClose }: { onClose: () => void }) {
         setRecommendations(results);
 
         // Automatically add to comparison
-        results.forEach(rec => {
+        results.forEach((rec, index) => {
           useComparisonStore.getState().addItem({
             name: rec.name,
             brand: rec.brand,
@@ -109,7 +109,7 @@ export function ShoeWizard({ onClose }: { onClose: () => void }) {
             rating: rec.rating,
             price: rec.price,
             slug: rec.slug,
-            badge: index === 0 ? "Top Pick" : undefined,
+            badge: index === 0 ? t("wizard.top_pick") : undefined,
             weight: rec.weight,
             drop: rec.drop,
             aspectRatings: rec.ratings
@@ -163,7 +163,7 @@ export function ShoeWizard({ onClose }: { onClose: () => void }) {
       }
     } catch (err) {
       console.error(err);
-      toast.error("ไม่สามารถดึงข้อมูลได้");
+      toast.error(t("wizard.fetch_error"));
     } finally {
       setLoading(false);
       setStep("result");
@@ -183,7 +183,7 @@ export function ShoeWizard({ onClose }: { onClose: () => void }) {
       drop: rec.drop,
       aspectRatings: rec.ratings
     });
-    toast.success(`เพิ่ม ${rec.name} ในตารางเปรียบเทียบแล้ว`);
+    toast.success(t("wizard.added_to_compare").replace("{name}", rec.name));
   };
 
   return (
@@ -489,7 +489,7 @@ export function ShoeWizard({ onClose }: { onClose: () => void }) {
                   <div key={rec.id} className="relative group bg-card rounded-3xl border border-primary/5 overflow-hidden flex flex-col md:flex-row gap-6 p-6 hover:shadow-xl transition-all">
                     {index === 0 && (
                       <div className="absolute top-0 left-0 bg-accent text-white px-4 py-1 text-[10px] font-semibold uppercase rounded-br-xl">
-                        Top Pick
+                        {t("wizard.top_pick")}
                       </div>
                     )}
 
@@ -517,7 +517,7 @@ export function ShoeWizard({ onClose }: { onClose: () => void }) {
                             size="sm"
                             className="rounded-full h-10 w-10 p-0"
                             onClick={() => handleAddToCompare(rec, index)}
-                            title="เพิ่มลงตารางเปรียบเทียบ"
+                            title={t("wizard.add_to_compare")}
                           >
                             <Scale className="h-4 w-4" />
                           </Button>
@@ -528,7 +528,7 @@ export function ShoeWizard({ onClose }: { onClose: () => void }) {
                               onClose();
                             }}
                           >
-                            ดูรีวิว <ArrowRight className="h-4 w-4" />
+                            {t("review.read_review")} <ArrowRight className="h-4 w-4" />
                           </Button>
                         </div>
                       </div>

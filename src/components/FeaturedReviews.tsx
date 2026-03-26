@@ -78,7 +78,7 @@ export function FeaturedReviews() {
       try {
         const { data, error } = await supabase
           .from("reviews")
-          .select("name, brand, image_url, overall_rating, price, badge, pros, cons, specs, ratings, slug, affiliate_url, created_at")
+          .select("name, name_en, brand, image_url, overall_rating, price, price_en, badge, badge_en, pros, pros_en, cons, cons_en, specs, ratings, slug, affiliate_url, created_at")
           .eq("published", true)
           .order("created_at", { ascending: false })
           .limit(8);
@@ -87,15 +87,20 @@ export function FeaturedReviews() {
 
         if (data && data.length > 0) {
           setProducts(
-            (data as unknown as ReviewData[]).map((r) => ({
+            (data as unknown as (ReviewData & { name_en: string, price_en: string, badge_en: string, pros_en: string[], cons_en: string[] })[]).map((r) => ({
               name: r.name,
+              name_en: r.name_en,
               brand: r.brand,
               image: getOptimizedImageUrl(r.image_url, 'card') || "",
               rating: Number(r.overall_rating),
               price: r.price,
+              price_en: r.price_en,
               badge: r.badge || undefined,
+              badge_en: r.badge_en || undefined,
               pros: Array.isArray(r.pros) ? (r.pros as string[]) : [],
+              pros_en: Array.isArray(r.pros_en) ? (r.pros_en as string[]) : [],
               cons: Array.isArray(r.cons) ? (r.cons as string[]) : [],
+              cons_en: Array.isArray(r.cons_en) ? (r.cons_en as string[]) : [],
               specs: Array.isArray(r.specs) ? (r.specs as { label: string; value: string }[]) : [],
               ratings: Array.isArray(r.ratings) ? (r.ratings as { label: string; score: number }[]) : [],
               slug: r.slug,

@@ -41,7 +41,7 @@ export const QuickDecision = ({ suitable, notSuitable }: QuickDecisionProps) => 
                 </span>
               </li>
             )) : (
-               <li className="text-slate-400 text-sm italic">No data available</li>
+               <li className="text-slate-400 text-sm italic">{t("common.no_data")}</li>
             )}
           </ul>
         </div>
@@ -63,7 +63,7 @@ export const QuickDecision = ({ suitable, notSuitable }: QuickDecisionProps) => 
                 </span>
               </li>
             )) : (
-               <li className="text-slate-400 text-sm italic">No data available</li>
+               <li className="text-slate-400 text-sm italic">{t("common.no_data")}</li>
             )}
           </ul>
         </div>

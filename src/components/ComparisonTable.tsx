@@ -14,18 +14,20 @@ const getSpecIcon = (label: string) => {
   const l = label.toLowerCase();
   if (l.includes('weight') || l.includes('น้ำหนัก')) return <Weight className="h-4 w-4" />;
   if (l.includes('drop')) return <Ruler className="h-4 w-4" />;
-  if (l.includes('เหมาะกับ') || l.includes('suitable')) return <Heart className="h-4 w-4" />;
-  if (l.includes('พื้น') || l.includes('sole')) return <Shield className="h-4 w-4" />;
-  if (l.includes('ระยะ') || l.includes('distance')) return <BarChart3 className="h-4 w-4" />;
+  if (l.includes('เหมาะกับ') || l.includes('suitable') || l.includes('for')) return <Heart className="h-4 w-4" />;
+  if (l.includes('พื้น') || l.includes('sole') || l.includes('stack')) return <Shield className="h-4 w-4" />;
+  if (l.includes('ระยะ') || l.includes('distance') || l.includes('terrain')) return <BarChart3 className="h-4 w-4" />;
+  if (l.includes('width') || l.includes('หน้ากว้าง')) return <Scale className="h-4 w-4" />;
   return <Info className="h-4 w-4" />;
 };
 
 const getRatingIcon = (label: string) => {
   const l = label.toLowerCase();
-  if (l.includes('คืนตัว') || l.includes('energy') || l.includes('bounce')) return <Zap className="h-4 w-4" />;
+  if (l.includes('คืนตัว') || l.includes('energy') || l.includes('bounce') || l.includes('response')) return <Zap className="h-4 w-4" />;
   if (l.includes('ทนทาน') || l.includes('durability')) return <Shield className="h-4 w-4" />;
   if (l.includes('สบาย') || l.includes('comfort')) return <Heart className="h-4 w-4" />;
-  if (l.includes('เบา') || l.includes('lightweight')) return <Weight className="h-4 w-4" />;
+  if (l.includes('เบา') || l.includes('lightweight') || l.includes('weight')) return <Weight className="h-4 w-4" />;
+  if (l.includes('value') || l.includes('คุ้มค่า')) return <Star className="h-4 w-4" />;
   return <Star className="h-4 w-4" />;
 };
 

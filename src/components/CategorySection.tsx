@@ -24,7 +24,7 @@ export function CategorySection() {
               <span className="text-[10px] md:text-xs font-bold text-accent uppercase tracking-sporty">CATEGORIES</span>
             </div>
             <h2 className="font-heading text-2xl md:text-4xl font-semibold text-foreground uppercase tracking-tight-compact">
-              EXPLORE <span className="text-primary/40">GEAR</span>
+              {t("home.explore")} <span className="text-primary/40">{t("home.gear")}</span>
             </h2>
           </div>
           <p className="hidden md:block text-muted-foreground font-bold uppercase tracking-sporty text-[10px]">

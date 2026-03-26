@@ -244,8 +244,6 @@ export default function AdminReviewForm() {
     }
   };
 
-  const bypassAuth = true; // Temporary for verification if I can't mock context easily
-
   const Content = (
     <>
       <div className="flex items-center gap-3 mb-6">
@@ -700,9 +698,7 @@ export default function AdminReviewForm() {
 
   return (
     <AdminLayout>
-      {bypassAuth ? (
-        <div className="p-6">{Content}</div>
-      ) : Content}
+      {Content}
 
       <div className="lg:hidden fixed bottom-0 left-0 right-0 p-4 bg-background/80 backdrop-blur-md border-t z-50 flex gap-2">
         <Button variant="outline" className="flex-1 h-12" onClick={() => navigate("/admin/reviews")}>

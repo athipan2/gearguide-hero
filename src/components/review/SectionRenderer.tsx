@@ -26,9 +26,9 @@ export const SectionRenderer = ({ section, review, userRating }: SectionRenderer
       return <ReviewHero review={review} userRating={userRating} />;
 
     case 'quick_decision': {
-      const specs = (isEn && review.specs_en) ? review.specs_en : review.specs;
-      const pros = (isEn && review.pros_en) ? review.pros_en : review.pros;
-      const cons = (isEn && review.cons_en) ? review.cons_en : review.cons;
+      const specs = (isEn && review.specs_en && review.specs_en.length > 0) ? review.specs_en : review.specs;
+      const pros = (isEn && review.pros_en && review.pros_en.length > 0) ? review.pros_en : review.pros;
+      const cons = (isEn && review.cons_en && review.cons_en.length > 0) ? review.cons_en : review.cons;
 
       const suitable = specs
         ?.filter(s =>
@@ -38,11 +38,11 @@ export const SectionRenderer = ({ section, review, userRating }: SectionRenderer
           s.label.includes('Distance') ||
           s.label.toLowerCase().includes('target')
         )
-        ?.map(s => s.value) || [];
+        ?.map(s => isEn ? translateData(s.value, 'en') : s.value) || [];
 
       // Combine some default "suitable" from pros if needed, or just use pros/cons
-      const combinedSuitable = Array.from(new Set([...suitable, ...pros.slice(0, 2)]));
-      const notSuitable = cons?.slice(0, 3) || [];
+      const combinedSuitable = Array.from(new Set([...suitable, ...pros.slice(0, 2).map(p => isEn ? translateData(p, 'en') : p)]));
+      const notSuitable = (cons?.slice(0, 3) || []).map(c => isEn ? translateData(c, 'en') : c);
 
       return (
         <QuickDecision
@@ -53,7 +53,7 @@ export const SectionRenderer = ({ section, review, userRating }: SectionRenderer
     }
 
     case 'score_breakdown': {
-      const ratings = (isEn && review.ratings_en) ? review.ratings_en : review.ratings;
+      const ratings = (isEn && review.ratings_en && review.ratings_en.length > 0) ? review.ratings_en : review.ratings;
       const translatedRatings = ratings?.map(r => ({
         ...r,
         label: isEn ? translateData(r.label, 'en') : r.label
@@ -71,7 +71,8 @@ export const SectionRenderer = ({ section, review, userRating }: SectionRenderer
     }
 
     case 'real_world_test': {
-      const conditions = (isEn && review.test_conditions_en)
+      const hasEnConditions = isEn && review.test_conditions_en && Object.keys(review.test_conditions_en).length > 0;
+      const conditions = hasEnConditions
         ? review.test_conditions_en
         : (section.props as ReviewData['test_conditions']) || review.test_conditions;
 
@@ -79,25 +80,26 @@ export const SectionRenderer = ({ section, review, userRating }: SectionRenderer
 
       return (
         <RealWorldTest
-          terrain={conditions?.terrain || (isEn ? "Road / Trail" : "ถนน / เทรล")}
-          weather={conditions?.weather || (isEn ? "Dry / Sunny" : "แดดจัด / พื้นแห้ง")}
-          distance={conditions?.distance || (isEn ? "50km+ Test" : "ทดสอบ 50 กม.+")}
-          performance={performance || ""}
+          terrain={isEn ? translateData(conditions?.terrain, 'en') : conditions?.terrain || (isEn ? "Road / Trail" : "ถนน / เทรล")}
+          weather={isEn ? translateData(conditions?.weather, 'en') : conditions?.weather || (isEn ? "Dry / Sunny" : "แดดจัด / พื้นแห้ง")}
+          distance={isEn ? translateData(conditions?.distance, 'en') : conditions?.distance || (isEn ? "50km+ Test" : "ทดสอบ 50 กม.+")}
+          performance={isEn ? translateData(performance, 'en') : performance || ""}
         />
       );
     }
 
     case 'specs': {
-      const specs = (isEn && review.specs_en) ? review.specs_en : review.specs;
+      const specs = (isEn && review.specs_en && review.specs_en.length > 0) ? review.specs_en : review.specs;
       const translatedSpecs = specs?.map(s => ({
         ...s,
         label: isEn ? translateData(s.label, 'en') : s.label,
         value: isEn ? translateData(s.value, 'en') : s.value
       }));
+      const title = (isEn && section.title_en) ? section.title_en : section.title;
       return (
         <ReviewSpecs
           specs={translatedSpecs || []}
-          title={(isEn && section.title_en) ? section.title_en : section.title}
+          title={isEn ? translateData(title, 'en') : title}
         />
       );
     }
@@ -105,15 +107,19 @@ export const SectionRenderer = ({ section, review, userRating }: SectionRenderer
     case 'comparison':
       return <ReviewComparison review={review} />;
 
-    case 'verdict':
+    case 'verdict': {
+      const verdict = (isEn && review.verdict_en) ? review.verdict_en : review.verdict;
+      const ctaText = (isEn && review.cta_text_en) ? review.cta_text_en : review.cta_text;
+
       return (
         <ReviewVerdict
-          verdict={((isEn && review.verdict_en) ? review.verdict_en : review.verdict) || ""}
+          verdict={isEn ? translateData(verdict, 'en') : (verdict || "")}
           affiliateUrl={review.affiliate_url}
-          ctaText={review.cta_text}
+          ctaText={isEn ? translateData(ctaText, 'en') : (ctaText || "")}
           review={review}
         />
       );
+    }
 
     case 'pros_cons':
       // Legacy support, but we now use quick_decision

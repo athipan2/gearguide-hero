@@ -45,8 +45,12 @@ export function ProductCard({
   const displayName = (isEn && name_en) ? name_en : name;
   const displayPrice = (isEn && price_en) ? price_en : price;
   const displayBadge = (isEn && badge_en) ? badge_en : badge;
-  const displayPros = (isEn && pros_en) ? pros_en : pros;
-  const displayCons = (isEn && cons_en) ? cons_en : cons;
+  const displayPros = (isEn && pros_en && pros_en.length > 0)
+    ? pros_en
+    : (isEn ? pros.map(p => translateData(p, 'en')) : pros);
+  const displayCons = (isEn && cons_en && cons_en.length > 0)
+    ? cons_en
+    : (isEn ? cons.map(c => translateData(c, 'en')) : cons);
 
   const isNew = createdAt ? (new Date().getTime() - new Date(createdAt).getTime()) < (30 * 24 * 60 * 60 * 1000) : false;
 
@@ -83,7 +87,7 @@ export function ProductCard({
           )}
           {displayBadge && (
             <div className={`px-3 py-1.5 rounded-lg text-xs font-semibold uppercase tracking-sporty shadow-sm ${badgeColors[displayBadge] || "bg-primary text-primary-foreground"}`}>
-              {displayBadge}
+              {isEn ? translateData(displayBadge, 'en') : displayBadge}
             </div>
           )}
         </div>
@@ -146,19 +150,20 @@ export function ProductCard({
                 specs: translatedSpecs,
                 aspectRatings: translatedRatings
               });
-              toast.success(isEn ? `Added ${displayName} to comparison` : `เพิ่ม ${displayName} เข้าสู่การเปรียบเทียบ`);
+              toast.success(t("wizard.added_to_compare").replace("{name}", displayName));
             }}
+            title={t("nav.compare_btn")}
           >
             {t("nav.compare_btn")}
           </Button>
 
           {slug ? (
             <Button variant="outline" size="sm" className="w-full text-xs font-bold uppercase tracking-sporty h-10 md:h-9 rounded-lg px-1 md:px-2" asChild>
-              <Link to={`/review/${slug}`}>{isEn ? 'REVIEW' : 'รีวิว'}</Link>
+              <Link to={`/review/${slug}`}>{t("review.read_review")}</Link>
             </Button>
           ) : (
             <Button variant="outline" size="sm" className="w-full text-xs font-bold uppercase tracking-sporty h-10 md:h-9 rounded-lg px-1 md:px-2">
-              {isEn ? 'REVIEW' : 'รีวิว'}
+              {t("review.read_review")}
             </Button>
           )}
 

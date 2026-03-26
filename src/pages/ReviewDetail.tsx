@@ -119,21 +119,52 @@ export default function ReviewDetail() {
       if (data) {
         currentReview = {
           id: data.id,
-          name: data.name, brand: data.brand, category: data.category, price: data.price,
-          image_url: data.image_url, badge: data.badge, overall_rating: Number(data.overall_rating),
+          name: data.name,
+          // @ts-expect-error fields added via migration
+          name_en: data.name_en,
+          brand: data.brand,
+          category: data.category,
+          // @ts-expect-error fields added via migration
+          category_en: data.category_en,
+          price: data.price,
+          // @ts-expect-error fields added via migration
+          price_en: data.price_en,
+          image_url: data.image_url,
+          badge: data.badge,
+          // @ts-expect-error fields added via migration
+          badge_en: data.badge_en,
+          overall_rating: Number(data.overall_rating),
           images: (data.images as unknown as string[]) || [],
           ratings: (data.ratings as unknown as ReviewData["ratings"]) || [],
+          // @ts-expect-error fields added via migration
+          ratings_en: (data.ratings_en as unknown as ReviewData["ratings"]) || [],
           specs: (data.specs as unknown as ReviewData["specs"]) || [],
+          // @ts-expect-error fields added via migration
+          specs_en: (data.specs_en as unknown as ReviewData["specs"]) || [],
           pros: (data.pros as unknown as string[]) || [],
+          // @ts-expect-error fields added via migration
+          pros_en: (data.pros_en as unknown as string[]) || [],
           cons: (data.cons as unknown as string[]) || [],
-          intro: data.intro, verdict: data.verdict,
+          // @ts-expect-error fields added via migration
+          cons_en: (data.cons_en as unknown as string[]) || [],
+          intro: data.intro,
+          // @ts-expect-error fields added via migration
+          intro_en: data.intro_en,
+          verdict: data.verdict,
+          // @ts-expect-error fields added via migration
+          verdict_en: data.verdict_en,
           sections: (data.sections as unknown as ReviewSectionData[]) || [],
-          affiliate_url: data.affiliate_url, cta_text: data.cta_text,
+          affiliate_url: data.affiliate_url,
+          cta_text: data.cta_text,
+          // @ts-expect-error fields added via migration
+          cta_text_en: data.cta_text_en,
           slug: data.slug,
           // @ts-expect-error adding these fields which might not be in the generated types yet but are in our extended ReviewData
           shopee_url: data.shopee_url,
           lazada_url: data.lazada_url,
-          test_conditions: data.test_conditions as ReviewData['test_conditions']
+          test_conditions: data.test_conditions as ReviewData['test_conditions'],
+          // @ts-expect-error fields added via migration
+          test_conditions_en: data.test_conditions_en as ReviewData['test_conditions']
         };
         setReview(currentReview);
       } else if (fallbackData[slug]) {

@@ -114,10 +114,10 @@ function FilterContent({
 }
 
 const CATEGORY_META: Record<string, { label: string; description: string }> = {
-  "รองเท้าวิ่งถนน": { label: "รองเท้าวิ่งถนน", description: "รีวิวรองเท้าวิ่งถนนจากแบรนด์ชั้นนำ ทดสอบจริง" },
-  "อุปกรณ์วิ่งเทรล": { label: "อุปกรณ์วิ่งเทรล", description: "รีวิวอุปกรณ์วิ่งเทรล เดินป่า ทดสอบจริง" },
-  "camping-gear": { label: "Camping Gear", description: "รีวิวอุปกรณ์แคมป์ปิ้ง เต็นท์ ถุงนอน" },
-  "นาฬิกา-gps": { label: "นาฬิกา GPS", description: "รีวิวนาฬิกา GPS สำหรับวิ่งและกิจกรรมกลางแจ้ง" },
+  "รองเท้าวิ่งถนน": { label: "nav.shoes", description: "category.road_desc" },
+  "อุปกรณ์วิ่งเทรล": { label: "nav.gear", description: "category.trail_desc" },
+  "camping-gear": { label: "nav.camping", description: "category.camping_desc" },
+  "นาฬิกา-gps": { label: "wizard.cat_watch", description: "category.watch_desc" },
 };
 
 type SortOption = "newest" | "rating-desc" | "price-asc" | "price-desc";
@@ -218,7 +218,7 @@ export default function CategoryPage() {
       setLoading(true);
       let query = supabase
         .from("reviews")
-        .select("name, brand, image_url, overall_rating, price, badge, pros, cons, specs, ratings, slug, affiliate_url, category, created_at")
+        .select("name, name_en, brand, image_url, overall_rating, price, price_en, badge, badge_en, pros, pros_en, cons, cons_en, specs, ratings, slug, affiliate_url, category, created_at")
         .eq("published", true);
 
       if (category) {
@@ -325,8 +325,8 @@ export default function CategoryPage() {
   }, [reviews, searchQuery, selectedBrands, priceRange, sortBy, minRating]);
 
   const meta = category ? CATEGORY_META[decodeURIComponent(category)] : null;
-  const pageTitle = meta ? (isEn && meta.label === "รองเท้าวิ่งถนน" ? "Road Running" : (isEn && meta.label === "อุปกรณ์วิ่งเทรล" ? "Trail Gear" : meta.label)) : (isEn ? "All Products" : "สินค้าทั้งหมด");
-  const pageDescription = meta ? (isEn && meta.label === "รองเท้าวิ่งถนน" ? "Reviews of road running shoes from top brands, real tests" : (isEn && meta.label === "อุปกรณ์วิ่งเทรล" ? "Reviews of trail running and hiking gear, real tests" : meta.description)) : (isEn ? "Reviews of all products, real tests, latest updates" : "รีวิวสินค้าทั้งหมด ทดสอบจริง อัปเดตล่าสุด");
+  const pageTitle = meta ? t(meta.label as any) : t("common.all_products");
+  const pageDescription = meta ? t(meta.description as any) : (isEn ? "Reviews of all products, real tests, latest updates" : "รีวิวสินค้าทั้งหมด ทดสอบจริง อัปเดตล่าสุด");
 
   return (
     <div className="min-h-screen bg-background">
@@ -448,17 +448,22 @@ export default function CategoryPage() {
                   {t("common.showing").replace("{count}", filtered.length.toString())}
                 </p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-                  {filtered.map((r) => (
+                  {filtered.map((r: any) => (
                     <ProductCard
                       key={r.slug}
                       name={r.name}
+                      name_en={r.name_en}
                       brand={r.brand}
                       image={r.image_url || ""}
                       rating={Number(r.overall_rating)}
                       price={r.price}
+                      price_en={r.price_en}
                       badge={r.badge || undefined}
+                      badge_en={r.badge_en}
                       pros={Array.isArray(r.pros) ? (r.pros as string[]) : []}
+                      pros_en={Array.isArray(r.pros_en) ? (r.pros_en as string[]) : undefined}
                       cons={Array.isArray(r.cons) ? (r.cons as string[]) : []}
+                      cons_en={Array.isArray(r.cons_en) ? (r.cons_en as string[]) : undefined}
                       specs={Array.isArray(r.specs) ? (r.specs as { label: string; value: string }[]) : []}
                       slug={r.slug}
                       affiliateUrl={r.affiliate_url}

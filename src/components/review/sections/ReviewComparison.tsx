@@ -19,7 +19,7 @@ export const ReviewComparison = ({ review }: ReviewComparisonProps) => {
     const fetchSimilar = async () => {
       const { data } = await supabase
         .from("reviews")
-        .select("*")
+        .select("id, slug, name, name_en, brand, category, category_en, price, price_en, image_url, badge, badge_en, overall_rating, pros, pros_en, cons, cons_en")
         .eq("category", review.category)
         .eq("published", true)
         .neq("slug", review.slug)
@@ -82,13 +82,21 @@ export const ReviewComparison = ({ review }: ReviewComparisonProps) => {
                    <div className="flex items-start gap-2 text-emerald-600">
                     <Check className="h-3.5 w-3.5 mt-0.5" />
                     <span className="text-[10px] md:text-xs font-bold text-slate-500 uppercase tracking-widest leading-none">
-                      {t("common.key_advantage")}: {(language === 'en' && item.pros_en) ? item.pros_en[0] : item.pros[0]}
+                      {t("common.key_advantage")}: {
+                        language === 'en'
+                          ? (item.pros_en && item.pros_en[0] ? item.pros_en[0] : (item.pros && Array.isArray(item.pros) ? translateData(item.pros[0] as string, 'en') : ''))
+                          : (item.pros && Array.isArray(item.pros) ? item.pros[0] : '')
+                      }
                     </span>
                    </div>
                    <div className="flex items-start gap-2 text-rose-500">
                     <X className="h-3.5 w-3.5 mt-0.5" />
                     <span className="text-[10px] md:text-xs font-bold text-slate-500 uppercase tracking-widest leading-none">
-                      {t("common.weakness")}: {(language === 'en' && item.cons_en) ? item.cons_en[0] : item.cons[0]}
+                      {t("common.weakness")}: {
+                        language === 'en'
+                          ? (item.cons_en && item.cons_en[0] ? item.cons_en[0] : (item.cons && Array.isArray(item.cons) ? translateData(item.cons[0] as string, 'en') : ''))
+                          : (item.cons && Array.isArray(item.cons) ? item.cons[0] : '')
+                      }
                     </span>
                    </div>
                 </div>

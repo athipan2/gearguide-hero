@@ -14,8 +14,27 @@ export const translations = {
     // Home
     "home.hero_title": "THE WILD SIDE",
     "home.hero_subtitle": "รีวิวอุปกรณ์วิ่งเทรลและเอาท์ดอร์ที่เจาะลึกที่สุด เพื่อการตัดสินใจที่แม่นยำที่สุดของคุณ",
-    "home.featured_title": "รีวิวล่าสุด",
+    "home.featured_title": "รีวิวจริง ทดสอบจริง",
     "home.categories_title": "เลือกตามหมวดหมู่",
+    "home.trusted_by": "ได้รับความไว้วางใจจากนักวิ่งกว่า 10,000 คน",
+    "home.gear_wizard": "ค้นหาอุปกรณ์ที่ใช่",
+    "home.newsletter_title": "ไม่พลาดรีวิวใหม่",
+    "home.newsletter_subtitle": "รับรีวิวอุปกรณ์ล่าสุด ดีลราคาพิเศษ และ Best Of 2026 ส่งตรงถึงอินบ็อกซ์คุณ",
+    "home.newsletter_placeholder": "อีเมลของคุณ",
+    "home.newsletter_btn": "สมัครเลย",
+    "home.explore": "สำรวจ",
+    "home.gear": "อุปกรณ์",
+    "home.filter_distance": "เลือกระยะทางที่คุณวิ่ง",
+    "home.filter_category": "หมวดหมู่สินค้า",
+    "home.all": "ทั้งหมด",
+    "home.shoes": "รองเท้า",
+    "home.packs": "เป้ / เสื้อกั๊ก",
+    "home.watches": "นาฬิกา",
+    "home.others": "อุปกรณ์อื่นๆ",
+    "category.road_desc": "รีวิวรองเท้าวิ่งถนนจากแบรนด์ชั้นนำ ทดสอบจริง",
+    "category.trail_desc": "รีวิวอุปกรณ์วิ่งเทรล เดินป่า ทดสอบจริง",
+    "category.camping_desc": "รีวิวอุปกรณ์แคมป์ปิ้ง เต็นท์ ถุงนอน",
+    "category.watch_desc": "รีวิวนาฬิกา GPS สำหรับวิ่งและกิจกรรมกลางแจ้ง",
 
     // Review Detail
     "review.quick_summary": "สรุปสั้นๆ",
@@ -52,6 +71,7 @@ export const translations = {
     "footer.about_text": "แหล่งรวมรีวิวอุปกรณ์วิ่งเทรลและแคมป์ปิ้งที่จริงใจที่สุดในไทย",
     "footer.quick_links": "ลิงก์ด่วน",
     "footer.contact": "ติดต่อเรา",
+    "footer.affiliate": "ประกาศความร่วมมือทางโฆษณา (Affiliate Disclosure)",
     "footer.copyright": "© 2024 GearTrail. สงวนลิขสิทธิ์.",
 
     // General
@@ -64,12 +84,14 @@ export const translations = {
     "common.no_brands": "ไม่มีแบรนด์",
     "common.stars": "ดาว",
     "common.search_placeholder": "ค้นหาชื่อสินค้าหรือแบรนด์...",
+    "common.search_hero_placeholder": "ค้นหารองเท้า / เป้ / ไฟฉาย...",
     "common.sort_by": "เรียงลำดับ",
     "common.sort_newest": "ใหม่ล่าสุด",
     "common.sort_rating": "คะแนนสูงสุด",
     "common.sort_price_asc": "ราคาต่ำ → สูง",
     "common.sort_price_desc": "ราคาสูง → ต่ำ",
     "common.filters": "ตัวกรองสินค้า",
+    "common.no_data": "ไม่มีข้อมูล",
     "common.no_products": "ไม่พบสินค้าที่ตรงกับเงื่อนไข",
     "common.showing": "แสดง {count} รายการ",
     "common.all_products": "สินค้าทั้งหมด",
@@ -94,6 +116,22 @@ export const translations = {
     "common.distance": "Test Distance",
     "common.performance_summary": "Performance Summary",
     "common.back_home": "กลับหน้าหลัก",
+    "common.no_articles": "ยังไม่มีบทความในขณะนี้ ติดตามชมได้เร็วๆ นี้!",
+    "common.back_guides": "กลับไปหน้าคู่มือ",
+    "common.guides_desc": "อัปเกรดความรู้เรื่องวิ่งและการดูแลอุปกรณ์ พร้อมรีวิวจริงจากผู้ใช้งาน",
+
+    // Guides
+    "guides.seo_title": "คู่มือ & เทคนิคการวิ่ง — GearTrail",
+    "guides.seo_desc": "แหล่งรวมความรู้เรื่องอุปกรณ์วิ่ง เทคนิคการวิ่ง และการเตรียมตัวสำหรับนักวิ่งทุกระดับ",
+    "guides.heading": "คู่มือ & เทคนิค",
+    "guides.subheading": "อัปเกรดความรู้เรื่องวิ่งและการดูแลอุปกรณ์ไปกับเรา รวบรวมเทคนิคจากผู้เชี่ยวชาญและประสบการณ์จริง",
+
+    // Search
+    "search.placeholder": "ค้นหารีวิวสินค้า...",
+    "search.no_results": "ไม่พบผลลัพธ์ที่ค้นหา",
+    "search.results_heading": "ผลการค้นหา",
+    "search.actions_heading": "การทำงาน",
+    "search.search_all": "ค้นหา \"{query}\" ในสินค้าทั้งหมด",
 
     // Compare
     "compare.title": "เปรียบเทียบสเปคอุปกรณ์ — GearTrail",
@@ -159,6 +197,10 @@ export const translations = {
     "wizard.result_compare_title": "ต้องการเทียบจุดต่าง?",
     "wizard.result_compare_desc": "เรานำรุ่นที่แนะนำใส่ในตารางเปรียบเทียบให้แล้ว",
     "wizard.result_compare_btn": "Comparison Mode",
+    "wizard.fetch_error": "ไม่สามารถดึงข้อมูลได้",
+    "wizard.added_to_compare": "เพิ่ม {name} ในตารางเปรียบเทียบแล้ว",
+    "wizard.add_to_compare": "เพิ่มลงตารางเปรียบเทียบ",
+    "wizard.top_pick": "Top Pick",
   },
   en: {
     // Navbar
@@ -175,8 +217,27 @@ export const translations = {
     // Home
     "home.hero_title": "THE WILD SIDE",
     "home.hero_subtitle": "Deep-dive trail running and outdoor gear reviews for your best decision.",
-    "home.featured_title": "Latest Reviews",
+    "home.featured_title": "Real Tests, Real Reviews",
     "home.categories_title": "Browse by Category",
+    "home.trusted_by": "Trusted by 10,000+ Runners",
+    "home.gear_wizard": "Gear Wizard",
+    "home.newsletter_title": "Never Miss a Review",
+    "home.newsletter_subtitle": "Get the latest gear reviews, exclusive deals, and Best of 2026 sent to your inbox.",
+    "home.newsletter_placeholder": "Your email address",
+    "home.newsletter_btn": "Subscribe Now",
+    "home.explore": "EXPLORE",
+    "home.gear": "GEAR",
+    "home.filter_distance": "CHOOSE YOUR DISTANCE",
+    "home.filter_category": "PRODUCT CATEGORIES",
+    "home.all": "All",
+    "home.shoes": "Shoes",
+    "home.packs": "Packs / Vests",
+    "home.watches": "Watches",
+    "home.others": "Others",
+    "category.road_desc": "Reviews of road running shoes from top brands, real tests",
+    "category.trail_desc": "Reviews of trail running and hiking gear, real tests",
+    "category.camping_desc": "Reviews of camping gear, tents, sleeping bags",
+    "category.watch_desc": "Reviews of GPS watches for running and outdoor activities",
 
     // Review Detail
     "review.quick_summary": "Quick Summary",
@@ -213,6 +274,7 @@ export const translations = {
     "footer.about_text": "The most honest trail running and camping gear reviews in Thailand.",
     "footer.quick_links": "Quick Links",
     "footer.contact": "Contact Us",
+    "footer.affiliate": "Affiliate Disclosure",
     "footer.copyright": "© 2024 GearTrail. All rights reserved.",
 
     // General
@@ -225,12 +287,14 @@ export const translations = {
     "common.no_brands": "No brands",
     "common.stars": "Stars",
     "common.search_placeholder": "Search product name or brand...",
+    "common.search_hero_placeholder": "Search shoes / packs / headlamps...",
     "common.sort_by": "Sort by",
     "common.sort_newest": "Newest",
     "common.sort_rating": "Highest Rating",
     "common.sort_price_asc": "Price: Low to High",
     "common.sort_price_desc": "Price: High to Low",
     "common.filters": "Filters",
+    "common.no_data": "No data available",
     "common.no_products": "No products found matching your criteria",
     "common.showing": "Showing {count} items",
     "common.all_products": "All Products",
@@ -255,6 +319,22 @@ export const translations = {
     "common.distance": "Test Distance",
     "common.performance_summary": "Performance Summary",
     "common.back_home": "Back to Home",
+    "common.no_articles": "No articles yet. Stay tuned!",
+    "common.back_guides": "Back to Guides",
+    "common.guides_desc": "Upgrade your running knowledge and gear maintenance with real user reviews.",
+
+    // Guides
+    "guides.seo_title": "Running Guides & Techniques — GearTrail",
+    "guides.seo_desc": "The ultimate resource for running gear knowledge, techniques, and preparation for all levels.",
+    "guides.heading": "Guides & Techniques",
+    "guides.subheading": "Upgrade your running knowledge and gear maintenance with expert tips and real-world experience.",
+
+    // Search
+    "search.placeholder": "Search reviews...",
+    "search.no_results": "No results found",
+    "search.results_heading": "Search Results",
+    "search.actions_heading": "Actions",
+    "search.search_all": "Search for \"{query}\" in all products",
 
     // Compare
     "compare.title": "Compare Gear Specs — GearTrail",
@@ -320,6 +400,10 @@ export const translations = {
     "wizard.result_compare_title": "Want to compare?",
     "wizard.result_compare_desc": "We've added these recommendations to the comparison table.",
     "wizard.result_compare_btn": "Comparison Mode",
+    "wizard.fetch_error": "Failed to fetch data",
+    "wizard.added_to_compare": "Added {name} to comparison table",
+    "wizard.add_to_compare": "Add to comparison",
+    "wizard.top_pick": "Top Pick",
   }
 };
 
