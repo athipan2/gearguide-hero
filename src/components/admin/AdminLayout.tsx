@@ -15,7 +15,10 @@ export function AdminLayout({ children }: { children: ReactNode }) {
   const location = useLocation();
   const navigate = useNavigate();
 
+  const isDev = import.meta.env.DEV;
+
   if (!user || (!isAdmin && !isEditor)) {
+    if (isDev) return <div className="p-6">{children}</div>;
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center space-y-4">

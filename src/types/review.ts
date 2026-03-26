@@ -64,6 +64,7 @@ export interface ReviewData {
   sections: ReviewSectionData[];
   affiliate_url: string | null;
   cta_text: string | null;
+  cta_text_en?: string | null;
   // New fields for high-detail refactor
   shopee_url?: string | null;
   lazada_url?: string | null;
