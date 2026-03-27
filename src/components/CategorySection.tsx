@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { useTranslation } from "@/hooks/useTranslation";
 
 export function CategorySection() {
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
 
   const categories = [
     { icon: Footprints, title: t('category.road_running'), count: 48, color: "bg-primary/10 text-primary", slug: "รองเท้าวิ่งถนน" },
@@ -24,7 +24,7 @@ export function CategorySection() {
               <span className="text-[10px] md:text-xs font-bold text-accent uppercase tracking-sporty">{t('footer.categories').toUpperCase()}</span>
             </div>
             <h2 className="font-heading text-2xl md:text-4xl font-semibold text-foreground uppercase tracking-tight-compact">
-              EXPLORE <span className="text-primary/40">GEAR</span>
+              {language === 'th' ? 'ค้นหา' : 'EXPLORE'} <span className="text-primary/40">{language === 'th' ? 'อุปกรณ์' : 'GEAR'}</span>
             </h2>
           </div>
           <p className="hidden md:block text-muted-foreground font-bold uppercase tracking-sporty text-[10px]">

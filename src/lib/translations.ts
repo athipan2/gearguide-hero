@@ -39,6 +39,9 @@ export const translations = {
 
     // Common
     'common.read_more': 'อ่านเพิ่มเติม',
+    'common.review': 'รีวิว',
+    'common.new': 'ใหม่',
+    'common.compare': 'เทียบ',
     'common.buy_now': 'ซื้อเลย',
     'common.best_price': 'ราคาดีที่สุดวันนี้',
     'common.last_updated': 'อัปเดตล่าสุด',
@@ -200,6 +203,9 @@ export const translations = {
 
     // Common
     'common.read_more': 'Read More',
+    'common.review': 'REVIEW',
+    'common.new': 'NEW',
+    'common.compare': 'COMPARE',
     'common.buy_now': 'Buy Now',
     'common.best_price': 'Best Price Today',
     'common.last_updated': 'Last Updated',

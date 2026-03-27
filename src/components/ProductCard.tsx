@@ -61,7 +61,7 @@ export function ProductCard({ name, brand, image, rating, price, badge, pros, co
         <div className="absolute top-3 left-3 flex flex-col gap-2 pointer-events-none">
           {isNew && (
             <div className="bg-accent text-accent-foreground px-3 py-1.5 rounded-lg text-xs font-semibold uppercase tracking-sporty shadow-xl">
-              NEW
+              {t('common.new')}
             </div>
           )}
           {badge && (
@@ -123,15 +123,15 @@ export function ProductCard({ name, brand, image, rating, price, badge, pros, co
               toast.success(`${t('nav.compare')} ${name}`);
             }}
           >
-            {t('nav.compare')}
+            {t('common.compare')}
           </Button>
 
           {slug ? (
             <Button variant="outline" size="sm" className="w-full text-[10px] md:text-xs font-bold uppercase tracking-sporty h-10 md:h-9 rounded-lg px-1 md:px-2" asChild>
-              <Link to={`/review/${slug}`}>REVIEW</Link>
+              <Link to={`/review/${slug}`}>{t('common.review')}</Link>
             </Button>
           ) : (
-            <Button variant="outline" size="sm" className="w-full text-[10px] md:text-xs font-bold uppercase tracking-sporty h-10 md:h-9 rounded-lg px-1 md:px-2">REVIEW</Button>
+            <Button variant="outline" size="sm" className="w-full text-[10px] md:text-xs font-bold uppercase tracking-sporty h-10 md:h-9 rounded-lg px-1 md:px-2">{t('common.review')}</Button>
           )}
 
           <Button variant="cta" size="sm" className="col-span-2 lg:col-span-1 text-[10px] md:text-xs font-bold uppercase tracking-sporty h-11 md:h-9 rounded-lg px-1 md:px-2 bg-accent text-white" asChild={!!affiliateUrl}>

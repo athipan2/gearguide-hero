@@ -71,7 +71,7 @@ interface MappedProduct {
 export function FeaturedReviews() {
   const [products, setProducts] = useState<MappedProduct[]>([]);
   const [loading, setLoading] = useState(true);
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
 
   useEffect(() => {
     const fetchReviews = async () => {
@@ -123,7 +123,7 @@ export function FeaturedReviews() {
         <div className="space-y-8">
           <div className="flex items-center gap-2">
             <span className="w-8 h-1 bg-accent rounded-full" />
-            <span className="text-[10px] md:text-xs font-bold text-accent uppercase tracking-sporty">TESTED & REVIEWED</span>
+            <span className="text-[10px] md:text-xs font-bold text-accent uppercase tracking-sporty">{language === 'th' ? 'ทดสอบและรีวิว' : 'TESTED & REVIEWED'}</span>
           </div>
           <h2 className="font-heading text-2xl md:text-3xl font-semibold text-primary uppercase">{t('footer.latest_reviews')}</h2>
           <p className="text-base text-muted-foreground max-w-md leading-relaxed">{t('footer.tagline')}</p>
