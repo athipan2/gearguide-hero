@@ -68,14 +68,14 @@ export default function AdminReviewForm() {
             verdict: data.verdict || "", verdict_en: data.verdict_en || "",
             published: data.published,
           });
-          setRatings((data.ratings as unknown as ReviewRating[]) || []);
-          setSpecs((data.specs as unknown as SpecItem[]) || []);
-          setPros((data.pros as unknown as string[]) || [""]);
-          setProsEn((data.pros_en as unknown as string[]) || [""]);
-          setCons((data.cons as unknown as string[]) || [""]);
-          setConsEn((data.cons_en as unknown as string[]) || [""]);
-          setSections((data.sections as unknown as ReviewSectionData[]) || []);
-          setImages((data.images as unknown as string[]) || []);
+          setRatings(Array.isArray(data.ratings) ? (data.ratings as unknown as ReviewRating[]) : []);
+          setSpecs(Array.isArray(data.specs) ? (data.specs as unknown as SpecItem[]) : []);
+          setPros(Array.isArray(data.pros) ? (data.pros as unknown as string[]) : [""]);
+          setProsEn(Array.isArray(data.pros_en) ? (data.pros_en as unknown as string[]) : [""]);
+          setCons(Array.isArray(data.cons) ? (data.cons as unknown as string[]) : [""]);
+          setConsEn(Array.isArray(data.cons_en) ? (data.cons_en as unknown as string[]) : [""]);
+          setSections(Array.isArray(data.sections) ? (data.sections as unknown as ReviewSectionData[]) : []);
+          setImages(Array.isArray(data.images) ? (data.images as unknown as string[]) : []);
         }
       });
     } else {
@@ -301,7 +301,7 @@ export default function AdminReviewForm() {
                 </div>
 
                 <div className="grid grid-cols-3 gap-2">
-                  {images.map((url, i) => (
+              {Array.isArray(images) && images.map((url, i) => (
                     <div key={i} className="relative aspect-square rounded-md overflow-hidden border bg-muted group">
                       <img
                         src={getOptimizedImageUrl(url, 'thumbnail')}
@@ -393,7 +393,7 @@ export default function AdminReviewForm() {
             </div>
 
             <div className="space-y-4">
-              {sections.map((section, i) => (
+              {Array.isArray(sections) && sections.map((section, i) => (
                 <div key={i} className="border rounded-lg p-4 bg-slate-50/50 space-y-4">
                   <div className="flex items-center justify-between gap-4">
                     <div className="flex items-center gap-2">
@@ -519,7 +519,7 @@ export default function AdminReviewForm() {
               </Button>
             </div>
             <div className="space-y-3">
-              {ratings.map((r, i) => (
+              {Array.isArray(ratings) && ratings.map((r, i) => (
                 <div key={i} className="space-y-2 border-b pb-3 last:border-none">
                   <div className="flex gap-2 items-center">
                     <Input placeholder="ด้าน (TH)" value={r.label} onChange={(e) => { const n = [...ratings]; n[i].label = e.target.value; setRatings(n); }} className="flex-1 h-8 text-sm" />
@@ -541,7 +541,7 @@ export default function AdminReviewForm() {
               </Button>
             </div>
             <div className="space-y-4">
-              {specs.map((s, i) => (
+              {Array.isArray(specs) && specs.map((s, i) => (
                 <div key={i} className="space-y-2 border-b pb-4 last:border-none">
                   <div className="flex gap-2 items-center">
                     <Input placeholder="หัวข้อ (TH)" value={s.label} onChange={(e) => { const n = [...specs]; n[i].label = e.target.value; setSpecs(n); }} className="flex-1 h-8 text-sm" />
@@ -579,7 +579,7 @@ export default function AdminReviewForm() {
               <div className="space-y-4">
                 <div className="space-y-2">
                    <Label className="text-[10px] text-muted-foreground uppercase">Thai</Label>
-                   {pros.map((p, i) => (
+                   {Array.isArray(pros) && pros.map((p, i) => (
                     <div key={i} className="flex gap-2">
                       <Input value={p} onChange={(e) => { const n = [...pros]; n[i] = e.target.value; setPros(n); }} className="flex-1 h-8 text-sm" />
                       <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setPros(pros.filter((_, j) => j !== i))}><X className="h-4 w-4" /></Button>
@@ -588,7 +588,7 @@ export default function AdminReviewForm() {
                 </div>
                 <div className="space-y-2 pt-2 border-t">
                    <Label className="text-[10px] text-muted-foreground uppercase">English</Label>
-                   {pros_en.map((p, i) => (
+                   {Array.isArray(pros_en) && pros_en.map((p, i) => (
                     <div key={i} className="flex gap-2">
                       <Input value={p} onChange={(e) => { const n = [...pros_en]; n[i] = e.target.value; setProsEn(n); }} className="flex-1 h-8 text-sm bg-slate-50/50" />
                       <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setProsEn(pros_en.filter((_, j) => j !== i))}><X className="h-4 w-4" /></Button>
@@ -610,7 +610,7 @@ export default function AdminReviewForm() {
               <div className="space-y-4">
                 <div className="space-y-2">
                    <Label className="text-[10px] text-muted-foreground uppercase">Thai</Label>
-                   {cons.map((c, i) => (
+                   {Array.isArray(cons) && cons.map((c, i) => (
                     <div key={i} className="flex gap-2">
                       <Input value={c} onChange={(e) => { const n = [...cons]; n[i] = e.target.value; setCons(n); }} className="flex-1 h-8 text-sm" />
                       <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setCons(cons.filter((_, j) => j !== i))}><X className="h-4 w-4" /></Button>
@@ -619,7 +619,7 @@ export default function AdminReviewForm() {
                 </div>
                 <div className="space-y-2 pt-2 border-t">
                    <Label className="text-[10px] text-muted-foreground uppercase">English</Label>
-                   {cons_en.map((c, i) => (
+                   {Array.isArray(cons_en) && cons_en.map((c, i) => (
                     <div key={i} className="flex gap-2">
                       <Input value={c} onChange={(e) => { const n = [...cons_en]; n[i] = e.target.value; setConsEn(n); }} className="flex-1 h-8 text-sm bg-slate-50/50" />
                       <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setConsEn(cons_en.filter((_, j) => j !== i))}><X className="h-4 w-4" /></Button>
