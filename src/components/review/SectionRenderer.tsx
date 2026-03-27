@@ -65,7 +65,7 @@ export const SectionRenderer = ({ section, review, userRating }: SectionRenderer
 
     case 'real_world_test': {
       const conditions = (section.props as ReviewData['test_conditions']) || review.test_conditions;
-      const conditionsEn = (section.props as any)?.test_conditions_en || review.test_conditions_en;
+      const conditionsEn = (section.props as Record<string, unknown>)?.test_conditions_en as ReviewData['test_conditions_en'] || review.test_conditions_en;
 
       const activeConditions = language === 'en' && conditionsEn ? conditionsEn : conditions;
 
@@ -146,6 +146,7 @@ export const SectionRenderer = ({ section, review, userRating }: SectionRenderer
           </div>
         </section>
       );
+    }
 
     default:
       return null;

@@ -58,23 +58,27 @@ export function translateTerm(term: string, lang: Language): string {
 /**
  * Maps database fields to English if they exist, or falls back to Thai
  */
-export function translateData<T extends Record<string, any>>(data: T, field: string, lang: Language): string {
+export function translateData<T extends Record<string, string | number | null | undefined | unknown>>(data: T, field: string, lang: Language): string {
   if (lang === 'en') {
     const enField = `${field}_en`;
-    if (data[enField]) return data[enField];
+    const val = data[enField];
+    if (typeof val === 'string') return val;
   }
-  return data[field] || '';
+  const fallback = data[field];
+  return typeof fallback === 'string' ? fallback : '';
 }
 
 /**
  * Translates an array of strings (like pros/cons)
  */
-export function translateArray(data: Record<string, any>, field: string, lang: Language): string[] {
+export function translateArray(data: Record<string, string[] | unknown>, field: string, lang: Language): string[] {
   if (lang === 'en') {
     const enField = `${field}_en`;
-    if (Array.isArray(data[enField]) && data[enField].length > 0) return data[enField];
+    const enVal = data[enField];
+    if (Array.isArray(enVal) && enVal.length > 0) return enVal as string[];
   }
-  return Array.isArray(data[field]) ? data[field] : [];
+  const val = data[field];
+  return Array.isArray(val) ? (val as string[]) : [];
 }
 
 /**
