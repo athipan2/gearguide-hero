@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Link } from "react-router-dom";
 import { Clock, ArrowRight } from "lucide-react";
 import { getOptimizedImageUrl } from "@/lib/utils";
+import { useTranslation } from "@/hooks/useTranslation";
 
 interface Article {
   id: string;
@@ -34,6 +35,7 @@ const fallbackArticles: Article[] = [
 
 export function LatestGuides() {
   const [articles, setArticles] = useState<Article[]>([]);
+  const { t, language } = useTranslation();
 
   useEffect(() => {
     const fetchArticles = async () => {
@@ -63,11 +65,11 @@ export function LatestGuides() {
             <span className="w-8 h-1 bg-accent rounded-full" />
             <span className="text-[10px] md:text-xs font-bold text-accent uppercase tracking-sporty">TIPS & GUIDES</span>
           </div>
-          <h2 className="font-heading text-2xl md:text-3xl font-semibold text-foreground uppercase tracking-tight-compact">คู่มือ & เทคนิค</h2>
-          <p className="text-xs md:text-sm text-muted-foreground mt-1 max-w-md">อัปเกรดความรู้เรื่องวิ่งและการดูแลอุปกรณ์ พร้อมรีวิวจริงจากผู้ใช้งาน</p>
+          <h2 className="font-heading text-2xl md:text-3xl font-semibold text-foreground uppercase tracking-tight-compact">{t('guides.title')}</h2>
+          <p className="text-xs md:text-sm text-muted-foreground mt-1 max-w-md">{t('guides.subtitle')}</p>
         </div>
         <Link to="/guides" className="hidden md:inline-flex items-center gap-2 text-xs font-bold uppercase tracking-sporty text-primary hover:text-accent transition-all group">
-          ดูคู่มือทั้งหมด
+          {t('common.all')} {t('guides.title')}
           <span className="group-hover:translate-x-1 transition-transform">→</span>
         </Link>
       </div>
@@ -95,7 +97,7 @@ export function LatestGuides() {
               </h3>
               <div className="flex items-center text-xs text-muted-foreground">
                 <Clock className="h-3 w-3 mr-1" />
-                {new Date(article.created_at).toLocaleDateString("th-TH")}
+                {new Date(article.created_at).toLocaleDateString(language === 'th' ? "th-TH" : "en-US")}
               </div>
             </div>
           </Link>
@@ -104,7 +106,7 @@ export function LatestGuides() {
 
       <div className="mt-8 md:hidden text-center">
         <Link to="/guides" className="inline-flex items-center text-sm font-medium text-primary">
-          ดูคู่มือทั้งหมด <ArrowRight className="ml-1 h-4 w-4" />
+          {t('common.all')} {t('guides.title')} <ArrowRight className="ml-1 h-4 w-4" />
         </Link>
       </div>
     </section>

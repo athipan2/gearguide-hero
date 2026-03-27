@@ -5,6 +5,7 @@ import { FastFilters } from "./FastFilters";
 import { Link } from "react-router-dom";
 import { ProductCardSkeleton } from "./ReviewSkeleton";
 import { getOptimizedImageUrl } from "@/lib/utils";
+import { useTranslation } from "@/hooks/useTranslation";
 
 const fallbackProducts = [
   {
@@ -70,6 +71,7 @@ interface MappedProduct {
 export function FeaturedReviews() {
   const [products, setProducts] = useState<MappedProduct[]>([]);
   const [loading, setLoading] = useState(true);
+  const { t } = useTranslation();
 
   useEffect(() => {
     const fetchReviews = async () => {
@@ -123,11 +125,11 @@ export function FeaturedReviews() {
             <span className="w-8 h-1 bg-accent rounded-full" />
             <span className="text-[10px] md:text-xs font-bold text-accent uppercase tracking-sporty">TESTED & REVIEWED</span>
           </div>
-          <h2 className="font-heading text-2xl md:text-3xl font-semibold text-primary uppercase">รีวิวล่าสุด</h2>
-          <p className="text-base text-muted-foreground max-w-md leading-relaxed">ทดสอบจริง รีวิวจริง อัปเดตทุกสัปดาห์ เพื่อให้คุณเลือกอุปกรณ์ที่ดีที่สุด</p>
+          <h2 className="font-heading text-2xl md:text-3xl font-semibold text-primary uppercase">{t('footer.latest_reviews')}</h2>
+          <p className="text-base text-muted-foreground max-w-md leading-relaxed">{t('footer.tagline')}</p>
         </div>
         <Link to="/category" className="hidden md:inline-flex items-center gap-2 text-xs font-bold uppercase tracking-sporty text-primary hover:text-accent transition-all group">
-          ดูทั้งหมด
+          {t('common.all')}
           <span className="group-hover:translate-x-1 transition-transform">→</span>
         </Link>
       </div>

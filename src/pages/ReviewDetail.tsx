@@ -12,6 +12,8 @@ import { parseThaiPrice } from "@/lib/utils";
 import { ExternalLink, ChevronRight, ShoppingBag } from "lucide-react";
 import { ReviewData, ReviewSectionData } from "@/types/review";
 import { SectionRenderer } from "@/components/review/SectionRenderer";
+import { useTranslation } from "@/hooks/useTranslation";
+import { translateData } from "@/lib/translation-utils";
 
 const fallbackData: Record<string, ReviewData> = {
   "nike-vaporfly-3": {
@@ -55,6 +57,7 @@ const fallbackData: Record<string, ReviewData> = {
 };
 
 export default function ReviewDetail() {
+  const { t, language } = useTranslation();
   const { slug } = useParams<{ slug: string }>();
   const [review, setReview] = useState<ReviewData | undefined>(undefined);
   const [userRating, setUserRating] = useState<{ average: number; count: number } | null>(null);
@@ -125,7 +128,15 @@ export default function ReviewDetail() {
           // @ts-expect-error adding these fields which might not be in the generated types yet but are in our extended ReviewData
           shopee_url: data.shopee_url,
           lazada_url: data.lazada_url,
-          test_conditions: data.test_conditions as ReviewData['test_conditions']
+          test_conditions: data.test_conditions as ReviewData['test_conditions'],
+          name_en: data.name_en,
+          brand_en: data.brand_en,
+          category_en: data.category_en,
+          badge_en: data.badge_en,
+          verdict_en: data.verdict_en,
+          intro_en: data.intro_en,
+          cta_text_en: data.cta_text_en,
+          test_conditions_en: data.test_conditions_en
         };
         setReview(currentReview);
       } else if (fallbackData[slug]) {
@@ -196,19 +207,21 @@ export default function ReviewDetail() {
       <div className="min-h-screen bg-background">
         <Navbar />
         <div className="max-w-[800px] mx-auto px-4 py-20 text-center">
-          <h1 className="font-heading text-3xl font-semibold mb-4">ไม่พบรีวิว</h1>
-          <Link to="/"><Button variant="cta">กลับหน้าหลัก</Button></Link>
+          <h1 className="font-heading text-3xl font-semibold mb-4">{t('common.no_results')}</h1>
+          <Link to="/"><Button variant="cta">{t('404.back_home')}</Button></Link>
         </div>
         <Footer />
       </div>
     );
   }
 
+  const localizedName = translateData(review, 'name', language);
+
   return (
     <div className="min-h-screen bg-white pb-[120px] md:pb-20">
       <SEOHead
-        title={`${review.name} รีวิว — GearTrail`}
-        description={`รีวิว ${review.name} จาก ${review.brand}: ${(review.intro || "").slice(0, 120)}...`}
+        title={`${localizedName} ${t('common.verdict')} — GearTrail`}
+        description={`รีวิว ${localizedName} จาก ${translateData(review, 'brand', language)}: ${(translateData(review, 'intro', language) || "").slice(0, 120)}...`}
         image={review.image_url || undefined}
         canonical={`https://gearguide-hero.lovable.app/review/${slug}`}
         jsonLd={jsonLd}
@@ -220,9 +233,9 @@ export default function ReviewDetail() {
            <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-slate-400 mb-8 overflow-x-auto whitespace-nowrap scrollbar-hide">
             <Link to="/" className="hover:text-primary transition-colors shrink-0">HOME</Link>
             <ChevronRight className="h-3 w-3 shrink-0" />
-            <Link to={`/category/${encodeURIComponent(review.category)}`} className="hover:text-primary transition-colors shrink-0">{review.category}</Link>
+            <Link to={`/category/${encodeURIComponent(review.category)}`} className="hover:text-primary transition-colors shrink-0">{translateData(review, 'category', language)}</Link>
             <ChevronRight className="h-3 w-3 shrink-0" />
-            <span className="text-primary truncate">{review.name}</span>
+            <span className="text-primary truncate">{localizedName}</span>
           </div>
         </div>
 
@@ -240,7 +253,7 @@ export default function ReviewDetail() {
         {review.id && (
           <div className="mt-16 max-w-[800px] mx-auto px-4">
             <div className="bg-white border-t pt-12">
-              <h2 className="font-heading text-2xl font-bold mb-8">ความเห็นจากผู้ใช้งาน</h2>
+              <h2 className="font-heading text-2xl font-bold mb-8">{language === 'th' ? 'ความเห็นจากผู้ใช้งาน' : 'User Reviews'}</h2>
               <CommentSection reviewId={review.id} isCompact={true} />
             </div>
           </div>
@@ -263,7 +276,7 @@ export default function ReviewDetail() {
       {/* STICKY BOTTOM CTA (Mobile Only) */}
       <div className="md:hidden fixed bottom-0 left-0 right-0 z-[100] bg-white border-t p-4 shadow-[0_-10px_40px_rgba(0,0,0,0.1)] flex items-center justify-between gap-4 animate-in slide-in-from-bottom duration-500">
         <div className="flex flex-col">
-          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none mb-1">BEST PRICE</span>
+          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none mb-1">{t('common.best_price').toUpperCase()}</span>
           <span className="text-lg font-heading font-bold text-primary leading-none italic-prohibited">{review.price}</span>
         </div>
         <div className="flex-1 flex gap-2">
@@ -283,7 +296,7 @@ export default function ReviewDetail() {
               asChild
             >
               <a href={review.affiliate_url} target="_blank" rel="noopener noreferrer nofollow">
-                ซื้อเลย
+                {t('common.buy_now')}
                 <ExternalLink className="w-4 h-4 ml-1.5" />
               </a>
             </Button>

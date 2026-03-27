@@ -13,6 +13,8 @@ import { SlidersHorizontal, X, Search, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { ProductCardSkeleton } from "@/components/ReviewSkeleton";
+import { useTranslation } from "@/hooks/useTranslation";
+import { translateData, translateArray } from "@/lib/translation-utils";
 
 interface FilterContentProps {
   allBrands: string[];
@@ -39,11 +41,12 @@ function FilterContent({
   hasActiveFilters,
   clearFilters,
 }: FilterContentProps) {
+  const { t } = useTranslation();
   return (
     <>
       {/* Brand filter */}
       <div>
-        <h3 className="font-heading font-semibold text-sm text-foreground mb-3">แบรนด์</h3>
+        <h3 className="font-heading font-semibold text-sm text-foreground mb-3">{t('category.brands')}</h3>
         <div className="flex flex-wrap gap-2">
           {allBrands.map((brand) => (
             <Badge
@@ -63,7 +66,7 @@ function FilterContent({
 
       {/* Rating Filter */}
       <div>
-        <h3 className="font-heading font-semibold text-sm text-foreground mb-3">คะแนนรีวิว</h3>
+        <h3 className="font-heading font-semibold text-sm text-foreground mb-3">{t('common.rating')}</h3>
         <div className="space-y-2">
           {[4.5, 4, 3.5, 3].map((rating) => (
             <label key={rating} className="flex items-center gap-2 cursor-pointer group">
@@ -75,7 +78,7 @@ function FilterContent({
                 onChange={() => setMinRating(rating)}
               />
               <span className="text-sm text-muted-foreground group-hover:text-foreground">
-                {rating}+ ดาว
+                {rating}+ {t('category.stars')}
               </span>
             </label>
           ))}
@@ -84,7 +87,7 @@ function FilterContent({
 
       {/* Price range */}
       <div>
-        <h3 className="font-heading font-semibold text-sm text-foreground mb-3">ช่วงราคา</h3>
+        <h3 className="font-heading font-semibold text-sm text-foreground mb-3">{t('category.price_range')}</h3>
         <Slider
           min={0}
           max={maxPrice}
@@ -103,7 +106,7 @@ function FilterContent({
       {hasActiveFilters && (
         <Button variant="ghost" size="sm" className="w-full" onClick={clearFilters}>
           <X className="h-3 w-3 mr-1" />
-          ล้างตัวกรอง
+          {t('category.clear_filters')}
         </Button>
       )}
     </>
@@ -181,6 +184,7 @@ const fallbackReviews: ReviewItem[] = [
 ];
 
 export default function CategoryPage() {
+  const { t, language } = useTranslation();
   const { category } = useParams<{ category: string }>();
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -338,7 +342,7 @@ export default function CategoryPage() {
           className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors mb-6"
         >
           <ArrowLeft className="h-4 w-4" />
-          กลับสู่หน้าหลัก
+          {t('common.back')}
         </Link>
         {/* Header */}
         <div className="mb-8">
@@ -351,7 +355,7 @@ export default function CategoryPage() {
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="ค้นหาชื่อสินค้าหรือแบรนด์..."
+              placeholder={t('common.search_placeholder')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-10"
@@ -359,13 +363,13 @@ export default function CategoryPage() {
           </div>
           <Select value={sortBy} onValueChange={(v) => setSortBy(v as SortOption)}>
             <SelectTrigger className="w-full sm:w-[200px]">
-              <SelectValue placeholder="เรียงลำดับ" />
+              <SelectValue placeholder={t('category.sort_by')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="newest">ใหม่ล่าสุด</SelectItem>
-              <SelectItem value="rating-desc">คะแนนสูงสุด</SelectItem>
-              <SelectItem value="price-asc">ราคาต่ำ → สูง</SelectItem>
-              <SelectItem value="price-desc">ราคาสูง → ต่ำ</SelectItem>
+              <SelectItem value="newest">{t('category.newest')}</SelectItem>
+              <SelectItem value="rating-desc">{t('category.rating_desc')}</SelectItem>
+              <SelectItem value="price-asc">{t('category.price_asc')}</SelectItem>
+              <SelectItem value="price-desc">{t('category.price_desc')}</SelectItem>
             </SelectContent>
           </Select>
           <Sheet open={showFilters} onOpenChange={setShowFilters}>
@@ -381,7 +385,7 @@ export default function CategoryPage() {
             </SheetTrigger>
             <SheetContent side="left" className="w-[300px] sm:w-[400px]">
               <SheetHeader className="mb-6">
-                <SheetTitle>ตัวกรองสินค้า</SheetTitle>
+                <SheetTitle>{t('category.filters')}</SheetTitle>
               </SheetHeader>
               <div className="space-y-6">
                 <FilterContent
@@ -430,30 +434,30 @@ export default function CategoryPage() {
               </div>
             ) : filtered.length === 0 ? (
               <div className="text-center py-20">
-                <p className="text-muted-foreground text-lg">ไม่พบสินค้าที่ตรงกับเงื่อนไข</p>
+                <p className="text-muted-foreground text-lg">{t('category.no_products')}</p>
                 {hasActiveFilters && (
                   <Button variant="link" className="mt-2" onClick={clearFilters}>
-                    ล้างตัวกรองทั้งหมด
+                    {t('category.clear_all')}
                   </Button>
                 )}
               </div>
             ) : (
               <>
                 <p className="text-sm text-muted-foreground mb-4">
-                  แสดง {filtered.length} รายการ
+                  {t('category.showing_results', { count: filtered.length })}
                 </p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
                   {filtered.map((r) => (
                     <ProductCard
                       key={r.slug}
-                      name={r.name}
-                      brand={r.brand}
+                      name={translateData(r, 'name', language)}
+                      brand={translateData(r, 'brand', language)}
                       image={r.image_url || ""}
                       rating={Number(r.overall_rating)}
                       price={r.price}
-                      badge={r.badge || undefined}
-                      pros={Array.isArray(r.pros) ? (r.pros as string[]) : []}
-                      cons={Array.isArray(r.cons) ? (r.cons as string[]) : []}
+                      badge={translateData(r, 'badge', language) || undefined}
+                      pros={translateArray(r, 'pros', language)}
+                      cons={translateArray(r, 'cons', language)}
                       specs={Array.isArray(r.specs) ? (r.specs as { label: string; value: string }[]) : []}
                       slug={r.slug}
                       affiliateUrl={r.affiliate_url}

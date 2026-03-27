@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 import { useComparisonStore } from "@/lib/comparison-store";
 import { toast } from "sonner";
 import { getOptimizedImageUrl } from "@/lib/utils";
+import { useTranslation } from "@/hooks/useTranslation";
 
 interface ProductCardProps {
   name: string;
@@ -29,6 +30,7 @@ const badgeColors: Record<string, string> = {
 };
 
 export function ProductCard({ name, brand, image, rating, price, badge, pros, cons, specs, ratings, slug, affiliateUrl, createdAt }: ProductCardProps) {
+  const { t } = useTranslation();
   const isNew = createdAt ? (new Date().getTime() - new Date(createdAt).getTime()) < (30 * 24 * 60 * 60 * 1000) : false;
 
   const weight = specs?.find(s => s.label.toLowerCase().includes('weight') || s.label.includes('น้ำหนัก'))?.value;
@@ -110,7 +112,7 @@ export function ProductCard({ name, brand, image, rating, price, badge, pros, co
           <Button
             variant="outline"
             size="sm"
-            className="w-full border-primary/20 hover:bg-primary/5 text-xs font-bold uppercase tracking-sporty h-10 md:h-9 rounded-lg px-1 md:px-2"
+            className="w-full border-primary/20 hover:bg-primary/5 text-[10px] md:text-xs font-bold uppercase tracking-sporty h-10 md:h-9 rounded-lg px-1 md:px-2"
             onClick={() => {
               useComparisonStore.getState().addItem({
                 name, brand, image, rating, price, slug, weight, drop,
@@ -118,29 +120,29 @@ export function ProductCard({ name, brand, image, rating, price, badge, pros, co
                 specs,
                 aspectRatings: ratings
               });
-              toast.success(`เพิ่ม ${name} เข้าสู่การเปรียบเทียบ`);
+              toast.success(`${t('nav.compare')} ${name}`);
             }}
           >
-            COMPARE
+            {t('nav.compare')}
           </Button>
 
           {slug ? (
-            <Button variant="outline" size="sm" className="w-full text-xs font-bold uppercase tracking-sporty h-10 md:h-9 rounded-lg px-1 md:px-2" asChild>
+            <Button variant="outline" size="sm" className="w-full text-[10px] md:text-xs font-bold uppercase tracking-sporty h-10 md:h-9 rounded-lg px-1 md:px-2" asChild>
               <Link to={`/review/${slug}`}>REVIEW</Link>
             </Button>
           ) : (
-            <Button variant="outline" size="sm" className="w-full text-xs font-bold uppercase tracking-sporty h-10 md:h-9 rounded-lg px-1 md:px-2">REVIEW</Button>
+            <Button variant="outline" size="sm" className="w-full text-[10px] md:text-xs font-bold uppercase tracking-sporty h-10 md:h-9 rounded-lg px-1 md:px-2">REVIEW</Button>
           )}
 
-          <Button variant="cta" size="sm" className="col-span-2 lg:col-span-1 text-xs font-bold uppercase tracking-sporty h-11 md:h-9 rounded-lg px-1 md:px-2 bg-accent text-white" asChild={!!affiliateUrl}>
+          <Button variant="cta" size="sm" className="col-span-2 lg:col-span-1 text-[10px] md:text-xs font-bold uppercase tracking-sporty h-11 md:h-9 rounded-lg px-1 md:px-2 bg-accent text-white" asChild={!!affiliateUrl}>
             {affiliateUrl ? (
               <a href={affiliateUrl} target="_blank" rel="noopener noreferrer nofollow">
-                ดูราคา
+                {t('common.view_price')}
                 <ExternalLink className="ml-1 h-3 w-3 shrink-0" />
               </a>
             ) : (
               <div className="flex items-center justify-center">
-                ดูราคา
+                {t('common.view_price')}
                 <ExternalLink className="ml-1 h-3 w-3 shrink-0" />
               </div>
             )}

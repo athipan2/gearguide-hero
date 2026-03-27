@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Loader2, BookOpen, Clock, ArrowLeft } from "lucide-react";
+import { useTranslation } from "@/hooks/useTranslation";
 
 interface Article {
   id: string;
@@ -39,6 +40,7 @@ const fallbackArticles: Article[] = [
 ];
 
 export default function GuidesPage() {
+  const { t, language } = useTranslation();
   const [articles, setArticles] = useState<Article[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -63,8 +65,8 @@ export default function GuidesPage() {
   return (
     <div className="min-h-screen bg-background">
       <SEOHead
-        title="คู่มือ & เทคนิคการวิ่ง — GearTrail"
-        description="แหล่งรวมความรู้เรื่องอุปกรณ์วิ่ง เทคนิคการวิ่ง และการเตรียมตัวสำหรับนักวิ่งทุกระดับ"
+        title={t('guides.seo_title')}
+        description={t('guides.seo_description')}
       />
       <Navbar />
 
@@ -74,15 +76,14 @@ export default function GuidesPage() {
           className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors mb-6"
         >
           <ArrowLeft className="h-4 w-4" />
-          กลับสู่หน้าหลัก
+          {t('common.back')}
         </Link>
         <header className="mb-12 text-center max-w-2xl mx-auto">
           <h1 className="font-heading text-3xl md:text-5xl font-bold text-foreground mb-4">
-            คู่มือ & เทคนิค
+            {t('guides.title')}
           </h1>
           <p className="text-muted-foreground text-lg">
-            อัปเกรดความรู้เรื่องวิ่งและการดูแลอุปกรณ์ไปกับเรา
-            รวบรวมเทคนิคจากผู้เชี่ยวชาญและประสบการณ์จริง
+            {t('guides.subtitle')}
           </p>
         </header>
 
@@ -93,7 +94,7 @@ export default function GuidesPage() {
         ) : articles.length === 0 ? (
           <div className="text-center py-20 bg-muted/30 rounded-2xl">
             <BookOpen className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-            <p className="text-muted-foreground">ยังไม่มีบทความในขณะนี้ ติดตามชมได้เร็วๆ นี้!</p>
+            <p className="text-muted-foreground">{t('guides.empty')}</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -117,7 +118,7 @@ export default function GuidesPage() {
                     </span>
                     <span className="text-xs text-muted-foreground flex items-center gap-1">
                       <Clock className="h-3 w-3" />
-                      {new Date(article.created_at).toLocaleDateString('th-TH', {
+                      {new Date(article.created_at).toLocaleDateString(language === 'th' ? 'th-TH' : 'en-US', {
                         year: 'numeric',
                         month: 'short',
                         day: 'numeric'
@@ -131,7 +132,7 @@ export default function GuidesPage() {
                     {article.excerpt}
                   </p>
                   <Button variant="ghost" className="p-0 h-auto self-start text-primary hover:text-accent group-hover:gap-2 transition-all">
-                    อ่านเพิ่มเติม →
+                    {t('common.read_more')} →
                   </Button>
                 </div>
               </Link>

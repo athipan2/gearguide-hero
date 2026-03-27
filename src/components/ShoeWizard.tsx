@@ -11,6 +11,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { getOptimizedImageUrl } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "@/hooks/useTranslation";
 
 type Step = "category_select" | "entry" | "express_brand" | "express_details" | "consult_goal" | "consult_feeling" | "consult_foot" | "result";
 
@@ -44,6 +45,7 @@ export function ShoeWizard({ onClose }: { onClose: () => void }) {
   const [step, setStep] = useState<Step>("category_select");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const { t, language } = useTranslation();
 
   // Express Track Data
   const [brandSearch, setBrandSearch] = useState("");
@@ -99,7 +101,7 @@ export function ShoeWizard({ onClose }: { onClose: () => void }) {
         setRecommendations(results);
 
         // Automatically add to comparison
-        results.forEach(rec => {
+        results.forEach((rec, index) => {
           useComparisonStore.getState().addItem({
             name: rec.name,
             brand: rec.brand,
@@ -205,7 +207,7 @@ export function ShoeWizard({ onClose }: { onClose: () => void }) {
               <div className="h-[2px] w-8 bg-accent"></div>
             </div>
             <h2 className="font-heading text-2xl md:text-4xl font-semibold uppercase tracking-tighter">
-              Find Your Perfect Gear
+              {step === 'result' ? t('wizard.picked_for_you') : (language === 'th' ? 'ค้นหาอุปกรณ์ที่ใช่สำหรับคุณ' : 'Find Your Perfect Gear')}
             </h2>
           </div>
         </div>
@@ -217,13 +219,13 @@ export function ShoeWizard({ onClose }: { onClose: () => void }) {
           {step === "category_select" && (
             <div className="space-y-8 animate-in slide-in-from-bottom-4">
               <div className="text-center space-y-2">
-                <p className="text-lg text-muted-foreground">สวัสดีครับ วันนี้คุณกำลังมองหาอุปกรณ์ประเภทไหนครับ?</p>
+                <p className="text-lg text-muted-foreground">{t('wizard.greeting')}</p>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 {[
-                  { id: "shoes", label: "รองเท้าวิ่ง", icon: <Footprints className="h-6 w-6" />, color: "bg-primary/10 text-primary" },
-                  { id: "trail", label: "อุปกรณ์เทรล", icon: <Mountain className="h-6 w-6" />, color: "bg-accent/10 text-accent", slug: "อุปกรณ์วิ่งเทรล" },
-                  { id: "camping", label: "Camping", icon: <Tent className="h-6 w-6" />, color: "bg-green-500/10 text-green-600", slug: "camping-gear" },
+                  { id: "shoes", label: t('nav.running_shoes'), icon: <Footprints className="h-6 w-6" />, color: "bg-primary/10 text-primary" },
+                  { id: "trail", label: t('nav.trail_gear'), icon: <Mountain className="h-6 w-6" />, color: "bg-accent/10 text-accent", slug: "อุปกรณ์วิ่งเทรล" },
+                  { id: "camping", label: t('nav.camping'), icon: <Tent className="h-6 w-6" />, color: "bg-green-500/10 text-green-600", slug: "camping-gear" },
                   { id: "watch", label: "นาฬิกา GPS", icon: <Watch className="h-6 w-6" />, color: "bg-blue-500/10 text-blue-600", slug: "นาฬิกา-gps" }
                 ].map((cat) => (
                   <button
@@ -252,10 +254,10 @@ export function ShoeWizard({ onClose }: { onClose: () => void }) {
           {step === "entry" && (
             <div className="space-y-8 animate-in slide-in-from-right-4">
               <button onClick={() => setStep("category_select")} className="flex items-center gap-1 text-sm text-muted-foreground hover:text-primary">
-                <ChevronLeft className="h-4 w-4" /> ย้อนกลับ
+                <ChevronLeft className="h-4 w-4" /> {t('common.back')}
               </button>
               <div className="text-center space-y-2">
-                <p className="text-lg text-muted-foreground">เยี่ยมเลยครับ มีรองเท้าคู่ใจที่เล็งไว้ในใจหรือยังครับ?</p>
+                <p className="text-lg text-muted-foreground">{t('wizard.specific_pair')}</p>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <button
@@ -265,8 +267,8 @@ export function ShoeWizard({ onClose }: { onClose: () => void }) {
                   <div className="h-12 w-12 rounded-2xl bg-primary/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                     <Zap className="h-6 w-6 text-primary" />
                   </div>
-                  <h3 className="font-semibold text-xl mb-1">มีรุ่นที่สนใจแล้ว</h3>
-                  <p className="text-sm text-muted-foreground">ระบุรุ่นเพื่อดูรีวิวและเช็คราคาได้ทันที</p>
+                  <h3 className="font-semibold text-xl mb-1">{t('wizard.know_what_i_want')}</h3>
+                  <p className="text-sm text-muted-foreground">{t('wizard.express_desc')}</p>
                   <ChevronRight className="absolute bottom-8 right-8 h-6 w-6 text-muted-foreground opacity-0 group-hover:opacity-100 transition-all translate-x-2 group-hover:translate-x-0" />
                 </button>
 
@@ -277,8 +279,8 @@ export function ShoeWizard({ onClose }: { onClose: () => void }) {
                   <div className="h-12 w-12 rounded-2xl bg-accent/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                     <Target className="h-6 w-6 text-accent" />
                   </div>
-                  <h3 className="font-semibold text-xl mb-1">อยากให้ช่วยแนะนำ</h3>
-                  <p className="text-sm text-muted-foreground">ให้เราช่วยหารองเท้าที่เหมาะกับเป้าหมายและสรีระของคุณ</p>
+                  <h3 className="font-semibold text-xl mb-1">{t('wizard.need_suggestions')}</h3>
+                  <p className="text-sm text-muted-foreground">{t('wizard.consult_desc')}</p>
                   <ChevronRight className="absolute bottom-8 right-8 h-6 w-6 text-muted-foreground opacity-0 group-hover:opacity-100 transition-all translate-x-2 group-hover:translate-x-0" />
                 </button>
               </div>
@@ -289,14 +291,14 @@ export function ShoeWizard({ onClose }: { onClose: () => void }) {
           {step === "express_brand" && (
             <div className="space-y-6 animate-in slide-in-from-right-4">
               <button onClick={() => setStep("entry")} className="flex items-center gap-1 text-sm text-muted-foreground hover:text-primary">
-                <ChevronLeft className="h-4 w-4" /> ย้อนกลับ
+                <ChevronLeft className="h-4 w-4" /> {t('common.back')}
               </button>
               <div className="space-y-4">
-                <h3 className="text-2xl font-semibold">ระบุแบรนด์หรือรุ่นที่คุณมองหา</h3>
+                <h3 className="text-2xl font-semibold">{language === 'th' ? 'ระบุแบรนด์หรือรุ่นที่คุณมองหา' : 'Search for a brand or model'}</h3>
                 <div className="relative">
                   <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                   <Input
-                    placeholder="เช่น Nike Alphafly, Hoka Speedgoat..."
+                    placeholder={language === 'th' ? 'เช่น Nike Alphafly, Hoka Speedgoat...' : 'e.g. Nike Alphafly, Hoka Speedgoat...'}
                     className="pl-12 h-14 text-lg rounded-2xl"
                     value={brandSearch}
                     onChange={(e) => setBrandSearch(e.target.value)}
@@ -308,7 +310,7 @@ export function ShoeWizard({ onClose }: { onClose: () => void }) {
                 className="w-full h-14 rounded-2xl text-lg gap-2"
                 onClick={() => setStep("express_details")}
               >
-                ต่อไป <ChevronRight className="h-5 w-5" />
+                {language === 'th' ? 'ต่อไป' : 'Next'} <ChevronRight className="h-5 w-5" />
               </Button>
             </div>
           )}
@@ -317,25 +319,25 @@ export function ShoeWizard({ onClose }: { onClose: () => void }) {
           {step === "express_details" && (
             <div className="space-y-6 animate-in slide-in-from-right-4">
               <button onClick={() => setStep("express_brand")} className="flex items-center gap-1 text-sm text-muted-foreground hover:text-primary">
-                <ChevronLeft className="h-4 w-4" /> ย้อนกลับ
+                <ChevronLeft className="h-4 w-4" /> {t('common.back')}
               </button>
-              <h3 className="text-2xl font-semibold">รายละเอียดเพิ่มเติม</h3>
+              <h3 className="text-2xl font-semibold">{language === 'th' ? 'รายละเอียดเพิ่มเติม' : 'Additional Details'}</h3>
 
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="text-sm font-semibold text-muted-foreground mb-2 block uppercase">ไซส์ที่ต้องการ</label>
+                    <label className="text-sm font-semibold text-muted-foreground mb-2 block uppercase">{language === 'th' ? 'ไซส์ที่ต้องการ' : 'Preferred Size'}</label>
                     <Input
-                      placeholder="เช่น 10 US / 44 EU"
+                      placeholder={language === 'th' ? 'เช่น 10 US / 44 EU' : 'e.g. 10 US / 44 EU'}
                       value={size}
                       onChange={(e) => setSize(e.target.value)}
                       className="h-12 rounded-xl"
                     />
                   </div>
                   <div>
-                    <label className="text-sm font-semibold text-muted-foreground mb-2 block uppercase">สีที่ชอบ</label>
+                    <label className="text-sm font-semibold text-muted-foreground mb-2 block uppercase">{language === 'th' ? 'สีที่ชอบ' : 'Preferred Color'}</label>
                     <Input
-                      placeholder="เช่น สีส้ม, ขาว"
+                      placeholder={language === 'th' ? 'เช่น สีส้ม, ขาว' : 'e.g. Orange, White'}
                       value={color}
                       onChange={(e) => setColor(e.target.value)}
                       className="h-12 rounded-xl"
@@ -344,19 +346,19 @@ export function ShoeWizard({ onClose }: { onClose: () => void }) {
                 </div>
 
                 <div>
-                  <label className="text-sm font-semibold text-muted-foreground mb-2 block uppercase">ลักษณะการใช้งาน</label>
+                  <label className="text-sm font-semibold text-muted-foreground mb-2 block uppercase">{language === 'th' ? 'ลักษณะการใช้งาน' : 'Usage Type'}</label>
                   <div className="grid grid-cols-2 gap-3">
                     <button
                       onClick={() => setUsage("train")}
                       className={`p-4 rounded-xl border-2 transition-all font-semibold ${usage === "train" ? "border-primary bg-primary/5 text-primary" : "border-muted text-muted-foreground hover:border-primary/20"}`}
                     >
-                      ซ้อมทั่วไป
+                      {language === 'th' ? 'ซ้อมทั่วไป' : 'Training'}
                     </button>
                     <button
                       onClick={() => setUsage("race")}
                       className={`p-4 rounded-xl border-2 transition-all font-semibold ${usage === "race" ? "border-primary bg-primary/5 text-primary" : "border-muted text-muted-foreground hover:border-primary/20"}`}
                     >
-                      ใส่ลงแข่ง
+                      {language === 'th' ? 'ใส่ลงแข่ง' : 'Racing'}
                     </button>
                   </div>
                 </div>
@@ -367,7 +369,7 @@ export function ShoeWizard({ onClose }: { onClose: () => void }) {
                 onClick={() => fetchRecommendations({})}
                 loading={loading}
               >
-                ดูผลลัพธ์
+                {language === 'th' ? 'ดูผลลัพธ์' : 'View Results'}
               </Button>
             </div>
           )}
@@ -376,16 +378,16 @@ export function ShoeWizard({ onClose }: { onClose: () => void }) {
           {step === "consult_goal" && (
             <div className="space-y-6 animate-in slide-in-from-right-4">
               <button onClick={() => setStep("entry")} className="flex items-center gap-1 text-sm text-muted-foreground hover:text-primary">
-                <ChevronLeft className="h-4 w-4" /> ย้อนกลับ
+                <ChevronLeft className="h-4 w-4" /> {t('common.back')}
               </button>
-              <h3 className="text-2xl font-semibold text-center">เป้าหมายหลักในการวิ่งคืออะไร?</h3>
+              <h3 className="text-2xl font-semibold text-center">{language === 'th' ? 'เป้าหมายหลักในการวิ่งคืออะไร?' : 'What is your primary running goal?'}</h3>
               <div className="grid grid-cols-1 gap-3">
                 {[
-                  { id: "health", label: "วิ่งเพื่อสุขภาพ / ลดน้ำหนัก", icon: <Sparkles className="h-5 w-5" /> },
-                  { id: "marathon", label: "วิ่งมาราธอน (Road Race)", icon: <Zap className="h-5 w-5" /> },
-                  { id: "road-long", label: "วิ่งระยะไกล (Long Run)", icon: <Footprints className="h-5 w-5" /> },
-                  { id: "trail", label: "วิ่งเทล (Trail Running)", icon: <Target className="h-5 w-5" /> },
-                  { id: "ultra-trail", label: "วิ่งเทลระยะไกล (Ultra Trail)", icon: <Zap className="h-5 w-5" /> }
+                  { id: "health", label: language === 'th' ? "วิ่งเพื่อสุขภาพ / ลดน้ำหนัก" : "Health & Fitness", icon: <Sparkles className="h-5 w-5" /> },
+                  { id: "marathon", label: language === 'th' ? "วิ่งมาราธอน (Road Race)" : "Marathon / Road Race", icon: <Zap className="h-5 w-5" /> },
+                  { id: "road-long", label: language === 'th' ? "วิ่งระยะไกล (Long Run)" : "Long Distance / Road", icon: <Footprints className="h-5 w-5" /> },
+                  { id: "trail", label: language === 'th' ? "วิ่งเทล (Trail Running)" : "Trail Running", icon: <Target className="h-5 w-5" /> },
+                  { id: "ultra-trail", label: language === 'th' ? "วิ่งเทลระยะไกล (Ultra Trail)" : "Ultra Trail", icon: <Zap className="h-5 w-5" /> }
                 ].map((item) => (
                   <button
                     key={item.id}
@@ -407,9 +409,9 @@ export function ShoeWizard({ onClose }: { onClose: () => void }) {
           {step === "consult_feeling" && (
             <div className="space-y-6 animate-in slide-in-from-right-4">
               <button onClick={() => setStep("consult_goal")} className="flex items-center gap-1 text-sm text-muted-foreground hover:text-primary">
-                <ChevronLeft className="h-4 w-4" /> ย้อนกลับ
+                <ChevronLeft className="h-4 w-4" /> {t('common.back')}
               </button>
-              <h3 className="text-2xl font-semibold text-center">ชอบฟีลลิ่งรองเท้าแบบไหน?</h3>
+              <h3 className="text-2xl font-semibold text-center">{language === 'th' ? 'ชอบฟีลลิ่งรองเท้าแบบไหน?' : 'Preferred shoe feeling?'}</h3>
               <div className="grid grid-cols-2 gap-4">
                 <button
                   onClick={() => { setFeeling("soft"); setStep("consult_foot"); }}
@@ -418,8 +420,8 @@ export function ShoeWizard({ onClose }: { onClose: () => void }) {
                   <div className="h-16 w-16 mx-auto rounded-full bg-primary/10 flex items-center justify-center">
                     <span className="text-3xl">☁️</span>
                   </div>
-                  <h4 className="font-semibold text-xl">นุ่มซัพพอร์ต</h4>
-                  <p className="text-xs text-muted-foreground">ปกป้องเท้า ถนอมเข่า</p>
+                  <h4 className="font-semibold text-xl">{language === 'th' ? 'นุ่มซัพพอร์ต' : 'Cushioned & Soft'}</h4>
+                  <p className="text-xs text-muted-foreground">{language === 'th' ? 'ปกป้องเท้า ถนอมเข่า' : 'Maximum protection'}</p>
                 </button>
                 <button
                   onClick={() => { setFeeling("responsive"); setStep("consult_foot"); }}
@@ -428,8 +430,8 @@ export function ShoeWizard({ onClose }: { onClose: () => void }) {
                   <div className="h-16 w-16 mx-auto rounded-full bg-accent/10 flex items-center justify-center">
                     <span className="text-3xl">⚡</span>
                   </div>
-                  <h4 className="font-semibold text-xl">เบาเด้งทำเวลา</h4>
-                  <p className="text-xs text-muted-foreground">เน้นความเร็ว ตอบสนองดี</p>
+                  <h4 className="font-semibold text-xl">{language === 'th' ? 'เบาเด้งทำเวลา' : 'Light & Responsive'}</h4>
+                  <p className="text-xs text-muted-foreground">{language === 'th' ? 'เน้นความเร็ว ตอบสนองดี' : 'Built for speed'}</p>
                 </button>
               </div>
             </div>
@@ -439,9 +441,9 @@ export function ShoeWizard({ onClose }: { onClose: () => void }) {
           {step === "consult_foot" && (
             <div className="space-y-6 animate-in slide-in-from-right-4">
               <button onClick={() => setStep("consult_feeling")} className="flex items-center gap-1 text-sm text-muted-foreground hover:text-primary">
-                <ChevronLeft className="h-4 w-4" /> ย้อนกลับ
+                <ChevronLeft className="h-4 w-4" /> {t('common.back')}
               </button>
-              <h3 className="text-2xl font-semibold text-center">สรีระเท้าของคุณเป็นอย่างไร?</h3>
+              <h3 className="text-2xl font-semibold text-center">{language === 'th' ? 'สรีระเท้าของคุณเป็นอย่างไร?' : 'What is your foot type?'}</h3>
               <div className="grid grid-cols-2 gap-4">
                 <button
                   onClick={() => {
@@ -453,7 +455,7 @@ export function ShoeWizard({ onClose }: { onClose: () => void }) {
                   <div className="h-16 w-16 mx-auto border-2 border-dashed border-primary/20 rounded-full flex items-center justify-center overflow-hidden p-2">
                     <img src="https://images.unsplash.com/photo-1560769629-975ec94e6a86?w=100" className="opacity-40 grayscale" alt="Normal Foot" />
                   </div>
-                  <h4 className="font-semibold text-xl">อุ้งเท้าปกติ</h4>
+                  <h4 className="font-semibold text-xl">{language === 'th' ? 'อุ้งเท้าปกติ' : 'Normal Arch'}</h4>
                 </button>
                 <button
                   onClick={() => {
@@ -465,7 +467,7 @@ export function ShoeWizard({ onClose }: { onClose: () => void }) {
                   <div className="h-16 w-16 mx-auto border-2 border-dashed border-primary/20 rounded-full flex items-center justify-center overflow-hidden p-2">
                      <img src="https://images.unsplash.com/photo-1560769629-975ec94e6a86?w=100" className="opacity-40 grayscale scale-x-125" alt="Flat Foot" />
                   </div>
-                  <h4 className="font-semibold text-xl">เท้าแบน</h4>
+                  <h4 className="font-semibold text-xl">{language === 'th' ? 'เท้าแบน' : 'Flat Foot'}</h4>
                 </button>
               </div>
             </div>
@@ -478,8 +480,8 @@ export function ShoeWizard({ onClose }: { onClose: () => void }) {
                 <div className="h-16 w-16 bg-green-500/10 text-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
                    <Check className="h-8 w-8" />
                 </div>
-                <h3 className="text-3xl font-semibold">เราคัดมาให้คุณแล้ว!</h3>
-                <p className="text-muted-foreground">{recommendations.length} รุ่นที่เหมาะสมที่สุดกับสรีระและเป้าหมายของคุณ</p>
+                <h3 className="text-3xl font-semibold">{t('wizard.picked_for_you')}</h3>
+                <p className="text-muted-foreground">{t('wizard.best_models', { count: recommendations.length })}</p>
               </div>
 
               <div className="space-y-4">
@@ -526,7 +528,7 @@ export function ShoeWizard({ onClose }: { onClose: () => void }) {
                               onClose();
                             }}
                           >
-                            ดูรีวิว <ArrowRight className="h-4 w-4" />
+                            {t('common.read_more')} <ArrowRight className="h-4 w-4" />
                           </Button>
                         </div>
                       </div>
@@ -541,8 +543,8 @@ export function ShoeWizard({ onClose }: { onClose: () => void }) {
                     <Scale className="h-6 w-6 text-primary" />
                   </div>
                   <div>
-                    <h5 className="font-semibold">ต้องการเทียบจุดต่าง?</h5>
-                    <p className="text-xs text-muted-foreground">เรานำรุ่นที่แนะนำใส่ในตารางเปรียบเทียบให้แล้ว</p>
+                    <h5 className="font-semibold">{language === 'th' ? 'ต้องการเทียบจุดต่าง?' : 'Want to compare?'}</h5>
+                    <p className="text-xs text-muted-foreground">{language === 'th' ? 'เรานำรุ่นที่แนะนำใส่ในตารางเปรียบเทียบให้แล้ว' : "We've added these to the comparison table for you."}</p>
                   </div>
                 </div>
                 <Button
