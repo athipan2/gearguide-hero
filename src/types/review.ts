@@ -15,18 +15,24 @@ export type SectionType =
 export interface SpecItem {
   label: string;
   value: string;
+  label_en?: string;
+  value_en?: string;
   highlight?: boolean;
 }
 
 export interface ReviewRating {
   label: string;
+  label_en?: string;
   score: number;
 }
 
 export interface ReviewSectionData {
   title?: string;
+  title_en?: string;
   body?: string;
+  body_en?: string;
   items?: string[] | SpecItem[];
+  items_en?: string[];
   type: SectionType;
   props?: Record<string, unknown>;
 }
@@ -45,7 +51,9 @@ export interface ReviewData {
   ratings: ReviewRating[];
   specs: SpecItem[];
   pros: string[];
+  pros_en?: string[];
   cons: string[];
+  cons_en?: string[];
   verdict: string | null;
   intro: string | null;
   sections: ReviewSectionData[];
@@ -55,6 +63,19 @@ export interface ReviewData {
   shopee_url?: string | null;
   lazada_url?: string | null;
   test_conditions?: {
+    terrain: string;
+    weather: string;
+    distance: string;
+  };
+  // Localization support
+  name_en?: string | null;
+  brand_en?: string | null;
+  category_en?: string | null;
+  badge_en?: string | null;
+  verdict_en?: string | null;
+  intro_en?: string | null;
+  cta_text_en?: string | null;
+  test_conditions_en?: {
     terrain: string;
     weather: string;
     distance: string;

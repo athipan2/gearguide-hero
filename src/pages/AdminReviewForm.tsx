@@ -16,10 +16,10 @@ import { resizeImage, IMAGE_VARIANTS } from "@/lib/image-utils";
 import { getOptimizedImageUrl } from "@/lib/utils";
 
 const defaultForm = {
-  name: "", brand: "", category: "", price: "", slug: "",
+  name: "", name_en: "", brand: "", category: "", price: "", slug: "",
   image_url: "", badge: "", overall_rating: 0,
-  affiliate_url: "", cta_text: "ดูราคาล่าสุด",
-  intro: "", verdict: "", published: false,
+  affiliate_url: "", cta_text: "ดูราคาล่าสุด", cta_text_en: "View Latest Price",
+  intro: "", intro_en: "", verdict: "", verdict_en: "", published: false,
 };
 
 const sectionTypes: { label: string; value: SectionType }[] = [
@@ -41,10 +41,12 @@ export default function AdminReviewForm() {
   const { user } = useAuth();
 
   const [form, setForm] = useState(defaultForm);
-  const [ratings, setRatings] = useState<ReviewRating[]>([{ label: "", score: 0 }]);
-  const [specs, setSpecs] = useState<SpecItem[]>([{ label: "", value: "", highlight: false }]);
+  const [ratings, setRatings] = useState<ReviewRating[]>([{ label: "", label_en: "", score: 0 }]);
+  const [specs, setSpecs] = useState<SpecItem[]>([{ label: "", label_en: "", value: "", value_en: "", highlight: false }]);
   const [pros, setPros] = useState<string[]>([""]);
+  const [pros_en, setProsEn] = useState<string[]>([""]);
   const [cons, setCons] = useState<string[]>([""]);
+  const [cons_en, setConsEn] = useState<string[]>([""]);
   const [sections, setSections] = useState<ReviewSectionData[]>([]);
   const [images, setImages] = useState<string[]>([]);
   const [saving, setSaving] = useState(false);
@@ -56,18 +58,24 @@ export default function AdminReviewForm() {
       supabase.from("reviews").select("*").eq("id", id).maybeSingle().then(({ data }) => {
         if (data) {
           setForm({
-            name: data.name, brand: data.brand, category: data.category,
+            name: data.name, name_en: data.name_en || "", brand: data.brand, category: data.category,
             price: data.price, slug: data.slug, image_url: data.image_url || "",
             badge: data.badge || "", overall_rating: Number(data.overall_rating),
-            affiliate_url: data.affiliate_url || "", cta_text: data.cta_text || "ดูราคาล่าสุด",
-            intro: data.intro || "", verdict: data.verdict || "", published: data.published,
+            affiliate_url: data.affiliate_url || "",
+            cta_text: data.cta_text || "ดูราคาล่าสุด",
+            cta_text_en: data.cta_text_en || "View Latest Price",
+            intro: data.intro || "", intro_en: data.intro_en || "",
+            verdict: data.verdict || "", verdict_en: data.verdict_en || "",
+            published: data.published,
           });
-          setRatings((data.ratings as unknown as ReviewRating[]) || []);
-          setSpecs((data.specs as unknown as SpecItem[]) || []);
-          setPros((data.pros as unknown as string[]) || [""]);
-          setCons((data.cons as unknown as string[]) || [""]);
-          setSections((data.sections as unknown as ReviewSectionData[]) || []);
-          setImages((data.images as unknown as string[]) || []);
+          setRatings(Array.isArray(data.ratings) ? (data.ratings as unknown as ReviewRating[]) : []);
+          setSpecs(Array.isArray(data.specs) ? (data.specs as unknown as SpecItem[]) : []);
+          setPros(Array.isArray(data.pros) ? (data.pros as unknown as string[]) : [""]);
+          setProsEn(Array.isArray(data.pros_en) ? (data.pros_en as unknown as string[]) : [""]);
+          setCons(Array.isArray(data.cons) ? (data.cons as unknown as string[]) : [""]);
+          setConsEn(Array.isArray(data.cons_en) ? (data.cons_en as unknown as string[]) : [""]);
+          setSections(Array.isArray(data.sections) ? (data.sections as unknown as ReviewSectionData[]) : []);
+          setImages(Array.isArray(data.images) ? (data.images as unknown as string[]) : []);
         }
       });
     } else {
@@ -95,7 +103,9 @@ export default function AdminReviewForm() {
       ratings: ratings.filter((r) => r.label).map(r => ({ ...r, score: Math.round(r.score * 10) / 10 })),
       specs: specs.filter((s) => s.label),
       pros: pros.filter(Boolean),
+      pros_en: pros_en.filter(Boolean),
       cons: cons.filter(Boolean),
+      cons_en: cons_en.filter(Boolean),
       sections: sections,
       images: images.filter(Boolean),
       ...(isEdit ? {} : { created_by: user?.id }),
@@ -291,7 +301,7 @@ export default function AdminReviewForm() {
                 </div>
 
                 <div className="grid grid-cols-3 gap-2">
-                  {images.map((url, i) => (
+              {Array.isArray(images) && images.map((url, i) => (
                     <div key={i} className="relative aspect-square rounded-md overflow-hidden border bg-muted group">
                       <img
                         src={getOptimizedImageUrl(url, 'thumbnail')}
@@ -332,8 +342,12 @@ export default function AdminReviewForm() {
             <h2 className="font-heading font-semibold text-foreground">ข้อมูลพื้นฐาน</h2>
             <div className="grid sm:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label>ชื่อสินค้า *</Label>
+                <Label>ชื่อสินค้า (Thai) *</Label>
                 <Input value={form.name} onChange={(e) => updateField("name", e.target.value)} />
+              </div>
+              <div className="space-y-2">
+                <Label>Product Name (English)</Label>
+                <Input value={form.name_en} onChange={(e) => updateField("name_en", e.target.value)} />
               </div>
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
@@ -379,7 +393,7 @@ export default function AdminReviewForm() {
             </div>
 
             <div className="space-y-4">
-              {sections.map((section, i) => (
+              {Array.isArray(sections) && sections.map((section, i) => (
                 <div key={i} className="border rounded-lg p-4 bg-slate-50/50 space-y-4">
                   <div className="flex items-center justify-between gap-4">
                     <div className="flex items-center gap-2">
@@ -420,29 +434,61 @@ export default function AdminReviewForm() {
 
                   {section.type === 'content' && (
                     <div className="space-y-3 pt-2">
-                      <div className="space-y-1">
-                        <Label className="text-xs">หัวข้อ</Label>
-                        <Input
-                          value={section.title || ""}
-                          onChange={(e) => {
-                            const next = [...sections];
-                            next[i].title = e.target.value;
-                            setSections(next);
-                          }}
-                          className="h-8"
-                        />
+                      <div className="grid sm:grid-cols-2 gap-4">
+                        <div className="space-y-1">
+                          <Label className="text-xs">หัวข้อ (Thai)</Label>
+                          <Input
+                            value={section.title || ""}
+                            onChange={(e) => {
+                              const next = [...sections];
+                              next[i].title = e.target.value;
+                              setSections(next);
+                            }}
+                            className="h-8"
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <Label className="text-xs">Title (English)</Label>
+                          <Input
+                            // @ts-expect-error - Dynamic field
+                            value={section.title_en || ""}
+                            onChange={(e) => {
+                              const next = [...sections];
+                              // @ts-expect-error - Dynamic field
+                              next[i].title_en = e.target.value;
+                              setSections(next);
+                            }}
+                            className="h-8"
+                          />
+                        </div>
                       </div>
-                      <div className="space-y-1">
-                        <Label className="text-xs">เนื้อหา</Label>
-                        <Textarea
-                          value={section.body || ""}
-                          onChange={(e) => {
-                            const next = [...sections];
-                            next[i].body = e.target.value;
-                            setSections(next);
-                          }}
-                          rows={4}
-                        />
+                      <div className="grid sm:grid-cols-2 gap-4">
+                        <div className="space-y-1">
+                          <Label className="text-xs">เนื้อหา (Thai)</Label>
+                          <Textarea
+                            value={section.body || ""}
+                            onChange={(e) => {
+                              const next = [...sections];
+                              next[i].body = e.target.value;
+                              setSections(next);
+                            }}
+                            rows={4}
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <Label className="text-xs">Body (English)</Label>
+                          <Textarea
+                            // @ts-expect-error - Dynamic field
+                            value={section.body_en || ""}
+                            onChange={(e) => {
+                              const next = [...sections];
+                              // @ts-expect-error - Dynamic field
+                              next[i].body_en = e.target.value;
+                              setSections(next);
+                            }}
+                            rows={4}
+                          />
+                        </div>
                       </div>
                     </div>
                   )}
@@ -467,70 +513,120 @@ export default function AdminReviewForm() {
           {/* Ratings */}
           <div className="bg-card border rounded-xl p-5 space-y-4">
             <div className="flex items-center justify-between">
-              <h2 className="font-heading font-semibold text-foreground">คะแนนแต่ละด้าน</h2>
-              <Button variant="ghost" size="sm" onClick={() => setRatings([...ratings, { label: "", score: 0 }])}>
+              <h2 className="font-heading font-semibold text-foreground">คะแนนแต่ละด้าน (Ratings)</h2>
+              <Button variant="ghost" size="sm" onClick={() => setRatings([...ratings, { label: "", label_en: "", score: 0 }])}>
                 <Plus className="h-4 w-4 mr-1" /> เพิ่ม
               </Button>
             </div>
-            {ratings.map((r, i) => (
-              <div key={i} className="flex gap-2 items-center">
-                <Input placeholder="ด้าน" value={r.label} onChange={(e) => { const n = [...ratings]; n[i].label = e.target.value; setRatings(n); }} className="flex-1" />
-                <Input type="number" step="0.1" min="0" max="5" value={r.score} onChange={(e) => { const n = [...ratings]; n[i].score = parseFloat(e.target.value) || 0; setRatings(n); }} className="w-20" />
-                <Button variant="ghost" size="icon" onClick={() => setRatings(ratings.filter((_, j) => j !== i))}><X className="h-4 w-4" /></Button>
-              </div>
-            ))}
+            <div className="space-y-3">
+              {Array.isArray(ratings) && ratings.map((r, i) => (
+                <div key={i} className="space-y-2 border-b pb-3 last:border-none">
+                  <div className="flex gap-2 items-center">
+                    <Input placeholder="ด้าน (TH)" value={r.label} onChange={(e) => { const n = [...ratings]; n[i].label = e.target.value; setRatings(n); }} className="flex-1 h-8 text-sm" />
+                    <Input placeholder="Label (EN)" value={r.label_en || ""} onChange={(e) => { const n = [...ratings]; n[i].label_en = e.target.value; setRatings(n); }} className="flex-1 h-8 text-sm" />
+                    <Input type="number" step="0.1" min="0" max="5" value={r.score} onChange={(e) => { const n = [...ratings]; n[i].score = parseFloat(e.target.value) || 0; setRatings(n); }} className="w-16 h-8 text-sm" />
+                    <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setRatings(ratings.filter((_, j) => j !== i))}><X className="h-4 w-4" /></Button>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
 
           {/* Specs */}
           <div className="bg-card border rounded-xl p-5 space-y-4">
             <div className="flex items-center justify-between">
               <h2 className="font-heading font-semibold text-foreground">สเปค (Technical Specs)</h2>
-              <Button variant="ghost" size="sm" onClick={() => setSpecs([...specs, { label: "", value: "", highlight: false }])}>
+              <Button variant="ghost" size="sm" onClick={() => setSpecs([...specs, { label: "", label_en: "", value: "", value_en: "", highlight: false }])}>
                 <Plus className="h-4 w-4 mr-1" /> เพิ่ม
               </Button>
             </div>
-            {specs.map((s, i) => (
-              <div key={i} className="flex gap-2 items-center">
-                <Input placeholder="หัวข้อ" value={s.label} onChange={(e) => { const n = [...specs]; n[i].label = e.target.value; setSpecs(n); }} className="flex-1" />
-                <Input placeholder="ค่า" value={s.value} onChange={(e) => { const n = [...specs]; n[i].value = e.target.value; setSpecs(n); }} className="flex-1" />
-                <div className="flex items-center gap-1 shrink-0 px-2">
-                  <Label className="text-[10px]">Highlight</Label>
-                  <Switch
-                    checked={s.highlight}
-                    onCheckedChange={(v) => { const n = [...specs]; n[i].highlight = v; setSpecs(n); }}
-                    className="scale-75"
-                  />
+            <div className="space-y-4">
+              {Array.isArray(specs) && specs.map((s, i) => (
+                <div key={i} className="space-y-2 border-b pb-4 last:border-none">
+                  <div className="flex gap-2 items-center">
+                    <Input placeholder="หัวข้อ (TH)" value={s.label} onChange={(e) => { const n = [...specs]; n[i].label = e.target.value; setSpecs(n); }} className="flex-1 h-8 text-sm" />
+                    <Input placeholder="Label (EN)" value={s.label_en || ""} onChange={(e) => { const n = [...specs]; n[i].label_en = e.target.value; setSpecs(n); }} className="flex-1 h-8 text-sm" />
+                    <div className="flex items-center gap-1 shrink-0 px-2">
+                      <Label className="text-[10px]">Highlight</Label>
+                      <Switch
+                        checked={s.highlight}
+                        onCheckedChange={(v) => { const n = [...specs]; n[i].highlight = v; setSpecs(n); }}
+                        className="scale-75"
+                      />
+                    </div>
+                    <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setSpecs(specs.filter((_, j) => j !== i))}><X className="h-4 w-4" /></Button>
+                  </div>
+                  <div className="flex gap-2">
+                    <Input placeholder="ค่า (TH)" value={s.value} onChange={(e) => { const n = [...specs]; n[i].value = e.target.value; setSpecs(n); }} className="flex-1 h-8 text-sm bg-slate-50/50" />
+                    <Input placeholder="Value (EN)" value={s.value_en || ""} onChange={(e) => { const n = [...specs]; n[i].value_en = e.target.value; setSpecs(n); }} className="flex-1 h-8 text-sm bg-slate-50/50" />
+                  </div>
                 </div>
-                <Button variant="ghost" size="icon" onClick={() => setSpecs(specs.filter((_, j) => j !== i))}><X className="h-4 w-4" /></Button>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
 
           {/* Pros / Cons */}
           <div className="grid sm:grid-cols-2 gap-4">
+            {/* Pros */}
             <div className="bg-card border rounded-xl p-5 space-y-3">
               <div className="flex items-center justify-between">
-                <h2 className="font-heading font-semibold text-emerald-600">ข้อดี</h2>
-                <Button variant="ghost" size="sm" onClick={() => setPros([...pros, ""])}><Plus className="h-4 w-4" /></Button>
-              </div>
-              {pros.map((p, i) => (
-                <div key={i} className="flex gap-2">
-                  <Input value={p} onChange={(e) => { const n = [...pros]; n[i] = e.target.value; setPros(n); }} className="flex-1" />
-                  <Button variant="ghost" size="icon" onClick={() => setPros(pros.filter((_, j) => j !== i))}><X className="h-4 w-4" /></Button>
+                <h2 className="font-heading font-semibold text-emerald-600">ข้อดี (Pros)</h2>
+                <div className="flex gap-1">
+                  <Button variant="ghost" size="sm" className="h-8 text-[10px]" onClick={() => setProsEn([...pros_en, ""])}>+ EN</Button>
+                  <Button variant="ghost" size="sm" className="h-8 text-[10px]" onClick={() => setPros([...pros, ""])}>+ TH</Button>
                 </div>
-              ))}
+              </div>
+              <div className="space-y-4">
+                <div className="space-y-2">
+                   <Label className="text-[10px] text-muted-foreground uppercase">Thai</Label>
+                   {Array.isArray(pros) && pros.map((p, i) => (
+                    <div key={i} className="flex gap-2">
+                      <Input value={p} onChange={(e) => { const n = [...pros]; n[i] = e.target.value; setPros(n); }} className="flex-1 h-8 text-sm" />
+                      <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setPros(pros.filter((_, j) => j !== i))}><X className="h-4 w-4" /></Button>
+                    </div>
+                  ))}
+                </div>
+                <div className="space-y-2 pt-2 border-t">
+                   <Label className="text-[10px] text-muted-foreground uppercase">English</Label>
+                   {Array.isArray(pros_en) && pros_en.map((p, i) => (
+                    <div key={i} className="flex gap-2">
+                      <Input value={p} onChange={(e) => { const n = [...pros_en]; n[i] = e.target.value; setProsEn(n); }} className="flex-1 h-8 text-sm bg-slate-50/50" />
+                      <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setProsEn(pros_en.filter((_, j) => j !== i))}><X className="h-4 w-4" /></Button>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
+
+            {/* Cons */}
             <div className="bg-card border rounded-xl p-5 space-y-3">
               <div className="flex items-center justify-between">
-                <h2 className="font-heading font-semibold text-rose-500">ข้อเสีย</h2>
-                <Button variant="ghost" size="sm" onClick={() => setCons([...cons, ""])}><Plus className="h-4 w-4" /></Button>
-              </div>
-              {cons.map((c, i) => (
-                <div key={i} className="flex gap-2">
-                  <Input value={c} onChange={(e) => { const n = [...cons]; n[i] = e.target.value; setCons(n); }} className="flex-1" />
-                  <Button variant="ghost" size="icon" onClick={() => setCons(cons.filter((_, j) => j !== i))}><X className="h-4 w-4" /></Button>
+                <h2 className="font-heading font-semibold text-rose-500">ข้อเสีย (Cons)</h2>
+                <div className="flex gap-1">
+                  <Button variant="ghost" size="sm" className="h-8 text-[10px]" onClick={() => setConsEn([...cons_en, ""])}>+ EN</Button>
+                  <Button variant="ghost" size="sm" className="h-8 text-[10px]" onClick={() => setCons([...cons, ""])}>+ TH</Button>
                 </div>
-              ))}
+              </div>
+              <div className="space-y-4">
+                <div className="space-y-2">
+                   <Label className="text-[10px] text-muted-foreground uppercase">Thai</Label>
+                   {Array.isArray(cons) && cons.map((c, i) => (
+                    <div key={i} className="flex gap-2">
+                      <Input value={c} onChange={(e) => { const n = [...cons]; n[i] = e.target.value; setCons(n); }} className="flex-1 h-8 text-sm" />
+                      <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setCons(cons.filter((_, j) => j !== i))}><X className="h-4 w-4" /></Button>
+                    </div>
+                  ))}
+                </div>
+                <div className="space-y-2 pt-2 border-t">
+                   <Label className="text-[10px] text-muted-foreground uppercase">English</Label>
+                   {Array.isArray(cons_en) && cons_en.map((c, i) => (
+                    <div key={i} className="flex gap-2">
+                      <Input value={c} onChange={(e) => { const n = [...cons_en]; n[i] = e.target.value; setConsEn(n); }} className="flex-1 h-8 text-sm bg-slate-50/50" />
+                      <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setConsEn(cons_en.filter((_, j) => j !== i))}><X className="h-4 w-4" /></Button>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -549,17 +645,29 @@ export default function AdminReviewForm() {
               <Input value={form.affiliate_url} onChange={(e) => updateField("affiliate_url", e.target.value)} placeholder="https://..." />
             </div>
             <div className="space-y-2">
-              <Label>ข้อความปุ่ม CTA</Label>
+              <Label>ข้อความปุ่ม CTA (Thai)</Label>
               <Input value={form.cta_text} onChange={(e) => updateField("cta_text", e.target.value)} />
+            </div>
+            <div className="space-y-2">
+              <Label>CTA Text (English)</Label>
+              <Input value={form.cta_text_en} onChange={(e) => updateField("cta_text_en", e.target.value)} />
             </div>
 
             <div className="space-y-2 pt-2 border-t">
-              <Label>บทนำ (Intro)</Label>
+              <Label>บทนำ (Intro - Thai)</Label>
               <Textarea value={form.intro} onChange={(e) => updateField("intro", e.target.value)} rows={3} className="text-sm" />
             </div>
             <div className="space-y-2">
-              <Label>สรุป (Verdict Text)</Label>
+              <Label>Intro (English)</Label>
+              <Textarea value={form.intro_en} onChange={(e) => updateField("intro_en", e.target.value)} rows={3} className="text-sm" />
+            </div>
+            <div className="space-y-2 pt-2 border-t">
+              <Label>สรุป (Verdict - Thai)</Label>
               <Textarea value={form.verdict} onChange={(e) => updateField("verdict", e.target.value)} rows={3} className="text-sm" />
+            </div>
+            <div className="space-y-2">
+              <Label>Verdict (English)</Label>
+              <Textarea value={form.verdict_en} onChange={(e) => updateField("verdict_en", e.target.value)} rows={3} className="text-sm" />
             </div>
 
             <Button onClick={handleSave} disabled={saving} className="w-full h-12 lg:h-10">

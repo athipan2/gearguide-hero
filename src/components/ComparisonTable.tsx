@@ -8,6 +8,8 @@ import {
 import { useComparisonStore } from "@/lib/comparison-store";
 import { cn, getOptimizedImageUrl } from "@/lib/utils";
 import { Link } from "react-router-dom";
+import { useTranslation } from "@/hooks/useTranslation";
+import { translateSpecLabel } from "@/lib/translation-utils";
 
 const getSpecIcon = (label: string) => {
   const l = label.toLowerCase();
@@ -29,6 +31,7 @@ const getRatingIcon = (label: string) => {
 };
 
 export function ComparisonTable() {
+  const { t, language } = useTranslation();
   const { selectedItems, removeItem, clear } = useComparisonStore();
 
   const item1 = selectedItems[0];
@@ -122,13 +125,13 @@ export function ComparisonTable() {
             <Scale className="h-10 w-10" />
           </div>
           <div className="space-y-2">
-            <p className="text-2xl font-semibold text-primary/60 uppercase tracking-tight">ยังไม่มีสินค้าที่เลือก</p>
+            <p className="text-2xl font-semibold text-primary/60 uppercase tracking-tight">{language === 'th' ? 'ยังไม่มีสินค้าที่เลือก' : 'No items selected'}</p>
             <p className="text-muted-foreground max-w-xs mx-auto">
-              กดปุ่ม "เทียบ" ที่หน้าสินค้าเพื่อเริ่มการเปรียบเทียบ (เลือกได้สูงสุด 2 รุ่น)
+              {language === 'th' ? 'กดปุ่ม "เทียบ" ที่หน้าสินค้าเพื่อเริ่มการเปรียบเทียบ (เลือกได้สูงสุด 2 รุ่น)' : 'Click "Compare" on a product to start (up to 2 models)'}
             </p>
           </div>
           <Button variant="cta" className="rounded-full" asChild>
-            <Link to="/">ไปเลือกสินค้า</Link>
+            <Link to="/">{language === 'th' ? 'ไปเลือกสินค้า' : 'Go choose products'}</Link>
           </Button>
         </div>
       </div>
@@ -218,8 +221,8 @@ export function ComparisonTable() {
                 <Plus className="h-4 w-4 md:h-8 md:w-8" />
               </div>
               <div className="text-center">
-                <p className="font-semibold uppercase tracking-widest text-primary text-[9px] md:text-sm">เพิ่มอีกรุ่น</p>
-                <p className="text-[8px] md:text-xs text-muted-foreground mt-0.5 hidden md:block">เพื่อเปรียบเทียบให้เห็นภาพ</p>
+                <p className="font-semibold uppercase tracking-widest text-primary text-[9px] md:text-sm">{language === 'th' ? 'เพิ่มอีกรุ่น' : 'Add another'}</p>
+                <p className="text-[8px] md:text-xs text-muted-foreground mt-0.5 hidden md:block">{language === 'th' ? 'เพื่อเปรียบเทียบให้เห็นภาพ' : 'For visual comparison'}</p>
               </div>
             </Link>
           )}
@@ -232,13 +235,13 @@ export function ComparisonTable() {
             <div className="flex items-center gap-2 md:gap-3 mb-6 md:mb-8">
               <div className="h-px flex-1 bg-primary/10" />
               <div className="flex items-center gap-1.5 md:gap-2 text-primary font-semibold uppercase tracking-[0.15em] md:tracking-[0.2em] text-[10px] md:text-xs">
-                <Award className="h-3.5 w-3.5 md:h-4 md:w-4" /> คะแนนทดสอบ
+                <Award className="h-3.5 w-3.5 md:h-4 md:w-4" /> {language === 'th' ? 'คะแนนทดสอบ' : 'Test Scores'}
               </div>
               <div className="h-px flex-1 bg-primary/10" />
             </div>
 
             <ComparisonRow
-              label="คะแนนรวม"
+              label={t('common.overall')}
               value1={item1.rating?.toFixed(1)}
               value2={item2?.rating?.toFixed(1)}
               icon={<Star className="h-4 w-4" />}
@@ -248,7 +251,7 @@ export function ComparisonTable() {
             {allRatingLabels.map(label => (
               <ComparisonRow
                 key={label}
-                label={label}
+                label={translateSpecLabel(label, language)}
                 value1={item1.aspectRatings?.find(r => r.label === label)?.score}
                 value2={item2?.aspectRatings?.find(r => r.label === label)?.score}
                 icon={getRatingIcon(label)}
@@ -262,7 +265,7 @@ export function ComparisonTable() {
             <div className="flex items-center gap-2 md:gap-3 mb-6 md:mb-8">
               <div className="h-px flex-1 bg-primary/10" />
               <div className="flex items-center gap-1.5 md:gap-2 text-primary font-semibold uppercase tracking-[0.15em] md:tracking-[0.2em] text-[10px] md:text-xs">
-                <Info className="h-3.5 w-3.5 md:h-4 md:w-4" /> ข้อมูลสเปค
+                <Info className="h-3.5 w-3.5 md:h-4 md:w-4" /> {t('common.specs')}
               </div>
               <div className="h-px flex-1 bg-primary/10" />
             </div>
@@ -270,7 +273,7 @@ export function ComparisonTable() {
             {allSpecLabels.map(label => (
               <ComparisonRow
                 key={label}
-                label={label}
+                label={translateSpecLabel(label, language)}
                 value1={item1.specs?.find(s => s.label === label)?.value}
                 value2={item2?.specs?.find(s => s.label === label)?.value}
                 icon={getSpecIcon(label)}
@@ -283,7 +286,7 @@ export function ComparisonTable() {
             <div className="space-y-4">
               <Button variant="cta" className="w-full rounded-xl md:rounded-2xl h-10 md:h-16 text-[10px] md:text-lg shadow-xl hover:scale-[1.02] transition-transform" asChild>
                 <Link to={item1.slug ? `/review/${item1.slug}` : '#'}>
-                  <span className="hidden md:inline">อ่านรีวิว</span> {item1.name.split(' ')[0]} <ExternalLink className="ml-1 md:ml-2 h-3 w-3 md:h-4 md:w-4" />
+                  <span className="hidden md:inline">{t('common.read_more')}</span> {item1.name.split(' ')[0]} <ExternalLink className="ml-1 md:ml-2 h-3 w-3 md:h-4 md:w-4" />
                 </Link>
               </Button>
             </div>
@@ -291,7 +294,7 @@ export function ComparisonTable() {
               <div className="space-y-4">
                 <Button variant="cta" className="w-full rounded-xl md:rounded-2xl h-10 md:h-16 text-[10px] md:text-lg shadow-xl hover:scale-[1.02] transition-transform" asChild>
                   <Link to={item2.slug ? `/review/${item2.slug}` : '#'}>
-                    <span className="hidden md:inline">อ่านรีวิว</span> {item2.name.split(' ')[0]} <ExternalLink className="ml-1 md:ml-2 h-3 w-3 md:h-4 md:w-4" />
+                    <span className="hidden md:inline">{t('common.read_more')}</span> {item2.name.split(' ')[0]} <ExternalLink className="ml-1 md:ml-2 h-3 w-3 md:h-4 md:w-4" />
                   </Link>
                 </Button>
               </div>
@@ -300,7 +303,7 @@ export function ComparisonTable() {
 
           <div className="mt-8 text-center">
             <Button variant="ghost" size="sm" onClick={clear} className="text-muted-foreground hover:text-destructive transition-colors rounded-full text-[10px] md:text-xs">
-              ล้างข้อมูลทั้งหมด
+              {t('category.clear_all')}
             </Button>
           </div>
         </div>

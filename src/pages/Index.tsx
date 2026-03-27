@@ -8,8 +8,10 @@ import { Footer } from "@/components/Footer";
 import { SEOHead } from "@/components/SEOHead";
 import { ShoeWizard } from "@/components/ShoeWizard";
 import { useState, useEffect } from "react";
+import { useTranslation } from "@/hooks/useTranslation";
 
 const Index = () => {
+  const { t } = useTranslation();
   const [showWizard, setShowWizard] = useState(false);
 
   useEffect(() => {
@@ -27,8 +29,8 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background bg-noise">
       <SEOHead
-        title="GearTrail — รีวิวอุปกรณ์วิ่ง เทรล แคมป์ปิ้ง"
-        description="รีวิวจริง ทดสอบจริง รองเท้าวิ่ง อุปกรณ์เทรล เดินป่า แคมป์ปิ้ง พร้อมเปรียบเทียบราคาและสเปค อัปเดต 2026"
+        title={t('index.seo_title')}
+        description={t('index.seo_description')}
         canonical="https://gearguide-hero.lovable.app/"
       />
       <Navbar />
