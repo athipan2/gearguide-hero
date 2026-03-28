@@ -235,7 +235,7 @@ export default function ReviewDetail() {
            <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-slate-400 mb-8 overflow-x-auto whitespace-nowrap scrollbar-hide">
             <Link to="/" className="hover:text-primary transition-colors shrink-0">HOME</Link>
             <ChevronRight className="h-3 w-3 shrink-0" />
-            <Link to={`/category/${encodeURIComponent(review.category)}`} className="hover:text-primary transition-colors shrink-0">{translateData(review, 'category', language)}</Link>
+            <Link to={`/category/${encodeURIComponent(review.category)}`} className="hover:text-primary transition-colors shrink-0">{translateData(review, 'category', language) || review.category}</Link>
             <ChevronRight className="h-3 w-3 shrink-0" />
             <span className="text-primary truncate">{localizedName}</span>
           </div>

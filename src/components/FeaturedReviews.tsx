@@ -6,6 +6,7 @@ import { Link } from "react-router-dom";
 import { ProductCardSkeleton } from "./ReviewSkeleton";
 import { getOptimizedImageUrl } from "@/lib/utils";
 import { useTranslation } from "@/hooks/useTranslation";
+import { translateData, translateArray } from "@/lib/translation-utils";
 
 const fallbackProducts = [
   {
@@ -38,13 +39,18 @@ const fallbackProducts = [
 
 interface ReviewData {
   name: string;
+  name_en?: string | null;
   brand: string;
+  brand_en?: string | null;
   image_url: string | null;
   overall_rating: number;
   price: string;
   badge: string | null;
+  badge_en?: string | null;
   pros: unknown;
+  pros_en?: unknown;
   cons: unknown;
+  cons_en?: unknown;
   specs: unknown;
   ratings: unknown;
   slug: string;
@@ -78,7 +84,7 @@ export function FeaturedReviews() {
       try {
         const { data, error } = await supabase
           .from("reviews")
-          .select("name, brand, image_url, overall_rating, price, badge, pros, cons, specs, ratings, slug, affiliate_url, created_at")
+          .select("name, name_en, brand, brand_en, image_url, overall_rating, price, badge, badge_en, pros, pros_en, cons, cons_en, specs, ratings, slug, affiliate_url, created_at")
           .eq("published", true)
           .order("created_at", { ascending: false })
           .limit(8);
@@ -88,14 +94,14 @@ export function FeaturedReviews() {
         if (data && data.length > 0) {
           setProducts(
             (data as unknown as ReviewData[]).map((r) => ({
-              name: r.name,
-              brand: r.brand,
+              name: translateData(r, 'name', language),
+              brand: translateData(r, 'brand', language),
               image: getOptimizedImageUrl(r.image_url, 'card') || "",
               rating: Number(r.overall_rating),
               price: r.price,
-              badge: r.badge || undefined,
-              pros: Array.isArray(r.pros) ? (r.pros as string[]) : [],
-              cons: Array.isArray(r.cons) ? (r.cons as string[]) : [],
+              badge: translateData(r, 'badge', language) || undefined,
+              pros: translateArray(r, 'pros', language),
+              cons: translateArray(r, 'cons', language),
               specs: Array.isArray(r.specs) ? (r.specs as { label: string; value: string }[]) : [],
               ratings: Array.isArray(r.ratings) ? (r.ratings as { label: string; score: number }[]) : [],
               slug: r.slug,

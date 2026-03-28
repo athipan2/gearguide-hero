@@ -56,29 +56,38 @@ export function translateTerm(term: string, lang: Language): string {
 }
 
 /**
- * Maps database fields to English if they exist, or falls back to Thai
+ * Maps database fields to English if they exist, or falls back to Thai.
+ * Improved with mutual fallback: if the requested language version is empty,
+ * it tries the other one.
  */
-export function translateData<T extends Record<string, string | number | null | undefined | unknown>>(data: T, field: string, lang: Language): string {
+export function translateData<T extends Record<string, any>>(data: T, field: string, lang: Language): string {
+  const thVal = typeof data[field] === 'string' ? data[field] : '';
+  const enField = `${field}_en`;
+  const enVal = typeof data[enField] === 'string' ? data[enField] : '';
+
   if (lang === 'en') {
-    const enField = `${field}_en`;
-    const val = data[enField];
-    if (typeof val === 'string') return val;
+    return enVal.trim() ? enVal : thVal;
   }
-  const fallback = data[field];
-  return typeof fallback === 'string' ? fallback : '';
+  return thVal.trim() ? thVal : enVal;
 }
 
 /**
- * Translates an array of strings (like pros/cons)
+ * Translates an array of strings (like pros/cons).
+ * Improved with mutual fallback: if the requested language version is empty,
+ * it tries the other one.
  */
-export function translateArray(data: Record<string, string[] | unknown>, field: string, lang: Language): string[] {
+export function translateArray(data: Record<string, any>, field: string, lang: Language): string[] {
+  const thVal = data[field];
+  const enField = `${field}_en`;
+  const enVal = data[enField];
+
+  const thArray = Array.isArray(thVal) ? (thVal as string[]).filter(Boolean) : [];
+  const enArray = Array.isArray(enVal) ? (enVal as string[]).filter(Boolean) : [];
+
   if (lang === 'en') {
-    const enField = `${field}_en`;
-    const enVal = data[enField];
-    if (Array.isArray(enVal) && enVal.length > 0) return enVal as string[];
+    return enArray.length > 0 ? enArray : thArray;
   }
-  const val = data[field];
-  return Array.isArray(val) ? (val as string[]) : [];
+  return thArray.length > 0 ? thArray : enArray;
 }
 
 /**

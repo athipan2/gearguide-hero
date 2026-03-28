@@ -124,13 +124,18 @@ type SortOption = "newest" | "rating-desc" | "price-asc" | "price-desc";
 
 interface ReviewItem {
   name: string;
+  name_en?: string | null;
   brand: string;
+  brand_en?: string | null;
   image_url: string | null;
   overall_rating: number;
   price: string;
   badge: string | null;
+  badge_en?: string | null;
   pros: unknown;
+  pros_en?: unknown;
   cons: unknown;
+  cons_en?: unknown;
   specs: unknown;
   ratings?: { label: string; score: number }[];
   slug: string;
@@ -217,7 +222,7 @@ export default function CategoryPage() {
       setLoading(true);
       let query = supabase
         .from("reviews")
-        .select("name, brand, image_url, overall_rating, price, badge, pros, cons, specs, ratings, slug, affiliate_url, category, created_at")
+        .select("name, name_en, brand, brand_en, image_url, overall_rating, price, badge, badge_en, pros, pros_en, cons, cons_en, specs, ratings, slug, affiliate_url, category, created_at")
         .eq("published", true);
 
       if (category) {
