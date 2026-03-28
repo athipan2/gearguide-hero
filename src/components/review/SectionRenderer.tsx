@@ -106,13 +106,18 @@ export const SectionRenderer = ({ section, review, userRating }: SectionRenderer
         />
       );
 
-    case 'pros_cons':
-      // Legacy support, but we now use quick_decision
-      return null;
+    case 'pros_cons': {
+      const pros = translateArray(review, 'pros', language);
+      const cons = translateArray(review, 'cons', language);
+      return <QuickDecision suitable={pros} notSuitable={cons} />;
+    }
 
-    case 'who_is_this_for':
-      // Legacy support, but we now use quick_decision
-      return null;
+    case 'who_is_this_for': {
+      const suitable = (review.specs || [])
+        .filter(s => s.label.includes('เหมาะกับ') || s.label.includes('ระยะ') || s.label.includes('Suitable') || s.label.includes('Distance'))
+        .map(s => translateTerm(s.value, language));
+      return <QuickDecision suitable={suitable} notSuitable={[]} />;
+    }
 
     case 'content': {
       const title = translateData(section, 'title', language);

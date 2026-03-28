@@ -19,18 +19,23 @@ const defaultForm = {
   name: "", name_en: "", brand: "", category: "", price: "", slug: "",
   image_url: "", badge: "", overall_rating: 0,
   affiliate_url: "", cta_text: "ดูราคาล่าสุด", cta_text_en: "View Latest Price",
+  shopee_url: "", lazada_url: "",
   intro: "", intro_en: "", verdict: "", verdict_en: "", published: false,
 };
 
 const sectionTypes: { label: string; value: SectionType }[] = [
   { label: "Hero", value: "hero" },
+  { label: "Quick Decision (Pros/Cons)", value: "quick_decision" },
+  { label: "Score Breakdown", value: "score_breakdown" },
   { label: "Technical Specs", value: "specs" },
-  { label: "Pros & Cons", value: "pros_cons" },
-  { label: "Who is this for?", value: "who_is_this_for" },
+  { label: "Pros & Cons (Legacy)", value: "pros_cons" },
+  { label: "Who is this for? (Legacy)", value: "who_is_this_for" },
   { label: "Gallery", value: "gallery" },
   { label: "Comparison", value: "comparison" },
   { label: "Verdict Card", value: "verdict" },
   { label: "Content Section", value: "content" },
+  { label: "Real World Test", value: "real_world_test" },
+  { label: "Deep Dive", value: "deep_dive" },
 ];
 
 export default function AdminReviewForm() {
@@ -55,7 +60,12 @@ export default function AdminReviewForm() {
 
   useEffect(() => {
     if (isEdit) {
-      supabase.from("reviews").select("*").eq("id", id).maybeSingle().then(({ data }) => {
+      supabase.from("reviews").select("*").eq("id", id).maybeSingle().then(({ data, error }) => {
+        if (error) {
+          console.error("Error fetching review:", error);
+          toast({ title: "โหลดข้อมูลไม่สำเร็จ", description: error.message, variant: "destructive" });
+          return;
+        }
         if (data) {
           setForm({
             name: data.name, name_en: data.name_en || "", brand: data.brand, category: data.category,
@@ -64,6 +74,8 @@ export default function AdminReviewForm() {
             affiliate_url: data.affiliate_url || "",
             cta_text: data.cta_text || "ดูราคาล่าสุด",
             cta_text_en: data.cta_text_en || "View Latest Price",
+            shopee_url: data.shopee_url || "",
+            lazada_url: data.lazada_url || "",
             intro: data.intro || "", intro_en: data.intro_en || "",
             verdict: data.verdict || "", verdict_en: data.verdict_en || "",
             published: data.published,
@@ -97,35 +109,38 @@ export default function AdminReviewForm() {
       return;
     }
     setSaving(true);
-    const payload = {
-      ...form,
-      overall_rating: Math.round(form.overall_rating * 10) / 10,
-      ratings: ratings.filter((r) => r.label).map(r => ({ ...r, score: Math.round(r.score * 10) / 10 })),
-      specs: specs.filter((s) => s.label),
-      pros: pros.filter(Boolean),
-      pros_en: pros_en.filter(Boolean),
-      cons: cons.filter(Boolean),
-      cons_en: cons_en.filter(Boolean),
-      sections: sections,
-      images: images.filter(Boolean),
-      ...(isEdit ? {} : { created_by: user?.id }),
-    };
+    try {
+      const payload = {
+        ...form,
+        overall_rating: Math.round(form.overall_rating * 10) / 10,
+        ratings: ratings.filter((r) => r.label).map(r => ({ ...r, score: Math.round(r.score * 10) / 10 })),
+        specs: specs.filter((s) => s.label),
+        pros: pros.filter(Boolean),
+        pros_en: pros_en.filter(Boolean),
+        cons: cons.filter(Boolean),
+        cons_en: cons_en.filter(Boolean),
+        sections: sections,
+        images: images.filter(Boolean),
+        ...(isEdit ? {} : { created_by: user?.id }),
+      };
 
-    const { error } = isEdit
-      ? await supabase.from("reviews").update(payload).eq("id", id)
-      : await supabase.from("reviews").insert([payload]);
+      const { error } = isEdit
+        ? await supabase.from("reviews").update(payload).eq("id", id)
+        : await supabase.from("reviews").insert([payload]);
 
-    setSaving(false);
-    if (error) {
+      if (error) throw error;
+
+      toast({ title: isEdit ? "อัปเดตเรียบร้อยแล้ว" : "สร้างรีวิวเรียบร้อยแล้ว" });
+      navigate("/admin/reviews");
+    } catch (error: any) {
       console.error("Supabase save error:", error);
       toast({
         title: "บันทึกไม่สำเร็จ",
         description: error.message || "เกิดข้อผิดพลาดในการเชื่อมต่อฐานข้อมูล",
         variant: "destructive"
       });
-    } else {
-      toast({ title: isEdit ? "อัปเดตแล้ว" : "สร้างรีวิวแล้ว" });
-      navigate("/admin/reviews");
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -641,8 +656,16 @@ export default function AdminReviewForm() {
             </div>
 
             <div className="space-y-2">
-              <Label>Affiliate URL</Label>
+              <Label>Affiliate URL (Default)</Label>
               <Input value={form.affiliate_url} onChange={(e) => updateField("affiliate_url", e.target.value)} placeholder="https://..." />
+            </div>
+            <div className="space-y-2">
+              <Label>Shopee URL</Label>
+              <Input value={form.shopee_url} onChange={(e) => updateField("shopee_url", e.target.value)} placeholder="https://shope.ee/..." />
+            </div>
+            <div className="space-y-2">
+              <Label>Lazada URL</Label>
+              <Input value={form.lazada_url} onChange={(e) => updateField("lazada_url", e.target.value)} placeholder="https://s.lazada.co.th/..." />
             </div>
             <div className="space-y-2">
               <Label>ข้อความปุ่ม CTA (Thai)</Label>
