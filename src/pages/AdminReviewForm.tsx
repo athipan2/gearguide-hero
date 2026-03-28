@@ -101,7 +101,7 @@ export default function AdminReviewForm() {
         { type: 'verdict' }
       ]);
     }
-  }, [id, isEdit]);
+  }, [id, isEdit, toast]);
 
   const handleSave = async () => {
     if (!form.name || !form.slug || !form.brand || !form.category || !form.price) {
@@ -132,11 +132,12 @@ export default function AdminReviewForm() {
 
       toast({ title: isEdit ? "อัปเดตเรียบร้อยแล้ว" : "สร้างรีวิวเรียบร้อยแล้ว" });
       navigate("/admin/reviews");
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Supabase save error:", error);
+      const errorMessage = error instanceof Error ? error.message : "เกิดข้อผิดพลาดในการเชื่อมต่อฐานข้อมูล";
       toast({
         title: "บันทึกไม่สำเร็จ",
-        description: error.message || "เกิดข้อผิดพลาดในการเชื่อมต่อฐานข้อมูล",
+        description: errorMessage,
         variant: "destructive"
       });
     } finally {
