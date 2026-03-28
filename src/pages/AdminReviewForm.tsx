@@ -18,7 +18,8 @@ import { getOptimizedImageUrl } from "@/lib/utils";
 const defaultForm = {
   name: "", name_en: "", brand: "", category: "", price: "", slug: "",
   image_url: "", badge: "", overall_rating: 0,
-  affiliate_url: "", cta_text: "ดูราคาล่าสุด", cta_text_en: "View Latest Price",
+  affiliate_url: "", shopee_url: "", lazada_url: "",
+  cta_text: "ดูราคาล่าสุด", cta_text_en: "View Latest Price",
   intro: "", intro_en: "", verdict: "", verdict_en: "", published: false,
 };
 
@@ -41,6 +42,10 @@ export default function AdminReviewForm() {
   const { user } = useAuth();
 
   const [form, setForm] = useState(defaultForm);
+  const [testConditions, setTestConditions] = useState({
+    terrain: "", weather: "", distance: "",
+    terrain_en: "", weather_en: "", distance_en: ""
+  });
   const [ratings, setRatings] = useState<ReviewRating[]>([{ label: "", label_en: "", score: 0 }]);
   const [specs, setSpecs] = useState<SpecItem[]>([{ label: "", label_en: "", value: "", value_en: "", highlight: false }]);
   const [pros, setPros] = useState<string[]>([""]);
@@ -62,12 +67,25 @@ export default function AdminReviewForm() {
             price: data.price, slug: data.slug, image_url: data.image_url || "",
             badge: data.badge || "", overall_rating: Number(data.overall_rating),
             affiliate_url: data.affiliate_url || "",
+            // @ts-expect-error - new columns
+            shopee_url: (data as unknown as Record<string, string>).shopee_url || "",
+            // @ts-expect-error - new columns
+            lazada_url: (data as unknown as Record<string, string>).lazada_url || "",
             cta_text: data.cta_text || "ดูราคาล่าสุด",
             cta_text_en: data.cta_text_en || "View Latest Price",
             intro: data.intro || "", intro_en: data.intro_en || "",
             verdict: data.verdict || "", verdict_en: data.verdict_en || "",
             published: data.published,
           });
+
+          // Handle test conditions
+          const tc = (data.test_conditions as Record<string, string>) || {};
+          const tce = (data.test_conditions_en as Record<string, string>) || {};
+          setTestConditions({
+            terrain: tc.terrain || "", weather: tc.weather || "", distance: tc.distance || "",
+            terrain_en: tce.terrain || "", weather_en: tce.weather || "", distance_en: tce.distance || ""
+          });
+
           setRatings(Array.isArray(data.ratings) ? (data.ratings as unknown as ReviewRating[]) : []);
           setSpecs(Array.isArray(data.specs) ? (data.specs as unknown as SpecItem[]) : []);
           setPros(Array.isArray(data.pros) ? (data.pros as unknown as string[]) : [""]);
@@ -108,6 +126,16 @@ export default function AdminReviewForm() {
       cons_en: cons_en.filter(Boolean),
       sections: sections,
       images: images.filter(Boolean),
+      test_conditions: {
+        terrain: testConditions.terrain,
+        weather: testConditions.weather,
+        distance: testConditions.distance
+      },
+      test_conditions_en: {
+        terrain: testConditions.terrain_en,
+        weather: testConditions.weather_en,
+        distance: testConditions.distance_en
+      },
       ...(isEdit ? {} : { created_by: user?.id }),
     };
 
@@ -332,6 +360,43 @@ export default function AdminReviewForm() {
                       disabled={uploadingGallery}
                     />
                   </label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Test Conditions */}
+          <div className="bg-card border rounded-xl p-5 space-y-4">
+            <h2 className="font-heading font-semibold text-foreground">สภาพแวดล้อมการทดสอบ (Test Conditions)</h2>
+            <div className="grid sm:grid-cols-2 gap-6">
+              <div className="space-y-4">
+                <Label className="text-[10px] text-muted-foreground uppercase">Thai</Label>
+                <div className="space-y-2">
+                  <Label className="text-xs">สถานที่/พื้นผิว</Label>
+                  <Input value={testConditions.terrain} onChange={(e) => setTestConditions({...testConditions, terrain: e.target.value})} placeholder="เช่น ถนน, เทรล" />
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-xs">สภาพอากาศ</Label>
+                  <Input value={testConditions.weather} onChange={(e) => setTestConditions({...testConditions, weather: e.target.value})} placeholder="เช่น แดดร้อน, ฝนตก" />
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-xs">ระยะทางที่ทดสอบ</Label>
+                  <Input value={testConditions.distance} onChange={(e) => setTestConditions({...testConditions, distance: e.target.value})} placeholder="เช่น 100km+ Test" />
+                </div>
+              </div>
+              <div className="space-y-4 border-l pl-6">
+                <Label className="text-[10px] text-muted-foreground uppercase">English</Label>
+                <div className="space-y-2">
+                  <Label className="text-xs">Terrain</Label>
+                  <Input value={testConditions.terrain_en} onChange={(e) => setTestConditions({...testConditions, terrain_en: e.target.value})} placeholder="e.g. Road, Trail" />
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-xs">Weather</Label>
+                  <Input value={testConditions.weather_en} onChange={(e) => setTestConditions({...testConditions, weather_en: e.target.value})} placeholder="e.g. Sunny, Rainy" />
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-xs">Distance</Label>
+                  <Input value={testConditions.distance_en} onChange={(e) => setTestConditions({...testConditions, distance_en: e.target.value})} placeholder="e.g. 100km+ Test" />
                 </div>
               </div>
             </div>
@@ -640,10 +705,21 @@ export default function AdminReviewForm() {
               <Switch checked={form.published} onCheckedChange={(v) => updateField("published", v)} />
             </div>
 
-            <div className="space-y-2">
-              <Label>Affiliate URL</Label>
-              <Input value={form.affiliate_url} onChange={(e) => updateField("affiliate_url", e.target.value)} placeholder="https://..." />
+            <div className="space-y-4 py-2 border-y">
+              <div className="space-y-2">
+                <Label className="text-[#EE4D2D] font-bold">Shopee URL</Label>
+                <Input value={form.shopee_url} onChange={(e) => updateField("shopee_url", e.target.value)} placeholder="https://shope.ee/..." />
+              </div>
+              <div className="space-y-2">
+                <Label className="text-[#000083] font-bold">Lazada URL</Label>
+                <Input value={form.lazada_url} onChange={(e) => updateField("lazada_url", e.target.value)} placeholder="https://s.lazada.co.th/..." />
+              </div>
+              <div className="space-y-2">
+                <Label className="text-muted-foreground">Other Affiliate URL</Label>
+                <Input value={form.affiliate_url} onChange={(e) => updateField("affiliate_url", e.target.value)} placeholder="https://..." />
+              </div>
             </div>
+
             <div className="space-y-2">
               <Label>ข้อความปุ่ม CTA (Thai)</Label>
               <Input value={form.cta_text} onChange={(e) => updateField("cta_text", e.target.value)} />
