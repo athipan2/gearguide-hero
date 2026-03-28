@@ -68,9 +68,9 @@ export default function AdminReviewForm() {
             badge: data.badge || "", overall_rating: Number(data.overall_rating),
             affiliate_url: data.affiliate_url || "",
             // @ts-expect-error - new columns
-            shopee_url: data.shopee_url || "",
+            shopee_url: (data as unknown as Record<string, string>).shopee_url || "",
             // @ts-expect-error - new columns
-            lazada_url: data.lazada_url || "",
+            lazada_url: (data as unknown as Record<string, string>).lazada_url || "",
             cta_text: data.cta_text || "ดูราคาล่าสุด",
             cta_text_en: data.cta_text_en || "View Latest Price",
             intro: data.intro || "", intro_en: data.intro_en || "",
@@ -79,8 +79,8 @@ export default function AdminReviewForm() {
           });
 
           // Handle test conditions
-          const tc = data.test_conditions as any || {};
-          const tce = data.test_conditions_en as any || {};
+          const tc = (data.test_conditions as Record<string, string>) || {};
+          const tce = (data.test_conditions_en as Record<string, string>) || {};
           setTestConditions({
             terrain: tc.terrain || "", weather: tc.weather || "", distance: tc.distance || "",
             terrain_en: tce.terrain || "", weather_en: tce.weather || "", distance_en: tce.distance || ""
