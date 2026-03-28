@@ -162,7 +162,7 @@ export default function AdminReviewForm() {
 
       const { error } = isEdit
         ? await supabase.from("reviews").update(payload).eq("id", id)
-        : await supabase.from("reviews").insert([payload as any]);
+        : await supabase.from("reviews").insert([payload as Database["public"]["Tables"]["reviews"]["Insert"]]);
 
       if (error) {
         console.error("Supabase error detail:", error);
@@ -171,7 +171,8 @@ export default function AdminReviewForm() {
 
       toast({ title: isEdit ? "อัปเดตเรียบร้อยแล้ว" : "สร้างรีวิวเรียบร้อยแล้ว" });
       navigate("/admin/reviews");
-    } catch (error: any) {
+    } catch (err: unknown) {
+      const error = err as Record<string, unknown>;
       console.error("Supabase save error:", error);
       const errorMessage = error?.message || error?.details || "เกิดข้อผิดพลาดในการเชื่อมต่อฐานข้อมูล";
       toast({
@@ -182,7 +183,7 @@ export default function AdminReviewForm() {
             {error?.hint && <p>Hint: {error.hint}</p>}
             {error?.code && <p>Code: {error.code}</p>}
           </div>
-        ) as any,
+        ),
         variant: "destructive"
       });
     } finally {
@@ -199,7 +200,7 @@ export default function AdminReviewForm() {
       .replace(/^-+|-+$/g, '');
   };
 
-  const updateField = (key: string, value: any) => {
+  const updateField = (key: string, value: string | boolean | number | object | null) => {
     setForm((f) => {
       const next = { ...f, [key]: value };
       if (key === 'name' && !isEdit && !f.slug) {
