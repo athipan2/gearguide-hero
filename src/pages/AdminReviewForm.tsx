@@ -70,13 +70,20 @@ export default function AdminReviewForm() {
           return;
         }
         if (data) {
+          console.log("Fetched review data for ID:", id, data);
           setForm({
-            name: data.name, name_en: data.name_en || "",
-            brand: data.brand, brand_en: data.brand_en || "",
-            category: data.category, category_en: data.category_en || "",
-            price: data.price, slug: data.slug, image_url: data.image_url || "",
-            badge: data.badge || "", badge_en: data.badge_en || "",
-            overall_rating: Number(data.overall_rating),
+            name: data.name || "",
+            name_en: data.name_en || "",
+            brand: data.brand || "",
+            brand_en: data.brand_en || "",
+            category: data.category || "",
+            category_en: data.category_en || "",
+            price: data.price || "",
+            slug: data.slug || "",
+            image_url: data.image_url || "",
+            badge: data.badge || "",
+            badge_en: data.badge_en || "",
+            overall_rating: Number(data.overall_rating) || 0,
             affiliate_url: data.affiliate_url || "",
             cta_text: data.cta_text || "ดูราคาล่าสุด",
             cta_text_en: data.cta_text_en || "View Latest Price",
@@ -86,16 +93,31 @@ export default function AdminReviewForm() {
             test_conditions: data.test_conditions || { terrain: "", weather: "", distance: "" },
             // @ts-expect-error - Json type handling
             test_conditions_en: data.test_conditions_en || { terrain: "", weather: "", distance: "" },
-            intro: data.intro || "", intro_en: data.intro_en || "",
-            verdict: data.verdict || "", verdict_en: data.verdict_en || "",
-            published: data.published,
+            intro: data.intro || "",
+            intro_en: data.intro_en || "",
+            verdict: data.verdict || "",
+            verdict_en: data.verdict_en || "",
+            published: !!data.published,
           });
-          setRatings(Array.isArray(data.ratings) ? (data.ratings as unknown as ReviewRating[]) : []);
-          setSpecs(Array.isArray(data.specs) ? (data.specs as unknown as SpecItem[]) : []);
-          setPros(Array.isArray(data.pros) ? (data.pros as unknown as string[]) : [""]);
-          setProsEn(Array.isArray(data.pros_en) ? (data.pros_en as unknown as string[]) : [""]);
-          setCons(Array.isArray(data.cons) ? (data.cons as unknown as string[]) : [""]);
-          setConsEn(Array.isArray(data.cons_en) ? (data.cons_en as unknown as string[]) : [""]);
+
+          const loadedRatings = Array.isArray(data.ratings) ? (data.ratings as unknown as ReviewRating[]) : [];
+          setRatings(loadedRatings.length > 0 ? loadedRatings : [{ label: "", label_en: "", score: 0 }]);
+
+          const loadedSpecs = Array.isArray(data.specs) ? (data.specs as unknown as SpecItem[]) : [];
+          setSpecs(loadedSpecs.length > 0 ? loadedSpecs : [{ label: "", label_en: "", value: "", value_en: "", highlight: false }]);
+
+          const loadedPros = Array.isArray(data.pros) ? (data.pros as unknown as string[]) : [];
+          setPros(loadedPros.length > 0 ? loadedPros : [""]);
+
+          const loadedProsEn = Array.isArray(data.pros_en) ? (data.pros_en as unknown as string[]) : [];
+          setProsEn(loadedProsEn.length > 0 ? loadedProsEn : [""]);
+
+          const loadedCons = Array.isArray(data.cons) ? (data.cons as unknown as string[]) : [];
+          setCons(loadedCons.length > 0 ? loadedCons : [""]);
+
+          const loadedConsEn = Array.isArray(data.cons_en) ? (data.cons_en as unknown as string[]) : [];
+          setConsEn(loadedConsEn.length > 0 ? loadedConsEn : [""]);
+
           setSections(Array.isArray(data.sections) ? (data.sections as unknown as ReviewSectionData[]) : []);
           setImages(Array.isArray(data.images) ? (data.images as unknown as string[]) : []);
         }
@@ -114,13 +136,29 @@ export default function AdminReviewForm() {
   }, [id, isEdit, toast]);
 
   const handleSave = async () => {
+    console.log("Saving form with ID:", id, "isEdit:", isEdit);
+
     if (!form.name || !form.slug || !form.brand || !form.category || !form.price) {
-      toast({ title: "กรุณากรอกข้อมูลที่จำเป็น", variant: "destructive" });
+      const missing = [];
+      if (!form.name) missing.push("ชื่อสินค้า");
+      if (!form.slug) missing.push("Slug");
+      if (!form.brand) missing.push("แบรนด์");
+      if (!form.category) missing.push("หมวดหมู่");
+      if (!form.price) missing.push("ราคา");
+
+      toast({
+        title: "กรุณากรอกข้อมูลที่จำเป็น",
+        description: `ยังขาด: ${missing.join(", ")}`,
+        variant: "destructive"
+      });
       return;
     }
+
     setSaving(true);
+    toast({ title: "กำลังบันทึกข้อมูล..." });
+
     try {
-      const payload: Database["public"]["Tables"]["reviews"]["Update"] = {
+      const payload: Record<string, unknown> = {
         name: form.name,
         name_en: form.name_en,
         brand: form.brand,
@@ -143,45 +181,49 @@ export default function AdminReviewForm() {
         verdict: form.verdict,
         verdict_en: form.verdict_en,
         published: form.published,
-        test_conditions: form.test_conditions as unknown as Json,
-        test_conditions_en: form.test_conditions_en as unknown as Json,
-        ratings: ratings.filter((r) => r.label).map(r => ({ ...r, score: Math.round(r.score * 10) / 10 })) as unknown as Json,
-        specs: specs.filter((s) => s.label) as unknown as Json,
-        pros: pros.filter(Boolean) as unknown as Json,
-        pros_en: pros_en.filter(Boolean) as unknown as Json,
-        cons: cons.filter(Boolean) as unknown as Json,
-        cons_en: cons_en.filter(Boolean) as unknown as Json,
-        sections: sections as unknown as Json,
-        images: images.filter(Boolean) as unknown as Json,
+        test_conditions: form.test_conditions,
+        test_conditions_en: form.test_conditions_en,
+        ratings: ratings.filter((r) => r.label).map(r => ({ ...r, score: Math.round(r.score * 10) / 10 })),
+        specs: specs.filter((s) => s.label),
+        pros: pros.filter(p => p && p.trim()),
+        pros_en: pros_en.filter(p => p && p.trim()),
+        cons: cons.filter(c => c && c.trim()),
+        cons_en: cons_en.filter(c => c && c.trim()),
+        sections: sections,
+        images: images.filter(Boolean),
       };
 
       if (!isEdit) {
-        // @ts-expect-error - created_by exists on Insert type
         payload.created_by = user?.id;
       }
 
-      const { error } = isEdit
-        ? await supabase.from("reviews").update(payload).eq("id", id)
-        : await supabase.from("reviews").insert([payload as Database["public"]["Tables"]["reviews"]["Insert"]]);
+      console.log("Payload:", payload);
+
+      const query = isEdit
+        ? supabase.from("reviews").update(payload).eq("id", id)
+        : supabase.from("reviews").insert([payload]);
+
+      const { error } = await query;
 
       if (error) {
-        console.error("Supabase error detail:", error);
+        console.error("Supabase query error:", error);
         throw error;
       }
 
+      console.log("Save successful");
       toast({ title: isEdit ? "อัปเดตเรียบร้อยแล้ว" : "สร้างรีวิวเรียบร้อยแล้ว" });
       navigate("/admin/reviews");
     } catch (err: unknown) {
+      console.error("Detailed save error:", err);
       const error = err as Record<string, unknown>;
-      console.error("Supabase save error:", error);
-      const errorMessage = error?.message || error?.details || "เกิดข้อผิดพลาดในการเชื่อมต่อฐานข้อมูล";
+      const errorMessage = String(error?.message || error?.details || "เกิดข้อผิดพลาดในการเชื่อมต่อฐานข้อมูล");
       toast({
         title: "บันทึกไม่สำเร็จ",
         description: (
-          <div className="mt-2 text-xs space-y-1">
+          <div className="mt-2 text-xs space-y-1 overflow-auto max-h-[100px]">
             <p className="font-semibold">{errorMessage}</p>
-            {error?.hint && <p>Hint: {error.hint}</p>}
-            {error?.code && <p>Code: {error.code}</p>}
+            {error?.hint && <p>Hint: {String(error.hint)}</p>}
+            {error?.code && <p>Code: {String(error.code)}</p>}
           </div>
         ),
         variant: "destructive"
@@ -201,6 +243,7 @@ export default function AdminReviewForm() {
   };
 
   const updateField = (key: string, value: string | boolean | number | object | null) => {
+    console.log(`Updating field: ${key} =`, value);
     setForm((f) => {
       const next = { ...f, [key]: value };
       if (key === 'name' && !isEdit && !f.slug) {
@@ -810,7 +853,16 @@ export default function AdminReviewForm() {
               <Textarea value={form.verdict_en} onChange={(e) => updateField("verdict_en", e.target.value)} rows={3} className="text-sm" />
             </div>
 
-            <Button onClick={handleSave} disabled={saving} className="w-full h-12 lg:h-10">
+            <Button
+              type="button"
+              onClick={(e) => {
+                console.log("Desktop Save button clicked");
+                e.preventDefault();
+                handleSave();
+              }}
+              disabled={saving}
+              className="w-full h-12 lg:h-10"
+            >
               <Save className="mr-2 h-4 w-4" />
               {saving ? "กำลังบันทึก..." : "บันทึก"}
             </Button>
@@ -822,7 +874,16 @@ export default function AdminReviewForm() {
         <Button variant="outline" className="flex-1 h-12" onClick={() => navigate("/admin/reviews")}>
           ยกเลิก
         </Button>
-        <Button onClick={handleSave} disabled={saving} className="flex-[2] h-12">
+        <Button
+          type="button"
+          onClick={(e) => {
+            console.log("Mobile Save button clicked");
+            e.preventDefault();
+            handleSave();
+          }}
+          disabled={saving}
+          className="flex-[2] h-12"
+        >
           <Save className="mr-2 h-4 w-4" />
           {saving ? "บันทึก..." : "บันทึกการเปลี่ยนแปลง"}
         </Button>
