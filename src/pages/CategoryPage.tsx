@@ -193,7 +193,7 @@ export default function CategoryPage() {
   const { category } = useParams<{ category: string }>();
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const [reviews, setReviews] = useState<ReviewItem[]>([]);
+  const [rawReviews, setRawReviews] = useState<ReviewItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [allBrands, setAllBrands] = useState<string[]>([]);
   const [allCategories, setAllCategories] = useState<string[]>([]);
@@ -231,7 +231,22 @@ export default function CategoryPage() {
         query = query.eq("category", decoded);
       }
 
-      const { data, error } = await query.order("created_at", { ascending: false });
+      let { data, error } = await query.order("created_at", { ascending: false });
+
+      // Fallback if localized query fails
+      if (error) {
+        console.warn("Localized category fetch failed, falling back to basic columns:", error);
+        let basicQuery = supabase
+          .from("reviews")
+          .select("name, brand, image_url, overall_rating, price, badge, pros, cons, specs, ratings, slug, affiliate_url, category, created_at")
+          .eq("published", true);
+        if (category) {
+          basicQuery = basicQuery.eq("category", decodeURIComponent(category));
+        }
+        const basicFetch = await basicQuery.order("created_at", { ascending: false });
+        data = basicFetch.data;
+        error = basicFetch.error;
+      }
 
       let items = (data as unknown as ReviewItem[]) || [];
 
@@ -243,7 +258,7 @@ export default function CategoryPage() {
         items = items.length > 0 ? items : fallbackReviews.filter(r => r.category === decoded);
       }
 
-      setReviews(items);
+      setRawReviews(items);
 
       // Extract unique brands & categories
       const brands = [...new Set(items.map((r) => r.brand))].sort();
@@ -278,6 +293,17 @@ export default function CategoryPage() {
   };
 
   const hasActiveFilters = searchQuery || selectedBrands.length > 0 || minRating > 0 || priceRange[0] > 0 || priceRange[1] < maxPrice;
+
+  const reviews = useMemo(() => {
+    return rawReviews.map(r => ({
+      ...r,
+      name: translateData(r, 'name', language),
+      brand: translateData(r, 'brand', language),
+      badge: translateData(r, 'badge', language) || null,
+      pros: translateArray(r, 'pros', language),
+      cons: translateArray(r, 'cons', language),
+    })) as unknown as ReviewItem[];
+  }, [rawReviews, language]);
 
   // Filtered & sorted results
   const filtered = useMemo(() => {
@@ -455,14 +481,14 @@ export default function CategoryPage() {
                   {filtered.map((r) => (
                     <ProductCard
                       key={r.slug}
-                      name={translateData(r, 'name', language)}
-                      brand={translateData(r, 'brand', language)}
+                      name={r.name}
+                      brand={r.brand}
                       image={r.image_url || ""}
                       rating={Number(r.overall_rating)}
                       price={r.price}
-                      badge={translateData(r, 'badge', language) || undefined}
-                      pros={translateArray(r, 'pros', language)}
-                      cons={translateArray(r, 'cons', language)}
+                      badge={r.badge || undefined}
+                      pros={r.pros as string[]}
+                      cons={r.cons as string[]}
                       specs={Array.isArray(r.specs) ? (r.specs as { label: string; value: string }[]) : []}
                       slug={r.slug}
                       affiliateUrl={r.affiliate_url}

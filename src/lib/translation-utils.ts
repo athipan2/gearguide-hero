@@ -60,10 +60,15 @@ export function translateTerm(term: string, lang: Language): string {
  * Improved with mutual fallback: if the requested language version is empty,
  * it tries the other one.
  */
-export function translateData<T extends Record<string, any>>(data: T, field: string, lang: Language): string {
-  const thVal = typeof data[field] === 'string' ? data[field] : '';
+export function translateData<T extends Record<string, unknown>>(data: T, field: string, lang: Language): string {
+  if (!data) return '';
+
+  const thRaw = data[field];
+  const thVal = typeof thRaw === 'string' ? thRaw : '';
+
   const enField = `${field}_en`;
-  const enVal = typeof data[enField] === 'string' ? data[enField] : '';
+  const enRaw = data[enField];
+  const enVal = typeof enRaw === 'string' ? enRaw : '';
 
   if (lang === 'en') {
     return enVal.trim() ? enVal : thVal;
@@ -76,13 +81,15 @@ export function translateData<T extends Record<string, any>>(data: T, field: str
  * Improved with mutual fallback: if the requested language version is empty,
  * it tries the other one.
  */
-export function translateArray(data: Record<string, any>, field: string, lang: Language): string[] {
+export function translateArray(data: Record<string, unknown>, field: string, lang: Language): string[] {
+  if (!data) return [];
+
   const thVal = data[field];
   const enField = `${field}_en`;
   const enVal = data[enField];
 
-  const thArray = Array.isArray(thVal) ? (thVal as string[]).filter(Boolean) : [];
-  const enArray = Array.isArray(enVal) ? (enVal as string[]).filter(Boolean) : [];
+  const thArray = Array.isArray(thVal) ? (thVal as unknown[]).map(item => String(item)).filter(s => s && s.trim()) : [];
+  const enArray = Array.isArray(enVal) ? (enVal as unknown[]).map(item => String(item)).filter(s => s && s.trim()) : [];
 
   if (lang === 'en') {
     return enArray.length > 0 ? enArray : thArray;

@@ -137,6 +137,8 @@ export default function AdminReviewForm() {
 
   const handleSave = async () => {
     console.log("Saving form with ID:", id, "isEdit:", isEdit);
+    console.log("Current Form State:", form);
+    console.log("Current Pros/Cons State:", { pros, pros_en, cons, cons_en });
 
     if (!form.name || !form.slug || !form.brand || !form.category || !form.price) {
       const missing = [];
@@ -183,12 +185,12 @@ export default function AdminReviewForm() {
         published: form.published,
         test_conditions: form.test_conditions,
         test_conditions_en: form.test_conditions_en,
-        ratings: ratings.filter((r) => r.label).map(r => ({ ...r, score: Math.round(r.score * 10) / 10 })),
-        specs: specs.filter((s) => s.label),
-        pros: pros.filter(p => p && p.trim()),
-        pros_en: pros_en.filter(p => p && p.trim()),
-        cons: cons.filter(c => c && c.trim()),
-        cons_en: cons_en.filter(c => c && c.trim()),
+        ratings: ratings.filter((r) => r.label && r.label.trim()).map(r => ({ ...r, score: Math.round(Number(r.score) * 10) / 10 })),
+        specs: specs.filter((s) => s.label && s.label.trim()),
+        pros: pros.filter(p => typeof p === 'string' && p.trim()),
+        pros_en: pros_en.filter(p => typeof p === 'string' && p.trim()),
+        cons: cons.filter(c => typeof c === 'string' && c.trim()),
+        cons_en: cons_en.filter(c => typeof c === 'string' && c.trim()),
         sections: sections,
         images: images.filter(Boolean),
       };
