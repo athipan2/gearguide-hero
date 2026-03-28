@@ -9,18 +9,21 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
-import { Save, ArrowLeft, Plus, X, MoveUp, MoveDown, Upload, Image as ImageIcon, Loader2 } from "lucide-react";
+import { Save, ArrowLeft, Plus, X, MoveUp, MoveDown, Upload, Loader2 } from "lucide-react";
 import { ReviewSectionData, SpecItem, ReviewRating, SectionType } from "@/types/review";
+import { Database, Json } from "@/integrations/supabase/types";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { resizeImage, IMAGE_VARIANTS } from "@/lib/image-utils";
 import { getOptimizedImageUrl } from "@/lib/utils";
 
 const defaultForm = {
-  name: "", name_en: "", brand: "", category: "", price: "", slug: "",
-  image_url: "", badge: "", overall_rating: 0,
+  name: "", name_en: "", brand: "", brand_en: "", category: "", category_en: "", price: "", slug: "",
+  image_url: "", badge: "", badge_en: "", overall_rating: 0,
   affiliate_url: "", cta_text: "ดูราคาล่าสุด", cta_text_en: "View Latest Price",
   shopee_url: "", lazada_url: "",
   intro: "", intro_en: "", verdict: "", verdict_en: "", published: false,
+  test_conditions: { terrain: "", weather: "", distance: "" },
+  test_conditions_en: { terrain: "", weather: "", distance: "" },
 };
 
 const sectionTypes: { label: string; value: SectionType }[] = [
@@ -68,14 +71,21 @@ export default function AdminReviewForm() {
         }
         if (data) {
           setForm({
-            name: data.name, name_en: data.name_en || "", brand: data.brand, category: data.category,
+            name: data.name, name_en: data.name_en || "",
+            brand: data.brand, brand_en: data.brand_en || "",
+            category: data.category, category_en: data.category_en || "",
             price: data.price, slug: data.slug, image_url: data.image_url || "",
-            badge: data.badge || "", overall_rating: Number(data.overall_rating),
+            badge: data.badge || "", badge_en: data.badge_en || "",
+            overall_rating: Number(data.overall_rating),
             affiliate_url: data.affiliate_url || "",
             cta_text: data.cta_text || "ดูราคาล่าสุด",
             cta_text_en: data.cta_text_en || "View Latest Price",
             shopee_url: data.shopee_url || "",
             lazada_url: data.lazada_url || "",
+            // @ts-expect-error - Json type handling
+            test_conditions: data.test_conditions || { terrain: "", weather: "", distance: "" },
+            // @ts-expect-error - Json type handling
+            test_conditions_en: data.test_conditions_en || { terrain: "", weather: "", distance: "" },
             intro: data.intro || "", intro_en: data.intro_en || "",
             verdict: data.verdict || "", verdict_en: data.verdict_en || "",
             published: data.published,
@@ -110,34 +120,69 @@ export default function AdminReviewForm() {
     }
     setSaving(true);
     try {
-      const payload = {
-        ...form,
+      const payload: Database["public"]["Tables"]["reviews"]["Update"] = {
+        name: form.name,
+        name_en: form.name_en,
+        brand: form.brand,
+        brand_en: form.brand_en,
+        category: form.category,
+        category_en: form.category_en,
+        price: form.price,
+        slug: form.slug,
+        image_url: form.image_url,
+        badge: form.badge,
+        badge_en: form.badge_en,
         overall_rating: Math.round(form.overall_rating * 10) / 10,
-        ratings: ratings.filter((r) => r.label).map(r => ({ ...r, score: Math.round(r.score * 10) / 10 })),
-        specs: specs.filter((s) => s.label),
-        pros: pros.filter(Boolean),
-        pros_en: pros_en.filter(Boolean),
-        cons: cons.filter(Boolean),
-        cons_en: cons_en.filter(Boolean),
-        sections: sections,
-        images: images.filter(Boolean),
-        ...(isEdit ? {} : { created_by: user?.id }),
+        affiliate_url: form.affiliate_url,
+        cta_text: form.cta_text,
+        cta_text_en: form.cta_text_en,
+        shopee_url: form.shopee_url,
+        lazada_url: form.lazada_url,
+        intro: form.intro,
+        intro_en: form.intro_en,
+        verdict: form.verdict,
+        verdict_en: form.verdict_en,
+        published: form.published,
+        test_conditions: form.test_conditions as unknown as Json,
+        test_conditions_en: form.test_conditions_en as unknown as Json,
+        ratings: ratings.filter((r) => r.label).map(r => ({ ...r, score: Math.round(r.score * 10) / 10 })) as unknown as Json,
+        specs: specs.filter((s) => s.label) as unknown as Json,
+        pros: pros.filter(Boolean) as unknown as Json,
+        pros_en: pros_en.filter(Boolean) as unknown as Json,
+        cons: cons.filter(Boolean) as unknown as Json,
+        cons_en: cons_en.filter(Boolean) as unknown as Json,
+        sections: sections as unknown as Json,
+        images: images.filter(Boolean) as unknown as Json,
       };
+
+      if (!isEdit) {
+        // @ts-expect-error - created_by exists on Insert type
+        payload.created_by = user?.id;
+      }
 
       const { error } = isEdit
         ? await supabase.from("reviews").update(payload).eq("id", id)
-        : await supabase.from("reviews").insert([payload]);
+        : await supabase.from("reviews").insert([payload as any]);
 
-      if (error) throw error;
+      if (error) {
+        console.error("Supabase error detail:", error);
+        throw error;
+      }
 
       toast({ title: isEdit ? "อัปเดตเรียบร้อยแล้ว" : "สร้างรีวิวเรียบร้อยแล้ว" });
       navigate("/admin/reviews");
-    } catch (error: unknown) {
+    } catch (error: any) {
       console.error("Supabase save error:", error);
-      const errorMessage = error instanceof Error ? error.message : "เกิดข้อผิดพลาดในการเชื่อมต่อฐานข้อมูล";
+      const errorMessage = error?.message || error?.details || "เกิดข้อผิดพลาดในการเชื่อมต่อฐานข้อมูล";
       toast({
         title: "บันทึกไม่สำเร็จ",
-        description: errorMessage,
+        description: (
+          <div className="mt-2 text-xs space-y-1">
+            <p className="font-semibold">{errorMessage}</p>
+            {error?.hint && <p>Hint: {error.hint}</p>}
+            {error?.code && <p>Code: {error.code}</p>}
+          </div>
+        ) as any,
         variant: "destructive"
       });
     } finally {
@@ -154,7 +199,7 @@ export default function AdminReviewForm() {
       .replace(/^-+|-+$/g, '');
   };
 
-  const updateField = (key: string, value: string | number | boolean) => {
+  const updateField = (key: string, value: any) => {
     setForm((f) => {
       const next = { ...f, [key]: value };
       if (key === 'name' && !isEdit && !f.slug) {
@@ -381,12 +426,28 @@ export default function AdminReviewForm() {
                 <Input value={form.slug} onChange={(e) => updateField("slug", e.target.value)} placeholder="nike-vaporfly-3" />
               </div>
               <div className="space-y-2">
-                <Label>แบรนด์ *</Label>
+                <Label>แบรนด์ (Thai) *</Label>
                 <Input value={form.brand} onChange={(e) => updateField("brand", e.target.value)} />
               </div>
               <div className="space-y-2">
-                <Label>หมวดหมู่ *</Label>
+                <Label>Brand (English)</Label>
+                <Input value={form.brand_en} onChange={(e) => updateField("brand_en", e.target.value)} />
+              </div>
+              <div className="space-y-2">
+                <Label>หมวดหมู่ (Thai) *</Label>
                 <Input value={form.category} onChange={(e) => updateField("category", e.target.value)} />
+              </div>
+              <div className="space-y-2">
+                <Label>Category (English)</Label>
+                <Input value={form.category_en} onChange={(e) => updateField("category_en", e.target.value)} />
+              </div>
+              <div className="space-y-2">
+                <Label>ป้ายกำกับ (Badge - Thai)</Label>
+                <Input value={form.badge} onChange={(e) => updateField("badge", e.target.value)} placeholder="แนะนำโดยบรรณาธิการ" />
+              </div>
+              <div className="space-y-2">
+                <Label>Badge (English)</Label>
+                <Input value={form.badge_en} onChange={(e) => updateField("badge_en", e.target.value)} placeholder="Editor's Choice" />
               </div>
               <div className="space-y-2">
                 <Label>ราคา *</Label>
@@ -685,6 +746,60 @@ export default function AdminReviewForm() {
               <Label>Intro (English)</Label>
               <Textarea value={form.intro_en} onChange={(e) => updateField("intro_en", e.target.value)} rows={3} className="text-sm" />
             </div>
+            <div className="space-y-4 pt-2 border-t">
+              <h3 className="text-sm font-semibold">Test Conditions (Thai)</h3>
+              <div className="grid grid-cols-3 gap-2">
+                <Input
+                  placeholder="เส้นทาง"
+                  // @ts-expect-error - Dynamic field access
+                  value={form.test_conditions?.terrain || ""}
+                  onChange={(e) => updateField("test_conditions", { ...form.test_conditions, terrain: e.target.value })}
+                  className="h-8 text-xs"
+                />
+                <Input
+                  placeholder="สภาพอากาศ"
+                  // @ts-expect-error - Dynamic field access
+                  value={form.test_conditions?.weather || ""}
+                  onChange={(e) => updateField("test_conditions", { ...form.test_conditions, weather: e.target.value })}
+                  className="h-8 text-xs"
+                />
+                <Input
+                  placeholder="ระยะทาง"
+                  // @ts-expect-error - Dynamic field access
+                  value={form.test_conditions?.distance || ""}
+                  onChange={(e) => updateField("test_conditions", { ...form.test_conditions, distance: e.target.value })}
+                  className="h-8 text-xs"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-4 pt-2 border-t">
+              <h3 className="text-sm font-semibold">Test Conditions (English)</h3>
+              <div className="grid grid-cols-3 gap-2">
+                <Input
+                  placeholder="Terrain"
+                  // @ts-expect-error - Dynamic field access
+                  value={form.test_conditions_en?.terrain || ""}
+                  onChange={(e) => updateField("test_conditions_en", { ...form.test_conditions_en, terrain: e.target.value })}
+                  className="h-8 text-xs"
+                />
+                <Input
+                  placeholder="Weather"
+                  // @ts-expect-error - Dynamic field access
+                  value={form.test_conditions_en?.weather || ""}
+                  onChange={(e) => updateField("test_conditions_en", { ...form.test_conditions_en, weather: e.target.value })}
+                  className="h-8 text-xs"
+                />
+                <Input
+                  placeholder="Distance"
+                  // @ts-expect-error - Dynamic field access
+                  value={form.test_conditions_en?.distance || ""}
+                  onChange={(e) => updateField("test_conditions_en", { ...form.test_conditions_en, distance: e.target.value })}
+                  className="h-8 text-xs"
+                />
+              </div>
+            </div>
+
             <div className="space-y-2 pt-2 border-t">
               <Label>สรุป (Verdict - Thai)</Label>
               <Textarea value={form.verdict} onChange={(e) => updateField("verdict", e.target.value)} rows={3} className="text-sm" />

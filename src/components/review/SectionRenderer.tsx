@@ -7,6 +7,8 @@ import { ReviewGallery } from "./sections/ReviewGallery";
 import { ReviewComparison } from "./sections/ReviewComparison";
 import { ReviewVerdict } from "./sections/ReviewVerdict";
 import { QuickDecision } from "./sections/QuickDecision";
+import { ReviewProsCons } from "./sections/ReviewProsCons";
+import { ReviewWhoIsThisFor } from "./sections/ReviewWhoIsThisFor";
 import { ScoreBreakdown } from "./sections/ScoreBreakdown";
 import { RealWorldTest } from "./sections/RealWorldTest";
 import { DeepDive } from "./sections/DeepDive";
@@ -109,14 +111,22 @@ export const SectionRenderer = ({ section, review, userRating }: SectionRenderer
     case 'pros_cons': {
       const pros = translateArray(review, 'pros', language);
       const cons = translateArray(review, 'cons', language);
-      return <QuickDecision suitable={pros} notSuitable={cons} />;
+      return (
+        <section className="px-4 md:px-8">
+          <ReviewProsCons pros={pros} cons={cons} />
+        </section>
+      );
     }
 
     case 'who_is_this_for': {
       const suitable = (review.specs || [])
         .filter(s => s.label.includes('เหมาะกับ') || s.label.includes('ระยะ') || s.label.includes('Suitable') || s.label.includes('Distance'))
         .map(s => translateTerm(s.value, language));
-      return <QuickDecision suitable={suitable} notSuitable={[]} />;
+      return (
+        <section className="px-4 md:px-8">
+          <ReviewWhoIsThisFor suitable={suitable} />
+        </section>
+      );
     }
 
     case 'content': {
