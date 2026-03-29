@@ -60,8 +60,21 @@ export default function AdminReviewForm() {
   const [saving, setSaving] = useState(false);
   const [uploadingCover, setUploadingCover] = useState(false);
   const [uploadingGallery, setUploadingGallery] = useState(false);
+  const [dbError, setDbError] = useState<string | null>(null);
 
   useEffect(() => {
+    // Reset state when switching between reviews or starting new
+    setForm(defaultForm);
+    setRatings([{ label: "", label_en: "", score: 0 }]);
+    setSpecs([{ label: "", label_en: "", value: "", value_en: "", highlight: false }]);
+    setPros([""]);
+    setProsEn([""]);
+    setCons([""]);
+    setConsEn([""]);
+    setSections([]);
+    setImages([]);
+    setDbError(null);
+
     if (isEdit) {
       supabase.from("reviews").select("*").eq("id", id).maybeSingle().then(({ data, error }) => {
         if (error) {
@@ -71,32 +84,37 @@ export default function AdminReviewForm() {
         }
         if (data) {
           console.log("Fetched review data for ID:", id, data);
+
+          // Use type assertion to access localized fields safely
+          // @ts-expect-error - accessing localized fields
+          const d = data;
+
           setForm({
             name: data.name || "",
-            name_en: data.name_en || "",
+            name_en: String(d.name_en || ""),
             brand: data.brand || "",
-            brand_en: data.brand_en || "",
+            brand_en: String(d.brand_en || ""),
             category: data.category || "",
-            category_en: data.category_en || "",
+            category_en: String(d.category_en || ""),
             price: data.price || "",
             slug: data.slug || "",
             image_url: data.image_url || "",
             badge: data.badge || "",
-            badge_en: data.badge_en || "",
+            badge_en: String(d.badge_en || ""),
             overall_rating: Number(data.overall_rating) || 0,
             affiliate_url: data.affiliate_url || "",
             cta_text: data.cta_text || "ดูราคาล่าสุด",
-            cta_text_en: data.cta_text_en || "View Latest Price",
-            shopee_url: data.shopee_url || "",
-            lazada_url: data.lazada_url || "",
+            cta_text_en: String(d.cta_text_en || "View Latest Price"),
+            shopee_url: String(d.shopee_url || ""),
+            lazada_url: String(d.lazada_url || ""),
             // @ts-expect-error - Json type handling
             test_conditions: data.test_conditions || { terrain: "", weather: "", distance: "" },
             // @ts-expect-error - Json type handling
-            test_conditions_en: data.test_conditions_en || { terrain: "", weather: "", distance: "" },
+            test_conditions_en: d.test_conditions_en || { terrain: "", weather: "", distance: "" },
             intro: data.intro || "",
-            intro_en: data.intro_en || "",
+            intro_en: String(d.intro_en || ""),
             verdict: data.verdict || "",
-            verdict_en: data.verdict_en || "",
+            verdict_en: String(d.verdict_en || ""),
             published: !!data.published,
           });
 
@@ -109,13 +127,13 @@ export default function AdminReviewForm() {
           const loadedPros = Array.isArray(data.pros) ? (data.pros as unknown as string[]) : [];
           setPros(loadedPros.length > 0 ? loadedPros : [""]);
 
-          const loadedProsEn = Array.isArray(data.pros_en) ? (data.pros_en as unknown as string[]) : [];
+          const loadedProsEn = Array.isArray(d.pros_en) ? (d.pros_en as string[]) : [];
           setProsEn(loadedProsEn.length > 0 ? loadedProsEn : [""]);
 
           const loadedCons = Array.isArray(data.cons) ? (data.cons as unknown as string[]) : [];
           setCons(loadedCons.length > 0 ? loadedCons : [""]);
 
-          const loadedConsEn = Array.isArray(data.cons_en) ? (data.cons_en as unknown as string[]) : [];
+          const loadedConsEn = Array.isArray(d.cons_en) ? (d.cons_en as string[]) : [];
           setConsEn(loadedConsEn.length > 0 ? loadedConsEn : [""]);
 
           setSections(Array.isArray(data.sections) ? (data.sections as unknown as ReviewSectionData[]) : []);
@@ -268,7 +286,7 @@ export default function AdminReviewForm() {
   };
 
   const updateField = (key: string, value: string | boolean | number | object | null) => {
-    console.log(`Updating field: ${key} =`, value);
+    console.log(`[AdminForm] Updating ${key}:`, value);
     setForm((f) => {
       const next = { ...f, [key]: value };
       if (key === 'name' && !isEdit && !f.slug) {
@@ -367,6 +385,17 @@ export default function AdminReviewForm() {
 
   return (
     <AdminLayout>
+      {/* DB Connection / Schema Alert */}
+      {(dbError || (!isEdit && !user)) && (
+        <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-xl text-amber-800 text-sm space-y-2">
+          <p className="font-bold flex items-center gap-2">
+            ⚠️ ตรวจสอบระบบฐานข้อมูล
+          </p>
+          <p>หากคุณบันทึกข้อมูลภาษาอังกฤษแล้วไม่ติด กรุณารันคำสั่ง SQL ที่ทีมพัฒนาเตรียมไว้ให้ในแชทเพื่อเพิ่มคอลัมน์ใน Supabase ของคุณครับ</p>
+          {dbError && <p className="font-mono text-[10px] bg-white/50 p-2 rounded">{dbError}</p>}
+        </div>
+      )}
+
       <div className="flex items-center gap-3 mb-6">
         <Button variant="ghost" size="icon" onClick={() => navigate("/admin/reviews")}>
           <ArrowLeft className="h-5 w-5" />

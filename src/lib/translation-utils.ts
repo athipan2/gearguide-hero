@@ -72,10 +72,14 @@ export function translateData<T extends Record<string, unknown>>(data: T, field:
   const enRaw = data[enField];
   const enVal = typeof enRaw === 'string' ? enRaw : '';
 
+  // Explicit priority logic
   if (lang === 'en') {
-    return enVal.trim() ? enVal : thVal;
+    if (enVal && enVal.trim().length > 0) return enVal;
+    return thVal;
   }
-  return thVal.trim() ? thVal : enVal;
+
+  if (thVal && thVal.trim().length > 0) return thVal;
+  return enVal;
 }
 
 /**
@@ -92,13 +96,17 @@ export function translateArray(data: Record<string, unknown>, field: string, lan
   // @ts-expect-error - dynamic field access
   const enVal = data[enField];
 
-  const thArray = Array.isArray(thVal) ? (thVal as unknown[]).map(item => String(item)).filter(s => s && s.trim()) : [];
-  const enArray = Array.isArray(enVal) ? (enVal as unknown[]).map(item => String(item)).filter(s => s && s.trim()) : [];
+  const thArray = Array.isArray(thVal) ? (thVal as unknown[]).map(item => String(item)).filter(s => s && s !== 'null' && s.trim()) : [];
+  const enArray = Array.isArray(enVal) ? (enVal as unknown[]).map(item => String(item)).filter(s => s && s !== 'null' && s.trim()) : [];
 
+  // Explicit priority logic
   if (lang === 'en') {
-    return enArray.length > 0 ? enArray : thArray;
+    if (enArray.length > 0) return enArray;
+    return thArray;
   }
-  return thArray.length > 0 ? thArray : enArray;
+
+  if (thArray.length > 0) return thArray;
+  return enArray;
 }
 
 /**
@@ -106,4 +114,25 @@ export function translateArray(data: Record<string, unknown>, field: string, lan
  */
 export function translateSpecLabel(label: string, lang: Language): string {
   return translateTerm(label, lang);
+}
+
+/**
+ * Translates a full SpecItem based on current language with fallbacks
+ */
+export function translateSpec(spec: SpecItem, lang: Language): SpecItem {
+  if (!spec) return spec;
+
+  const label = lang === 'en'
+    ? (spec.label_en || translateTerm(spec.label, 'en'))
+    : (spec.label || spec.label_en || '');
+
+  const value = lang === 'en'
+    ? (spec.value_en || translateTerm(spec.value, 'en'))
+    : (spec.value || spec.value_en || '');
+
+  return {
+    ...spec,
+    label,
+    value
+  };
 }
