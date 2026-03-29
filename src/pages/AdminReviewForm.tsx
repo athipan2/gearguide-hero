@@ -61,6 +61,20 @@ export default function AdminReviewForm() {
   const [uploadingCover, setUploadingCover] = useState(false);
   const [uploadingGallery, setUploadingGallery] = useState(false);
   const [dbError, setDbError] = useState<string | null>(null);
+  const [schemaStatus, setSchemaStatus] = useState<{ checked: boolean; hasEnColumns: boolean; error?: string }>({ checked: false, hasEnColumns: false });
+
+  const checkSchema = async () => {
+    try {
+      const { data, error } = await supabase.from("reviews").select("pros_en, cons_en").limit(1);
+      if (error) {
+        setSchemaStatus({ checked: true, hasEnColumns: false, error: error.message });
+      } else {
+        setSchemaStatus({ checked: true, hasEnColumns: true });
+      }
+    } catch (err) {
+      setSchemaStatus({ checked: true, hasEnColumns: false, error: String(err) });
+    }
+  };
 
   const quickFillHoka = () => {
     updateField("name", "Hoka Hopara 2");
@@ -124,6 +138,7 @@ export default function AdminReviewForm() {
   };
 
   useEffect(() => {
+    checkSchema();
     // Reset state when switching between reviews or starting new
     setForm(defaultForm);
     setRatings([{ label: "", label_en: "", score: 0 }]);
@@ -269,10 +284,10 @@ export default function AdminReviewForm() {
         test_conditions_en: form.test_conditions_en || null,
         ratings: ratings.filter((r) => r.label?.trim()).map(r => ({ ...r, score: Math.round(Number(r.score) * 10) / 10 })),
         specs: specs.filter((s) => s.label?.trim()),
-        pros: pros.filter(p => typeof p === 'string' && p.trim()),
-        pros_en: pros_en.filter(p => typeof p === 'string' && p.trim()),
-        cons: cons.filter(c => typeof c === 'string' && c.trim()),
-        cons_en: cons_en.filter(c => typeof c === 'string' && c.trim()),
+        pros: pros.filter(p => typeof p === 'string' && p.trim()) || [],
+        pros_en: pros_en.filter(p => typeof p === 'string' && p.trim()) || [],
+        cons: cons.filter(c => typeof c === 'string' && c.trim()) || [],
+        cons_en: cons_en.filter(c => typeof c === 'string' && c.trim()) || [],
         sections: sections || [],
         images: images.filter(Boolean) || [],
       };
@@ -298,6 +313,17 @@ export default function AdminReviewForm() {
       }
 
       console.log("Save Result:", result);
+
+      if (!result || result.length === 0) {
+        console.warn("Save query returned no rows. Possible RLS or missing ID issue.");
+        toast({
+          title: "ข้อมูลไม่ถูกบันทึก!",
+          description: "บันทึกไม่สำเร็จและไม่มีข้อความผิดพลาด กรุณาตรวจสอบสิทธิ์การเขียนข้อมูล (RLS)",
+          variant: "destructive"
+        });
+        return;
+      }
+
       toast({ title: isEdit ? "อัปเดตเรียบร้อยแล้ว" : "สร้างรีวิวเรียบร้อยแล้ว", variant: "default" });
 
       // Delay navigation slightly so user can see the success toast
@@ -477,15 +503,48 @@ export default function AdminReviewForm() {
   return (
     <AdminLayout>
       {/* DB Connection / Schema Alert */}
-      {(dbError || (!isEdit && !user)) && (
-        <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-xl text-amber-800 text-sm space-y-2">
-          <p className="font-bold flex items-center gap-2">
-            ⚠️ ตรวจสอบระบบฐานข้อมูล
-          </p>
-          <p>หากคุณบันทึกข้อมูลภาษาอังกฤษแล้วไม่ติด กรุณารันคำสั่ง SQL ที่ทีมพัฒนาเตรียมไว้ให้ในแชทเพื่อเพิ่มคอลัมน์ใน Supabase ของคุณครับ</p>
-          {dbError && <p className="font-mono text-[10px] bg-white/50 p-2 rounded">{dbError}</p>}
-        </div>
-      )}
+      <div className="mb-6 space-y-4">
+        {schemaStatus.checked && !schemaStatus.hasEnColumns && (
+          <div className="p-4 bg-rose-50 border border-rose-200 rounded-xl text-rose-800 text-sm space-y-2">
+            <p className="font-bold flex items-center gap-2 text-rose-600">
+              ❌ ระบบบันทึกภาษาอังกฤษ "ยังไม่เปิดใช้งาน"
+            </p>
+            <p>ฐานข้อมูลของคุณยังไม่มีคอลัมน์สำหรับข้อมูลภาษาอังกฤษ (เช่น pros_en, cons_en) ทำให้ข้อมูลที่พิมพ์ในช่องภาษาอังกฤษจะไม่ถูกบันทึกครับ</p>
+            <div className="bg-white/80 p-3 rounded-lg border border-rose-100 space-y-2">
+              <p className="font-semibold underline">วิธีแก้ไข:</p>
+              <ol className="list-decimal list-inside space-y-1">
+                <li>เปิด <b>Supabase Dashboard</b> ของคุณ</li>
+                <li>ไปที่เมนู <b>SQL Editor</b></li>
+                <li>คัดลอกคำสั่ง SQL ที่ผมเตรียมไว้ให้ในแชทไปวางแล้วกด <b>Run</b></li>
+                <li>รีเฟรชหน้านี้ แล้วลองใหม่อีกครั้งครับ</li>
+              </ol>
+            </div>
+            {schemaStatus.error && (
+              <details className="mt-2">
+                <summary className="cursor-pointer font-mono text-[10px] opacity-70">ดูรายละเอียดข้อผิดพลาด (Technical Detail)</summary>
+                <p className="font-mono text-[10px] bg-white/50 p-2 rounded mt-1">{schemaStatus.error}</p>
+              </details>
+            )}
+          </div>
+        )}
+
+        {schemaStatus.checked && schemaStatus.hasEnColumns && (
+          <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-xl text-emerald-800 text-sm flex items-center justify-between">
+            <p className="font-bold flex items-center gap-2">
+              ✅ ฐานข้อมูลพร้อมสำหรับการแปลภาษาแล้ว
+            </p>
+            <Button variant="ghost" size="sm" className="h-7 text-[10px] text-emerald-600 hover:bg-emerald-100" onClick={checkSchema}>
+              ตรวจสอบอีกครั้ง
+            </Button>
+          </div>
+        )}
+
+        {!schemaStatus.checked && (
+          <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl text-slate-500 text-sm animate-pulse">
+            กำลังตรวจสอบความพร้อมของฐานข้อมูล...
+          </div>
+        )}
+      </div>
 
       <div className="flex items-center gap-3 mb-6">
         <Button variant="ghost" size="icon" onClick={() => navigate("/admin/reviews")}>
@@ -495,14 +554,28 @@ export default function AdminReviewForm() {
           {isEdit ? "แก้ไขรีวิว" : "เพิ่มรีวิวใหม่"}
         </h1>
         {!isEdit && (
-          <Button
-            variant="outline"
-            size="sm"
-            className="ml-auto bg-primary/5 border-primary/20 text-primary hover:bg-primary/10"
-            onClick={quickFillHoka}
-          >
-            ใส่ข้อมูล Hoka Hopara 2 อัตโนมัติ
-          </Button>
+          <div className="ml-auto flex gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              className="bg-primary/5 border-primary/20 text-primary hover:bg-primary/10"
+              onClick={quickFillHoka}
+            >
+              ใส่ข้อมูล Hoka Hopara 2 อัตโนมัติ
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              className="bg-accent/5 border-accent/20 text-accent hover:bg-accent/10"
+              onClick={async () => {
+                quickFillHoka();
+                setTimeout(() => handleSave(), 500);
+              }}
+              disabled={saving}
+            >
+              {saving ? "กำลังทดสอบ..." : "ทดสอบใส่ข้อมูลและบันทึกทันที"}
+            </Button>
+          </div>
         )}
       </div>
 
