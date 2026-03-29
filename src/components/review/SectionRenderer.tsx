@@ -1,12 +1,14 @@
 import { ReviewData, ReviewSectionData } from "@/types/review";
 import { useTranslation } from "@/hooks/useTranslation";
-import { translateData, translateArray, translateTerm } from "@/lib/translation-utils";
+import { translateData, translateArray, translateTerm, translateSpec } from "@/lib/translation-utils";
 import { ReviewHero } from "./sections/ReviewHero";
 import { ReviewSpecs } from "./sections/ReviewSpecs";
 import { ReviewGallery } from "./sections/ReviewGallery";
 import { ReviewComparison } from "./sections/ReviewComparison";
 import { ReviewVerdict } from "./sections/ReviewVerdict";
 import { QuickDecision } from "./sections/QuickDecision";
+import { ReviewProsCons } from "./sections/ReviewProsCons";
+import { ReviewWhoIsThisFor } from "./sections/ReviewWhoIsThisFor";
 import { ScoreBreakdown } from "./sections/ScoreBreakdown";
 import { RealWorldTest } from "./sections/RealWorldTest";
 import { DeepDive } from "./sections/DeepDive";
@@ -47,7 +49,9 @@ export const SectionRenderer = ({ section, review, userRating }: SectionRenderer
     case 'score_breakdown': {
       const localizedRatings = (review.ratings || []).map(r => ({
         ...r,
-        label: r.label_en && language === 'en' ? r.label_en : r.label
+        label: language === 'en'
+          ? (r.label_en || translateTerm(r.label, 'en'))
+          : (r.label || r.label_en || '')
       }));
       return <ScoreBreakdown ratings={localizedRatings} />;
     }
@@ -80,11 +84,7 @@ export const SectionRenderer = ({ section, review, userRating }: SectionRenderer
     }
 
     case 'specs': {
-      const localizedSpecs = (review.specs || []).map(s => ({
-        ...s,
-        label: s.label_en && language === 'en' ? s.label_en : translateTerm(s.label, language),
-        value: s.value_en && language === 'en' ? s.value_en : translateTerm(s.value, language)
-      }));
+      const localizedSpecs = (review.specs || []).map(s => translateSpec(s, language));
       return (
         <ReviewSpecs
           specs={localizedSpecs}
@@ -106,13 +106,27 @@ export const SectionRenderer = ({ section, review, userRating }: SectionRenderer
         />
       );
 
-    case 'pros_cons':
-      // Legacy support, but we now use quick_decision
-      return null;
+    case 'pros_cons': {
+      const pros = translateArray(review, 'pros', language);
+      const cons = translateArray(review, 'cons', language);
+      return (
+        <section className="px-4 md:px-8">
+          <ReviewProsCons pros={pros} cons={cons} />
+        </section>
+      );
+    }
 
-    case 'who_is_this_for':
-      // Legacy support, but we now use quick_decision
-      return null;
+    case 'who_is_this_for': {
+      const suitable = (review.specs || [])
+        .map(s => translateSpec(s, language))
+        .filter(s => s.label.includes('เหมาะกับ') || s.label.includes('ระยะ') || s.label.includes('Suitable') || s.label.includes('Distance'))
+        .map(s => s.value);
+      return (
+        <section className="px-4 md:px-8">
+          <ReviewWhoIsThisFor suitable={suitable} />
+        </section>
+      );
+    }
 
     case 'content': {
       const title = translateData(section, 'title', language);

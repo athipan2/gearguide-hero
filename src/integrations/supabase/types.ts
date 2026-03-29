@@ -180,6 +180,19 @@ export type Database = {
           specs: Json
           updated_at: string
           verdict: string | null
+          name_en: string | null
+          brand_en: string | null
+          category_en: string | null
+          badge_en: string | null
+          intro_en: string | null
+          verdict_en: string | null
+          cta_text_en: string | null
+          pros_en: Json
+          cons_en: Json
+          shopee_url: string | null
+          lazada_url: string | null
+          test_conditions: Json | null
+          test_conditions_en: Json | null
         }
         Insert: {
           affiliate_url?: string | null
@@ -205,6 +218,19 @@ export type Database = {
           specs?: Json
           updated_at?: string
           verdict?: string | null
+          name_en?: string | null
+          brand_en?: string | null
+          category_en?: string | null
+          badge_en?: string | null
+          intro_en?: string | null
+          verdict_en?: string | null
+          cta_text_en?: string | null
+          pros_en?: Json
+          cons_en?: Json
+          shopee_url?: string | null
+          lazada_url?: string | null
+          test_conditions?: Json | null
+          test_conditions_en?: Json | null
         }
         Update: {
           affiliate_url?: string | null
@@ -230,6 +256,19 @@ export type Database = {
           specs?: Json
           updated_at?: string
           verdict?: string | null
+          name_en?: string | null
+          brand_en?: string | null
+          category_en?: string | null
+          badge_en?: string | null
+          intro_en?: string | null
+          verdict_en?: string | null
+          cta_text_en?: string | null
+          pros_en?: Json
+          cons_en?: Json
+          shopee_url?: string | null
+          lazada_url?: string | null
+          test_conditions?: Json | null
+          test_conditions_en?: Json | null
         }
         Relationships: []
       }

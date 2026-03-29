@@ -5,7 +5,7 @@ interface ReviewWhoIsThisForProps {
   notSuitable: string[];
 }
 
-export const ReviewWhoIsThisFor = ({ suitable, notSuitable }: ReviewWhoIsThisForProps) => {
+export const ReviewWhoIsThisFor = ({ suitable, notSuitable = [] }: ReviewWhoIsThisForProps) => {
   return (
     <div className="bg-primary text-white rounded-[3rem] p-8 md:p-12 shadow-2xl shadow-primary/20 relative overflow-hidden group">
       <div className="absolute top-0 right-0 w-48 h-48 bg-white/5 blur-3xl rounded-full" />

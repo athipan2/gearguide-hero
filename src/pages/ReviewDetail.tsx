@@ -120,7 +120,9 @@ export default function ReviewDetail() {
           ratings: (data.ratings as unknown as ReviewData["ratings"]) || [],
           specs: (data.specs as unknown as ReviewData["specs"]) || [],
           pros: (data.pros as unknown as string[]) || [],
+          pros_en: (data.pros_en as unknown as string[]) || [],
           cons: (data.cons as unknown as string[]) || [],
+          cons_en: (data.cons_en as unknown as string[]) || [],
           intro: data.intro, verdict: data.verdict,
           sections: (data.sections as unknown as ReviewSectionData[]) || [],
           affiliate_url: data.affiliate_url, cta_text: data.cta_text,
@@ -233,7 +235,7 @@ export default function ReviewDetail() {
            <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-slate-400 mb-8 overflow-x-auto whitespace-nowrap scrollbar-hide">
             <Link to="/" className="hover:text-primary transition-colors shrink-0">HOME</Link>
             <ChevronRight className="h-3 w-3 shrink-0" />
-            <Link to={`/category/${encodeURIComponent(review.category)}`} className="hover:text-primary transition-colors shrink-0">{translateData(review, 'category', language)}</Link>
+            <Link to={`/category/${encodeURIComponent(review.category)}`} className="hover:text-primary transition-colors shrink-0">{translateData(review, 'category', language) || review.category}</Link>
             <ChevronRight className="h-3 w-3 shrink-0" />
             <span className="text-primary truncate">{localizedName}</span>
           </div>

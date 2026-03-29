@@ -9,28 +9,36 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
-import { Save, ArrowLeft, Plus, X, MoveUp, MoveDown, Upload, Image as ImageIcon, Loader2 } from "lucide-react";
+import { Save, ArrowLeft, Plus, X, MoveUp, MoveDown, Upload, Loader2 } from "lucide-react";
 import { ReviewSectionData, SpecItem, ReviewRating, SectionType } from "@/types/review";
+import { Database, Json } from "@/integrations/supabase/types";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { resizeImage, IMAGE_VARIANTS } from "@/lib/image-utils";
 import { getOptimizedImageUrl } from "@/lib/utils";
 
 const defaultForm = {
-  name: "", name_en: "", brand: "", category: "", price: "", slug: "",
-  image_url: "", badge: "", overall_rating: 0,
+  name: "", name_en: "", brand: "", brand_en: "", category: "", category_en: "", price: "", slug: "",
+  image_url: "", badge: "", badge_en: "", overall_rating: 0,
   affiliate_url: "", cta_text: "ดูราคาล่าสุด", cta_text_en: "View Latest Price",
+  shopee_url: "", lazada_url: "",
   intro: "", intro_en: "", verdict: "", verdict_en: "", published: false,
+  test_conditions: { terrain: "", weather: "", distance: "" },
+  test_conditions_en: { terrain: "", weather: "", distance: "" },
 };
 
 const sectionTypes: { label: string; value: SectionType }[] = [
   { label: "Hero", value: "hero" },
+  { label: "Quick Decision (Pros/Cons)", value: "quick_decision" },
+  { label: "Score Breakdown", value: "score_breakdown" },
   { label: "Technical Specs", value: "specs" },
-  { label: "Pros & Cons", value: "pros_cons" },
-  { label: "Who is this for?", value: "who_is_this_for" },
+  { label: "Pros & Cons (Legacy)", value: "pros_cons" },
+  { label: "Who is this for? (Legacy)", value: "who_is_this_for" },
   { label: "Gallery", value: "gallery" },
   { label: "Comparison", value: "comparison" },
   { label: "Verdict Card", value: "verdict" },
   { label: "Content Section", value: "content" },
+  { label: "Real World Test", value: "real_world_test" },
+  { label: "Deep Dive", value: "deep_dive" },
 ];
 
 export default function AdminReviewForm() {
@@ -52,28 +60,114 @@ export default function AdminReviewForm() {
   const [saving, setSaving] = useState(false);
   const [uploadingCover, setUploadingCover] = useState(false);
   const [uploadingGallery, setUploadingGallery] = useState(false);
+  const [dbError, setDbError] = useState<string | null>(null);
+  const [schemaStatus, setSchemaStatus] = useState<{ checked: boolean; hasEnColumns: boolean; error?: string }>({ checked: false, hasEnColumns: false });
+
+  const checkSchema = async () => {
+    try {
+      const { data, error } = await supabase.from("reviews").select("pros_en, cons_en").limit(1);
+      if (error) {
+        setSchemaStatus({ checked: true, hasEnColumns: false, error: error.message });
+      } else {
+        setSchemaStatus({ checked: true, hasEnColumns: true });
+      }
+    } catch (err) {
+      setSchemaStatus({ checked: true, hasEnColumns: false, error: String(err) });
+    }
+  };
 
   useEffect(() => {
+    checkSchema();
+    // Reset state when switching between reviews or starting new
+    setForm(defaultForm);
+    setRatings([{ label: "", label_en: "", score: 0 }]);
+    setSpecs([{ label: "", label_en: "", value: "", value_en: "", highlight: false }]);
+    setPros([""]);
+    setProsEn([""]);
+    setCons([""]);
+    setConsEn([""]);
+    setSections([]);
+    setImages([]);
+    setDbError(null);
+
     if (isEdit) {
-      supabase.from("reviews").select("*").eq("id", id).maybeSingle().then(({ data }) => {
+      supabase.from("reviews").select("*").eq("id", id).maybeSingle().then(({ data, error }) => {
+        if (error) {
+          console.error("Error fetching review:", error);
+          toast({ title: "โหลดข้อมูลไม่สำเร็จ", description: error.message, variant: "destructive" });
+          return;
+        }
         if (data) {
+          console.log("Fetched review data for ID:", id, data);
+
+          // Use type assertion to access localized fields safely
+          // @ts-expect-error - accessing localized fields
+          const d = data;
+
           setForm({
-            name: data.name, name_en: data.name_en || "", brand: data.brand, category: data.category,
-            price: data.price, slug: data.slug, image_url: data.image_url || "",
-            badge: data.badge || "", overall_rating: Number(data.overall_rating),
+            name: data.name || "",
+            name_en: String(d.name_en || ""),
+            brand: data.brand || "",
+            brand_en: String(d.brand_en || ""),
+            category: data.category || "",
+            category_en: String(d.category_en || ""),
+            price: data.price || "",
+            slug: data.slug || "",
+            image_url: data.image_url || "",
+            badge: data.badge || "",
+            badge_en: String(d.badge_en || ""),
+            overall_rating: Number(data.overall_rating) || 0,
             affiliate_url: data.affiliate_url || "",
             cta_text: data.cta_text || "ดูราคาล่าสุด",
-            cta_text_en: data.cta_text_en || "View Latest Price",
-            intro: data.intro || "", intro_en: data.intro_en || "",
-            verdict: data.verdict || "", verdict_en: data.verdict_en || "",
-            published: data.published,
+            cta_text_en: String(d.cta_text_en || "View Latest Price"),
+            shopee_url: String(d.shopee_url || ""),
+            lazada_url: String(d.lazada_url || ""),
+            // @ts-expect-error - Json type handling
+            test_conditions: data.test_conditions || { terrain: "", weather: "", distance: "" },
+            // @ts-expect-error - Json type handling
+            test_conditions_en: d.test_conditions_en || { terrain: "", weather: "", distance: "" },
+            intro: data.intro || "",
+            intro_en: String(d.intro_en || ""),
+            verdict: data.verdict || "",
+            verdict_en: String(d.verdict_en || ""),
+            published: !!data.published,
           });
-          setRatings(Array.isArray(data.ratings) ? (data.ratings as unknown as ReviewRating[]) : []);
-          setSpecs(Array.isArray(data.specs) ? (data.specs as unknown as SpecItem[]) : []);
-          setPros(Array.isArray(data.pros) ? (data.pros as unknown as string[]) : [""]);
-          setProsEn(Array.isArray(data.pros_en) ? (data.pros_en as unknown as string[]) : [""]);
-          setCons(Array.isArray(data.cons) ? (data.cons as unknown as string[]) : [""]);
-          setConsEn(Array.isArray(data.cons_en) ? (data.cons_en as unknown as string[]) : [""]);
+
+          const loadedRatings = Array.isArray(data.ratings) ? (data.ratings as unknown as ReviewRating[]) : [];
+          setRatings(loadedRatings.length > 0 ? loadedRatings : [{ label: "", label_en: "", score: 0 }]);
+
+          const loadedSpecs = Array.isArray(data.specs) ? (data.specs as unknown as SpecItem[]) : [];
+          setSpecs(loadedSpecs.length > 0 ? loadedSpecs : [{ label: "", label_en: "", value: "", value_en: "", highlight: false }]);
+
+          // Helper to split bulleted strings into clean arrays for the form
+          const splitBullets = (val: unknown): string[] => {
+            if (Array.isArray(val)) {
+              // If it's an array, check if it contains strings with bullets that need splitting
+              return val.flatMap(item => {
+                if (typeof item === 'string' && (item.includes('•') || item.includes('\n'))) {
+                  return item.split(/\n|•/).map(s => s.trim()).filter(Boolean);
+                }
+                return String(item);
+              }).filter(s => s && s !== 'null' && !s.includes('จุดเด่น') && !s.includes('ข้อสังเกต') && !s.includes('Pros') && !s.includes('Cons'));
+            }
+            if (typeof val === 'string' && val.trim()) {
+              return val.split(/\n|•/).map(s => s.trim()).filter(s => s && s !== 'null' && !s.includes('จุดเด่น') && !s.includes('ข้อสังเกต') && !s.includes('Pros') && !s.includes('Cons'));
+            }
+            return [];
+          };
+
+          const loadedPros = splitBullets(data.pros);
+          setPros(loadedPros.length > 0 ? loadedPros : [""]);
+
+          const loadedProsEn = splitBullets(d.pros_en);
+          setProsEn(loadedProsEn.length > 0 ? loadedProsEn : [""]);
+
+          const loadedCons = splitBullets(data.cons);
+          setCons(loadedCons.length > 0 ? loadedCons : [""]);
+
+          const loadedConsEn = splitBullets(d.cons_en);
+          setConsEn(loadedConsEn.length > 0 ? loadedConsEn : [""]);
+
           setSections(Array.isArray(data.sections) ? (data.sections as unknown as ReviewSectionData[]) : []);
           setImages(Array.isArray(data.images) ? (data.images as unknown as string[]) : []);
         }
@@ -89,56 +183,164 @@ export default function AdminReviewForm() {
         { type: 'verdict' }
       ]);
     }
-  }, [id, isEdit]);
+  }, [id, isEdit, toast]);
 
   const handleSave = async () => {
-    if (!form.name || !form.slug || !form.brand || !form.category || !form.price) {
-      toast({ title: "กรุณากรอกข้อมูลที่จำเป็น", variant: "destructive" });
-      return;
-    }
-    setSaving(true);
-    const payload = {
-      ...form,
-      overall_rating: Math.round(form.overall_rating * 10) / 10,
-      ratings: ratings.filter((r) => r.label).map(r => ({ ...r, score: Math.round(r.score * 10) / 10 })),
-      specs: specs.filter((s) => s.label),
-      pros: pros.filter(Boolean),
-      pros_en: pros_en.filter(Boolean),
-      cons: cons.filter(Boolean),
-      cons_en: cons_en.filter(Boolean),
-      sections: sections,
-      images: images.filter(Boolean),
-      ...(isEdit ? {} : { created_by: user?.id }),
-    };
+    console.log("Saving form with ID:", id, "isEdit:", isEdit);
+    console.log("Current Form State:", form);
+    console.log("Current Pros/Cons State:", { pros, pros_en, cons, cons_en });
 
-    const { error } = isEdit
-      ? await supabase.from("reviews").update(payload).eq("id", id)
-      : await supabase.from("reviews").insert([payload]);
+    // Validation
+    const missing = [];
+    if (!form.name?.trim()) missing.push("ชื่อสินค้า (Name)");
+    if (!form.slug?.trim()) missing.push("Slug");
+    if (!form.brand?.trim()) missing.push("แบรนด์ (Brand)");
+    if (!form.category?.trim()) missing.push("หมวดหมู่ (Category)");
+    if (!form.price?.trim()) missing.push("ราคา (Price)");
 
-    setSaving(false);
-    if (error) {
-      console.error("Supabase save error:", error);
+    if (missing.length > 0) {
       toast({
-        title: "บันทึกไม่สำเร็จ",
-        description: error.message || "เกิดข้อผิดพลาดในการเชื่อมต่อฐานข้อมูล",
+        title: "กรุณากรอกข้อมูลที่จำเป็น",
+        description: `ยังขาดข้อมูล: ${missing.join(", ")}`,
         variant: "destructive"
       });
-    } else {
-      toast({ title: isEdit ? "อัปเดตแล้ว" : "สร้างรีวิวแล้ว" });
-      navigate("/admin/reviews");
+      return;
+    }
+
+    setSaving(true);
+    toast({ title: "กำลังบันทึกข้อมูล...", description: "กรุณารอสักครู่" });
+
+    // Helper to split any accidental single-string-with-bullets before saving
+    const sanitizeArray = (arr: string[]): string[] => {
+      return arr.flatMap(item => {
+        if (typeof item === 'string' && (item.includes('•') || item.includes('\n'))) {
+          return item.split(/\n|•/).map(s => s.trim()).filter(Boolean);
+        }
+        return item;
+      }).filter(p => typeof p === 'string' && p.trim() && !p.includes('จุดเด่น') && !p.includes('ข้อสังเกต') && !p.includes('Pros') && !p.includes('Cons'));
+    };
+
+    try {
+      // Construction of payload
+      // We use Record<string, unknown> to satisfy lint, with casts for Supabase
+      const payload: Record<string, unknown> = {
+        name: form.name.trim(),
+        name_en: form.name_en?.trim() || null,
+        brand: form.brand.trim(),
+        brand_en: form.brand_en?.trim() || null,
+        category: form.category.trim(),
+        category_en: form.category_en?.trim() || null,
+        price: form.price.trim(),
+        slug: form.slug.trim(),
+        image_url: form.image_url || null,
+        badge: form.badge?.trim() || null,
+        badge_en: form.badge_en?.trim() || null,
+        overall_rating: Math.round(Number(form.overall_rating) * 10) / 10,
+        affiliate_url: form.affiliate_url?.trim() || null,
+        cta_text: form.cta_text?.trim() || "ดูราคาล่าสุด",
+        cta_text_en: form.cta_text_en?.trim() || "View Latest Price",
+        shopee_url: form.shopee_url?.trim() || null,
+        lazada_url: form.lazada_url?.trim() || null,
+        intro: form.intro?.trim() || null,
+        intro_en: form.intro_en?.trim() || null,
+        verdict: form.verdict?.trim() || null,
+        verdict_en: form.verdict_en?.trim() || null,
+        published: Boolean(form.published),
+        test_conditions: form.test_conditions || null,
+        test_conditions_en: form.test_conditions_en || null,
+        ratings: ratings.filter((r) => r.label?.trim()).map(r => ({ ...r, score: Math.round(Number(r.score) * 10) / 10 })),
+        specs: specs.filter((s) => s.label?.trim()),
+        pros: sanitizeArray(pros),
+        pros_en: sanitizeArray(pros_en),
+        cons: sanitizeArray(cons),
+        cons_en: sanitizeArray(cons_en),
+        sections: sections || [],
+        images: images.filter(Boolean) || [],
+      };
+
+      if (!isEdit) {
+        payload.created_by = user?.id;
+      }
+
+      console.log("Constructed Payload:", payload);
+
+      const query = isEdit
+        // @ts-expect-error - flexible payload
+        ? supabase.from("reviews").update(payload).eq("id", id)
+        // @ts-expect-error - flexible payload
+        : supabase.from("reviews").insert([payload]);
+
+      // Use select() to verify it was actually saved and get the data back
+      const { data: result, error } = await query.select();
+
+      if (error) {
+        console.error("Supabase Save Error:", error);
+        throw error;
+      }
+
+      console.log("Save Result:", result);
+
+      if (!result || result.length === 0) {
+        console.warn("Save query returned no rows. Possible RLS or missing ID issue.");
+        toast({
+          title: "ข้อมูลไม่ถูกบันทึก!",
+          description: "บันทึกไม่สำเร็จและไม่มีข้อความผิดพลาด กรุณาตรวจสอบสิทธิ์การเขียนข้อมูล (RLS)",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      toast({ title: isEdit ? "อัปเดตเรียบร้อยแล้ว" : "สร้างรีวิวเรียบร้อยแล้ว", variant: "default" });
+
+      // Delay navigation slightly so user can see the success toast
+      setTimeout(() => {
+        navigate("/admin/reviews");
+      }, 1000);
+    } catch (err: unknown) {
+      console.error("Caught Exception in handleSave:", err);
+      const error = err as Record<string, unknown>;
+      const errorMessage = String(error?.message || error?.details || "เกิดข้อผิดพลาดในการเชื่อมต่อฐานข้อมูล");
+
+      const isMissingColumn = errorMessage.toLowerCase().includes("column") &&
+                             (errorMessage.toLowerCase().includes("does not exist") ||
+                              errorMessage.toLowerCase().includes("not found"));
+
+      toast({
+        title: isMissingColumn ? "ฐานข้อมูลยังไม่พร้อม (Missing Columns)" : "บันทึกไม่สำเร็จ",
+        description: (
+          <div className="mt-2 text-xs space-y-2">
+            <p className="font-bold text-sm">{errorMessage}</p>
+            {isMissingColumn && (
+              <div className="text-amber-700 bg-amber-50 p-2 rounded border border-amber-200 font-medium">
+                ดูเหมือนว่าฐานข้อมูลของคุณยังไม่มีคอลัมน์สำหรับการแปลภาษา (Localization)
+                กรุณารันคำสั่ง SQL ที่เตรียมไว้ให้ในแชทเพื่อแก้ไขปัญหานี้ครับ
+              </div>
+            )}
+            {error?.hint && <p><span className="font-bold">Hint:</span> {String(error.hint)}</p>}
+            {error?.code && <p><span className="font-bold">Code:</span> {String(error.code)}</p>}
+            {error?.details && <p><span className="font-bold">Details:</span> {String(error.details)}</p>}
+          </div>
+        ),
+        variant: "destructive",
+        duration: 20000, // Show for 20 seconds to give time to read
+      });
+    } finally {
+      setSaving(false);
     }
   };
 
   const generateSlug = (name: string) => {
+    // Basic slugification that handles both English and non-ASCII characters (Thai)
     return name
       .toLowerCase()
       .trim()
-      .replace(/[^\w\s-]/g, '')
-      .replace(/[\s_]+/g, '-')
-      .replace(/^-+|-+$/g, '');
+      .replace(/[\s_]+/g, '-')           // Replace spaces and underscores with -
+      .replace(/[^\w\u0E00-\u0E7F-]+/g, '') // Keep alphanumeric, Thai characters, and hyphens
+      .replace(/^-+|-+$/g, '');           // Remove leading/trailing hyphens
   };
 
-  const updateField = (key: string, value: string | number | boolean) => {
+  const updateField = (key: string, value: string | boolean | number | object | null) => {
+    console.log(`[AdminForm] Updating ${key}:`, value);
     setForm((f) => {
       const next = { ...f, [key]: value };
       if (key === 'name' && !isEdit && !f.slug) {
@@ -146,6 +348,35 @@ export default function AdminReviewForm() {
       }
       return next;
     });
+  };
+
+  const handleSmartPaste = (e: React.ClipboardEvent, type: 'pros' | 'pros_en' | 'cons' | 'cons_en', index: number) => {
+    const text = e.clipboardData.getData('text');
+    if (!text) return;
+
+    // Detect if the text contains multiple lines or bullet points
+    const lines = text.split(/\n|•/).map(l => l.trim()).filter(Boolean);
+
+    if (lines.length > 1) {
+      e.preventDefault();
+
+      const setter = type === 'pros' ? setPros :
+                     type === 'pros_en' ? setProsEn :
+                     type === 'cons' ? setCons : setConsEn;
+
+      setter(prev => {
+        const next = [...prev];
+        // Replace current index with the first line, then insert subsequent lines after it
+        next[index] = lines[0];
+        next.splice(index + 1, 0, ...lines.slice(1));
+        return next;
+      });
+
+      toast({
+        title: "Smart Paste Active",
+        description: `Split pasted text into ${lines.length} items.`,
+      });
+    }
   };
 
   const handleCoverUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -237,6 +468,50 @@ export default function AdminReviewForm() {
 
   return (
     <AdminLayout>
+      {/* DB Connection / Schema Alert */}
+      <div className="mb-6 space-y-4">
+        {schemaStatus.checked && !schemaStatus.hasEnColumns && (
+          <div className="p-4 bg-rose-50 border border-rose-200 rounded-xl text-rose-800 text-sm space-y-2">
+            <p className="font-bold flex items-center gap-2 text-rose-600">
+              ❌ ระบบบันทึกภาษาอังกฤษ "ยังไม่เปิดใช้งาน"
+            </p>
+            <p>ฐานข้อมูลของคุณยังไม่มีคอลัมน์สำหรับข้อมูลภาษาอังกฤษ (เช่น pros_en, cons_en) ทำให้ข้อมูลที่พิมพ์ในช่องภาษาอังกฤษจะไม่ถูกบันทึกครับ</p>
+            <div className="bg-white/80 p-3 rounded-lg border border-rose-100 space-y-2">
+              <p className="font-semibold underline">วิธีแก้ไข:</p>
+              <ol className="list-decimal list-inside space-y-1">
+                <li>เปิด <b>Supabase Dashboard</b> ของคุณ</li>
+                <li>ไปที่เมนู <b>SQL Editor</b></li>
+                <li>คัดลอกคำสั่ง SQL ที่ผมเตรียมไว้ให้ในแชทไปวางแล้วกด <b>Run</b></li>
+                <li>รีเฟรชหน้านี้ แล้วลองใหม่อีกครั้งครับ</li>
+              </ol>
+            </div>
+            {schemaStatus.error && (
+              <details className="mt-2">
+                <summary className="cursor-pointer font-mono text-[10px] opacity-70">ดูรายละเอียดข้อผิดพลาด (Technical Detail)</summary>
+                <p className="font-mono text-[10px] bg-white/50 p-2 rounded mt-1">{schemaStatus.error}</p>
+              </details>
+            )}
+          </div>
+        )}
+
+        {schemaStatus.checked && schemaStatus.hasEnColumns && (
+          <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-xl text-emerald-800 text-sm flex items-center justify-between">
+            <p className="font-bold flex items-center gap-2">
+              ✅ ฐานข้อมูลพร้อมสำหรับการแปลภาษาแล้ว
+            </p>
+            <Button variant="ghost" size="sm" className="h-7 text-[10px] text-emerald-600 hover:bg-emerald-100" onClick={checkSchema}>
+              ตรวจสอบอีกครั้ง
+            </Button>
+          </div>
+        )}
+
+        {!schemaStatus.checked && (
+          <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl text-slate-500 text-sm animate-pulse">
+            กำลังตรวจสอบความพร้อมของฐานข้อมูล...
+          </div>
+        )}
+      </div>
+
       <div className="flex items-center gap-3 mb-6">
         <Button variant="ghost" size="icon" onClick={() => navigate("/admin/reviews")}>
           <ArrowLeft className="h-5 w-5" />
@@ -365,12 +640,28 @@ export default function AdminReviewForm() {
                 <Input value={form.slug} onChange={(e) => updateField("slug", e.target.value)} placeholder="nike-vaporfly-3" />
               </div>
               <div className="space-y-2">
-                <Label>แบรนด์ *</Label>
+                <Label>แบรนด์ (Thai) *</Label>
                 <Input value={form.brand} onChange={(e) => updateField("brand", e.target.value)} />
               </div>
               <div className="space-y-2">
-                <Label>หมวดหมู่ *</Label>
+                <Label>Brand (English)</Label>
+                <Input value={form.brand_en} onChange={(e) => updateField("brand_en", e.target.value)} />
+              </div>
+              <div className="space-y-2">
+                <Label>หมวดหมู่ (Thai) *</Label>
                 <Input value={form.category} onChange={(e) => updateField("category", e.target.value)} />
+              </div>
+              <div className="space-y-2">
+                <Label>Category (English)</Label>
+                <Input value={form.category_en} onChange={(e) => updateField("category_en", e.target.value)} />
+              </div>
+              <div className="space-y-2">
+                <Label>ป้ายกำกับ (Badge - Thai)</Label>
+                <Input value={form.badge} onChange={(e) => updateField("badge", e.target.value)} placeholder="แนะนำโดยบรรณาธิการ" />
+              </div>
+              <div className="space-y-2">
+                <Label>Badge (English)</Label>
+                <Input value={form.badge_en} onChange={(e) => updateField("badge_en", e.target.value)} placeholder="Editor's Choice" />
               </div>
               <div className="space-y-2">
                 <Label>ราคา *</Label>
@@ -581,7 +872,13 @@ export default function AdminReviewForm() {
                    <Label className="text-[10px] text-muted-foreground uppercase">Thai</Label>
                    {Array.isArray(pros) && pros.map((p, i) => (
                     <div key={i} className="flex gap-2">
-                      <Input value={p} onChange={(e) => { const n = [...pros]; n[i] = e.target.value; setPros(n); }} className="flex-1 h-8 text-sm" />
+                      <Input
+                        value={p}
+                        onChange={(e) => { const n = [...pros]; n[i] = e.target.value; setPros(n); }}
+                        onPaste={(e) => handleSmartPaste(e, 'pros', i)}
+                        className="flex-1 h-8 text-sm"
+                        placeholder="เพิ่มข้อดี..."
+                      />
                       <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setPros(pros.filter((_, j) => j !== i))}><X className="h-4 w-4" /></Button>
                     </div>
                   ))}
@@ -590,7 +887,13 @@ export default function AdminReviewForm() {
                    <Label className="text-[10px] text-muted-foreground uppercase">English</Label>
                    {Array.isArray(pros_en) && pros_en.map((p, i) => (
                     <div key={i} className="flex gap-2">
-                      <Input value={p} onChange={(e) => { const n = [...pros_en]; n[i] = e.target.value; setProsEn(n); }} className="flex-1 h-8 text-sm bg-slate-50/50" />
+                      <Input
+                        value={p}
+                        onChange={(e) => { const n = [...pros_en]; n[i] = e.target.value; setProsEn(n); }}
+                        onPaste={(e) => handleSmartPaste(e, 'pros_en', i)}
+                        className="flex-1 h-8 text-sm bg-slate-50/50"
+                        placeholder="Add pro..."
+                      />
                       <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setProsEn(pros_en.filter((_, j) => j !== i))}><X className="h-4 w-4" /></Button>
                     </div>
                   ))}
@@ -612,7 +915,13 @@ export default function AdminReviewForm() {
                    <Label className="text-[10px] text-muted-foreground uppercase">Thai</Label>
                    {Array.isArray(cons) && cons.map((c, i) => (
                     <div key={i} className="flex gap-2">
-                      <Input value={c} onChange={(e) => { const n = [...cons]; n[i] = e.target.value; setCons(n); }} className="flex-1 h-8 text-sm" />
+                      <Input
+                        value={c}
+                        onChange={(e) => { const n = [...cons]; n[i] = e.target.value; setCons(n); }}
+                        onPaste={(e) => handleSmartPaste(e, 'cons', i)}
+                        className="flex-1 h-8 text-sm"
+                        placeholder="เพิ่มข้อเสีย..."
+                      />
                       <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setCons(cons.filter((_, j) => j !== i))}><X className="h-4 w-4" /></Button>
                     </div>
                   ))}
@@ -621,7 +930,13 @@ export default function AdminReviewForm() {
                    <Label className="text-[10px] text-muted-foreground uppercase">English</Label>
                    {Array.isArray(cons_en) && cons_en.map((c, i) => (
                     <div key={i} className="flex gap-2">
-                      <Input value={c} onChange={(e) => { const n = [...cons_en]; n[i] = e.target.value; setConsEn(n); }} className="flex-1 h-8 text-sm bg-slate-50/50" />
+                      <Input
+                        value={c}
+                        onChange={(e) => { const n = [...cons_en]; n[i] = e.target.value; setConsEn(n); }}
+                        onPaste={(e) => handleSmartPaste(e, 'cons_en', i)}
+                        className="flex-1 h-8 text-sm bg-slate-50/50"
+                        placeholder="Add con..."
+                      />
                       <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setConsEn(cons_en.filter((_, j) => j !== i))}><X className="h-4 w-4" /></Button>
                     </div>
                   ))}
@@ -641,8 +956,16 @@ export default function AdminReviewForm() {
             </div>
 
             <div className="space-y-2">
-              <Label>Affiliate URL</Label>
+              <Label>Affiliate URL (Default)</Label>
               <Input value={form.affiliate_url} onChange={(e) => updateField("affiliate_url", e.target.value)} placeholder="https://..." />
+            </div>
+            <div className="space-y-2">
+              <Label>Shopee URL</Label>
+              <Input value={form.shopee_url} onChange={(e) => updateField("shopee_url", e.target.value)} placeholder="https://shope.ee/..." />
+            </div>
+            <div className="space-y-2">
+              <Label>Lazada URL</Label>
+              <Input value={form.lazada_url} onChange={(e) => updateField("lazada_url", e.target.value)} placeholder="https://s.lazada.co.th/..." />
             </div>
             <div className="space-y-2">
               <Label>ข้อความปุ่ม CTA (Thai)</Label>
@@ -661,6 +984,60 @@ export default function AdminReviewForm() {
               <Label>Intro (English)</Label>
               <Textarea value={form.intro_en} onChange={(e) => updateField("intro_en", e.target.value)} rows={3} className="text-sm" />
             </div>
+            <div className="space-y-4 pt-2 border-t">
+              <h3 className="text-sm font-semibold">Test Conditions (Thai)</h3>
+              <div className="grid grid-cols-3 gap-2">
+                <Input
+                  placeholder="เส้นทาง"
+                  // @ts-expect-error - Dynamic field access
+                  value={form.test_conditions?.terrain || ""}
+                  onChange={(e) => updateField("test_conditions", { ...form.test_conditions, terrain: e.target.value })}
+                  className="h-8 text-xs"
+                />
+                <Input
+                  placeholder="สภาพอากาศ"
+                  // @ts-expect-error - Dynamic field access
+                  value={form.test_conditions?.weather || ""}
+                  onChange={(e) => updateField("test_conditions", { ...form.test_conditions, weather: e.target.value })}
+                  className="h-8 text-xs"
+                />
+                <Input
+                  placeholder="ระยะทาง"
+                  // @ts-expect-error - Dynamic field access
+                  value={form.test_conditions?.distance || ""}
+                  onChange={(e) => updateField("test_conditions", { ...form.test_conditions, distance: e.target.value })}
+                  className="h-8 text-xs"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-4 pt-2 border-t">
+              <h3 className="text-sm font-semibold">Test Conditions (English)</h3>
+              <div className="grid grid-cols-3 gap-2">
+                <Input
+                  placeholder="Terrain"
+                  // @ts-expect-error - Dynamic field access
+                  value={form.test_conditions_en?.terrain || ""}
+                  onChange={(e) => updateField("test_conditions_en", { ...form.test_conditions_en, terrain: e.target.value })}
+                  className="h-8 text-xs"
+                />
+                <Input
+                  placeholder="Weather"
+                  // @ts-expect-error - Dynamic field access
+                  value={form.test_conditions_en?.weather || ""}
+                  onChange={(e) => updateField("test_conditions_en", { ...form.test_conditions_en, weather: e.target.value })}
+                  className="h-8 text-xs"
+                />
+                <Input
+                  placeholder="Distance"
+                  // @ts-expect-error - Dynamic field access
+                  value={form.test_conditions_en?.distance || ""}
+                  onChange={(e) => updateField("test_conditions_en", { ...form.test_conditions_en, distance: e.target.value })}
+                  className="h-8 text-xs"
+                />
+              </div>
+            </div>
+
             <div className="space-y-2 pt-2 border-t">
               <Label>สรุป (Verdict - Thai)</Label>
               <Textarea value={form.verdict} onChange={(e) => updateField("verdict", e.target.value)} rows={3} className="text-sm" />
@@ -670,7 +1047,16 @@ export default function AdminReviewForm() {
               <Textarea value={form.verdict_en} onChange={(e) => updateField("verdict_en", e.target.value)} rows={3} className="text-sm" />
             </div>
 
-            <Button onClick={handleSave} disabled={saving} className="w-full h-12 lg:h-10">
+            <Button
+              type="button"
+              onClick={(e) => {
+                console.log("Desktop Save button clicked");
+                e.preventDefault();
+                handleSave();
+              }}
+              disabled={saving}
+              className="w-full h-12 lg:h-10"
+            >
               <Save className="mr-2 h-4 w-4" />
               {saving ? "กำลังบันทึก..." : "บันทึก"}
             </Button>
@@ -682,7 +1068,16 @@ export default function AdminReviewForm() {
         <Button variant="outline" className="flex-1 h-12" onClick={() => navigate("/admin/reviews")}>
           ยกเลิก
         </Button>
-        <Button onClick={handleSave} disabled={saving} className="flex-[2] h-12">
+        <Button
+          type="button"
+          onClick={(e) => {
+            console.log("Mobile Save button clicked");
+            e.preventDefault();
+            handleSave();
+          }}
+          disabled={saving}
+          className="flex-[2] h-12"
+        >
           <Save className="mr-2 h-4 w-4" />
           {saving ? "บันทึก..." : "บันทึกการเปลี่ยนแปลง"}
         </Button>
