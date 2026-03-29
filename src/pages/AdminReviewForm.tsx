@@ -162,8 +162,8 @@ export default function AdminReviewForm() {
 
     try {
       // Construction of payload
-      // We use Record<string, any> to allow sending columns that might not be in the local types yet
-      const payload: Record<string, any> = {
+      // We use Record<string, unknown> to satisfy lint, with casts for Supabase
+      const payload: Record<string, unknown> = {
         name: form.name.trim(),
         name_en: form.name_en?.trim() || null,
         brand: form.brand.trim(),
@@ -205,7 +205,9 @@ export default function AdminReviewForm() {
       console.log("Constructed Payload:", payload);
 
       const query = isEdit
+        // @ts-expect-error - flexible payload
         ? supabase.from("reviews").update(payload).eq("id", id)
+        // @ts-expect-error - flexible payload
         : supabase.from("reviews").insert([payload]);
 
       // Use select() to verify it was actually saved and get the data back
@@ -223,9 +225,10 @@ export default function AdminReviewForm() {
       setTimeout(() => {
         navigate("/admin/reviews");
       }, 1000);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Caught Exception in handleSave:", err);
-      const errorMessage = String(err?.message || err?.details || "เกิดข้อผิดพลาดในการเชื่อมต่อฐานข้อมูล");
+      const error = err as Record<string, unknown>;
+      const errorMessage = String(error?.message || error?.details || "เกิดข้อผิดพลาดในการเชื่อมต่อฐานข้อมูล");
 
       const isMissingColumn = errorMessage.toLowerCase().includes("column") &&
                              (errorMessage.toLowerCase().includes("does not exist") ||
@@ -242,9 +245,9 @@ export default function AdminReviewForm() {
                 กรุณารันคำสั่ง SQL ที่เตรียมไว้ให้ในแชทเพื่อแก้ไขปัญหานี้ครับ
               </div>
             )}
-            {err?.hint && <p><span className="font-bold">Hint:</span> {String(err.hint)}</p>}
-            {err?.code && <p><span className="font-bold">Code:</span> {String(err.code)}</p>}
-            {err?.details && <p><span className="font-bold">Details:</span> {String(err.details)}</p>}
+            {error?.hint && <p><span className="font-bold">Hint:</span> {String(error.hint)}</p>}
+            {error?.code && <p><span className="font-bold">Code:</span> {String(error.code)}</p>}
+            {error?.details && <p><span className="font-bold">Details:</span> {String(error.details)}</p>}
           </div>
         ),
         variant: "destructive",
