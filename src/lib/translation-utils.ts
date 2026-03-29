@@ -111,6 +111,16 @@ export function translateArray(data: Record<string, unknown>, field: string, lan
     }
 
     if (Array.isArray(parsed)) {
+      // Handle special case where a single element array contains a JSON string (double encoding)
+      if (parsed.length === 1 && typeof parsed[0] === 'string' && parsed[0].trim().startsWith('[')) {
+        try {
+          const innerParsed = JSON.parse(parsed[0]);
+          if (Array.isArray(innerParsed)) return innerParsed.map(item => String(item)).filter(s => s && s !== 'null' && s.trim());
+        } catch (e) {
+          // Not JSON, continue with original
+        }
+      }
+
       // Even if it's an array, check if the first element is a long string with bullets
       if (parsed.length === 1 && typeof parsed[0] === 'string' && (parsed[0].includes('•') || parsed[0].includes('\n'))) {
         return parsed[0].split(/\n|•/).map(s => s.trim()).filter(s => s && s !== 'null' && !s.includes('จุดเด่น') && !s.includes('ข้อสังเกต') && !s.includes('Pros') && !s.includes('Cons'));
