@@ -63,10 +63,12 @@ export function translateTerm(term: string, lang: Language): string {
 export function translateData<T extends Record<string, unknown>>(data: T, field: string, lang: Language): string {
   if (!data) return '';
 
+  // @ts-expect-error - dynamic field access
   const thRaw = data[field];
   const thVal = typeof thRaw === 'string' ? thRaw : '';
 
   const enField = `${field}_en`;
+  // @ts-expect-error - dynamic field access
   const enRaw = data[enField];
   const enVal = typeof enRaw === 'string' ? enRaw : '';
 
@@ -84,8 +86,10 @@ export function translateData<T extends Record<string, unknown>>(data: T, field:
 export function translateArray(data: Record<string, unknown>, field: string, lang: Language): string[] {
   if (!data) return [];
 
+  // @ts-expect-error - dynamic field access
   const thVal = data[field];
   const enField = `${field}_en`;
+  // @ts-expect-error - dynamic field access
   const enVal = data[enField];
 
   const thArray = Array.isArray(thVal) ? (thVal as unknown[]).map(item => String(item)).filter(s => s && s.trim()) : [];

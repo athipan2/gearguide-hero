@@ -140,95 +140,115 @@ export default function AdminReviewForm() {
     console.log("Current Form State:", form);
     console.log("Current Pros/Cons State:", { pros, pros_en, cons, cons_en });
 
-    if (!form.name || !form.slug || !form.brand || !form.category || !form.price) {
-      const missing = [];
-      if (!form.name) missing.push("ชื่อสินค้า");
-      if (!form.slug) missing.push("Slug");
-      if (!form.brand) missing.push("แบรนด์");
-      if (!form.category) missing.push("หมวดหมู่");
-      if (!form.price) missing.push("ราคา");
+    // Validation
+    const missing = [];
+    if (!form.name?.trim()) missing.push("ชื่อสินค้า (Name)");
+    if (!form.slug?.trim()) missing.push("Slug");
+    if (!form.brand?.trim()) missing.push("แบรนด์ (Brand)");
+    if (!form.category?.trim()) missing.push("หมวดหมู่ (Category)");
+    if (!form.price?.trim()) missing.push("ราคา (Price)");
 
+    if (missing.length > 0) {
       toast({
         title: "กรุณากรอกข้อมูลที่จำเป็น",
-        description: `ยังขาด: ${missing.join(", ")}`,
+        description: `ยังขาดข้อมูล: ${missing.join(", ")}`,
         variant: "destructive"
       });
       return;
     }
 
     setSaving(true);
-    toast({ title: "กำลังบันทึกข้อมูล..." });
+    toast({ title: "กำลังบันทึกข้อมูล...", description: "กรุณารอสักครู่" });
 
     try {
-      const payload: Record<string, unknown> = {
-        name: form.name,
-        name_en: form.name_en,
-        brand: form.brand,
-        brand_en: form.brand_en,
-        category: form.category,
-        category_en: form.category_en,
-        price: form.price,
-        slug: form.slug,
-        image_url: form.image_url,
-        badge: form.badge,
-        badge_en: form.badge_en,
-        overall_rating: Math.round(form.overall_rating * 10) / 10,
-        affiliate_url: form.affiliate_url,
-        cta_text: form.cta_text,
-        cta_text_en: form.cta_text_en,
-        shopee_url: form.shopee_url,
-        lazada_url: form.lazada_url,
-        intro: form.intro,
-        intro_en: form.intro_en,
-        verdict: form.verdict,
-        verdict_en: form.verdict_en,
-        published: form.published,
-        test_conditions: form.test_conditions,
-        test_conditions_en: form.test_conditions_en,
-        ratings: ratings.filter((r) => r.label && r.label.trim()).map(r => ({ ...r, score: Math.round(Number(r.score) * 10) / 10 })),
-        specs: specs.filter((s) => s.label && s.label.trim()),
+      // Construction of payload
+      // We use Record<string, any> to allow sending columns that might not be in the local types yet
+      const payload: Record<string, any> = {
+        name: form.name.trim(),
+        name_en: form.name_en?.trim() || null,
+        brand: form.brand.trim(),
+        brand_en: form.brand_en?.trim() || null,
+        category: form.category.trim(),
+        category_en: form.category_en?.trim() || null,
+        price: form.price.trim(),
+        slug: form.slug.trim(),
+        image_url: form.image_url || null,
+        badge: form.badge?.trim() || null,
+        badge_en: form.badge_en?.trim() || null,
+        overall_rating: Math.round(Number(form.overall_rating) * 10) / 10,
+        affiliate_url: form.affiliate_url?.trim() || null,
+        cta_text: form.cta_text?.trim() || "ดูราคาล่าสุด",
+        cta_text_en: form.cta_text_en?.trim() || "View Latest Price",
+        shopee_url: form.shopee_url?.trim() || null,
+        lazada_url: form.lazada_url?.trim() || null,
+        intro: form.intro?.trim() || null,
+        intro_en: form.intro_en?.trim() || null,
+        verdict: form.verdict?.trim() || null,
+        verdict_en: form.verdict_en?.trim() || null,
+        published: Boolean(form.published),
+        test_conditions: form.test_conditions || null,
+        test_conditions_en: form.test_conditions_en || null,
+        ratings: ratings.filter((r) => r.label?.trim()).map(r => ({ ...r, score: Math.round(Number(r.score) * 10) / 10 })),
+        specs: specs.filter((s) => s.label?.trim()),
         pros: pros.filter(p => typeof p === 'string' && p.trim()),
         pros_en: pros_en.filter(p => typeof p === 'string' && p.trim()),
         cons: cons.filter(c => typeof c === 'string' && c.trim()),
         cons_en: cons_en.filter(c => typeof c === 'string' && c.trim()),
-        sections: sections,
-        images: images.filter(Boolean),
+        sections: sections || [],
+        images: images.filter(Boolean) || [],
       };
 
       if (!isEdit) {
         payload.created_by = user?.id;
       }
 
-      console.log("Payload:", payload);
+      console.log("Constructed Payload:", payload);
 
       const query = isEdit
         ? supabase.from("reviews").update(payload).eq("id", id)
         : supabase.from("reviews").insert([payload]);
 
-      const { error } = await query;
+      // Use select() to verify it was actually saved and get the data back
+      const { data: result, error } = await query.select();
 
       if (error) {
-        console.error("Supabase query error:", error);
+        console.error("Supabase Save Error:", error);
         throw error;
       }
 
-      console.log("Save successful");
-      toast({ title: isEdit ? "อัปเดตเรียบร้อยแล้ว" : "สร้างรีวิวเรียบร้อยแล้ว" });
-      navigate("/admin/reviews");
-    } catch (err: unknown) {
-      console.error("Detailed save error:", err);
-      const error = err as Record<string, unknown>;
-      const errorMessage = String(error?.message || error?.details || "เกิดข้อผิดพลาดในการเชื่อมต่อฐานข้อมูล");
+      console.log("Save Result:", result);
+      toast({ title: isEdit ? "อัปเดตเรียบร้อยแล้ว" : "สร้างรีวิวเรียบร้อยแล้ว", variant: "default" });
+
+      // Delay navigation slightly so user can see the success toast
+      setTimeout(() => {
+        navigate("/admin/reviews");
+      }, 1000);
+    } catch (err: any) {
+      console.error("Caught Exception in handleSave:", err);
+      const errorMessage = String(err?.message || err?.details || "เกิดข้อผิดพลาดในการเชื่อมต่อฐานข้อมูล");
+
+      const isMissingColumn = errorMessage.toLowerCase().includes("column") &&
+                             (errorMessage.toLowerCase().includes("does not exist") ||
+                              errorMessage.toLowerCase().includes("not found"));
+
       toast({
-        title: "บันทึกไม่สำเร็จ",
+        title: isMissingColumn ? "ฐานข้อมูลยังไม่พร้อม (Missing Columns)" : "บันทึกไม่สำเร็จ",
         description: (
-          <div className="mt-2 text-xs space-y-1 overflow-auto max-h-[100px]">
-            <p className="font-semibold">{errorMessage}</p>
-            {error?.hint && <p>Hint: {String(error.hint)}</p>}
-            {error?.code && <p>Code: {String(error.code)}</p>}
+          <div className="mt-2 text-xs space-y-2">
+            <p className="font-bold text-sm">{errorMessage}</p>
+            {isMissingColumn && (
+              <div className="text-amber-700 bg-amber-50 p-2 rounded border border-amber-200 font-medium">
+                ดูเหมือนว่าฐานข้อมูลของคุณยังไม่มีคอลัมน์สำหรับการแปลภาษา (Localization)
+                กรุณารันคำสั่ง SQL ที่เตรียมไว้ให้ในแชทเพื่อแก้ไขปัญหานี้ครับ
+              </div>
+            )}
+            {err?.hint && <p><span className="font-bold">Hint:</span> {String(err.hint)}</p>}
+            {err?.code && <p><span className="font-bold">Code:</span> {String(err.code)}</p>}
+            {err?.details && <p><span className="font-bold">Details:</span> {String(err.details)}</p>}
           </div>
         ),
-        variant: "destructive"
+        variant: "destructive",
+        duration: 20000, // Show for 20 seconds to give time to read
       });
     } finally {
       setSaving(false);
