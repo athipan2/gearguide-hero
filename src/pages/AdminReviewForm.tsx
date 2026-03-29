@@ -76,67 +76,6 @@ export default function AdminReviewForm() {
     }
   };
 
-  const quickFillHoka = () => {
-    updateField("name", "Hoka Hopara 2");
-    updateField("name_en", "Hoka Hopara 2");
-    updateField("brand", "Hoka");
-    updateField("brand_en", "Hoka");
-    updateField("category", "รองเท้าเดินป่า");
-    updateField("category_en", "Hiking Sandals");
-    updateField("price", "฿5,200");
-    updateField("overall_rating", 4.5);
-    updateField("intro", "Hoka Hopara 2 เป็นการอัปเกรดครั้งสำคัญของรองเท้าแซนดัลเดินป่าอเนกประสงค์ โดยมีการเพิ่มแผ่นตาข่าย Cordura ใหม่เพื่อการปกป้องที่ดียิ่งขึ้นโดยไม่เสียประสิทธิภาพในการลุยน้ำ");
-    updateField("intro_en", "The Hoka Hopara 2 is a major upgrade to the versatile hiking sandal, featuring a new Cordura mesh shroud for better protection without sacrificing water performance.");
-    updateField("verdict", "รองเท้าแซนดัลเดินป่าที่ทนทานและให้การปกป้องสูง ซึ่งลบเส้นแบ่งระหว่างรองเท้ากับรองเท้าแซนดัล เหมาะอย่างยิ่งสำหรับการข้ามลำธารทางเทคนิคและเส้นทางที่มีหิน");
-    updateField("verdict_en", "A rugged, high-protection hiking sandal that blurs the line between a shoe and a sandal, perfect for technical water crossings and rocky trails.");
-
-    setPros([
-      "การป้องกันที่เหนือกว่า: เลเยอร์ Cordura® Mesh ใหม่ช่วยป้องกันเศษหิน ทราย และกรวดได้อย่างมีประสิทธิภาพ ในขณะที่ยังระบายน้ำได้ดี",
-      "วัสดุเป็นมิตรต่อสิ่งแวดล้อม: ใช้พื้นชั้นกลาง Sugarcane EVA 30% และวัสดุรีไซเคิล 100% เป็นทางเลือกที่ยั่งยืน",
-      "การยึดเกาะที่ยอดเยี่ยม: ปุ่มรองเท้า 4 มม. แบบหลายทิศทางให้การยึดเกาะที่ดีเยี่ยมในทุกสภาพพื้นผิว",
-      "การปรับแต่งความกระชับ: มาพร้อมสายรัดส้นเท้าที่ปรับได้และระบบเชือกรูดที่รวดเร็ว",
-      "เคลือบกันละอองน้ำ: เคลือบสารกันน้ำแบบไร้ PFC ช่วยป้องกันไม่ให้วัสดุดูดซับน้ำ"
-    ]);
-
-    setProsEn([
-      "Enhanced Protection: The new Cordura® Mesh layer effectively keeps debris like rocks, sand, and gravel out of the shoe while maintaining water drainage.",
-      "Eco-Friendly Materials: Features a 30% Sugarcane EVA midsole and 100% recycled knit/mesh materials, making it a sustainable choice.",
-      "Superior Traction: The 4mm multidirectional lugs provide exceptional grip on diverse terrains, including wet rocks and muddy trails.",
-      "Customizable Fit: Equipped with an adjustable heel strap and a quick-toggle lace system for a secure, personalized lockdown.",
-      "Water Repellent: Treated with a PFC-free water repellency coating to prevent the materials from soaking up water during stream crossings."
-    ]);
-
-    setCons([
-      "น้ำหนัก: ที่ประมาณ 366 กรัม หนักกว่ารุ่นเดิมเล็กน้อยและหนักกว่ารองเท้าแซนดัลกีฬาทั่วไป",
-      "การระบายอากาศลดลง: การเพิ่ม Mesh เข้ามาช่วยป้องกันได้ดีขึ้น แต่ส่งผลให้การระบายอากาศโดยตรงลดลงเล็กน้อย",
-      "รูปทรงที่เทอะทะ: โครงสร้างที่แข็งแรงและพื้นรองเท้าที่หนาอาจรู้สึกเทอะทะสำหรับผู้ที่คุ้นเคยกับรองเท้าแซนดัลสายมินิมอล"
-    ]);
-
-    setConsEn([
-      "Weight: At approximately 366g, it is slightly heavier than the original Hopara and significantly heavier than standard sports sandals.",
-      "Reduced Airflow: The added mesh coverage provides better protection but results in slightly less direct ventilation compared to the more \"open\" design of the first version.",
-      "Bulkier Profile: The robust construction and thick midsole might feel a bit bulky for those used to minimalist hiking sandals."
-    ]);
-
-    setSpecs([
-      { label: "น้ำหนัก", label_en: "Weight", value: "366g", highlight: true },
-      { label: "ปุ่มยึดเกาะ", label_en: "Lugs", value: "4mm", highlight: true },
-      { label: "วัสดุ", label_en: "Material", value: "Cordura® Mesh / Sugarcane EVA", highlight: false }
-    ]);
-
-    setRatings([
-      { label: "การป้องกัน", label_en: "Protection", score: 4.8 },
-      { label: "การยึดเกาะ", label_en: "Traction", score: 4.7 },
-      { label: "ความสบาย", label_en: "Comfort", score: 4.4 },
-      { label: "การระบายอากาศ", label_en: "Breathability", score: 3.8 }
-    ]);
-
-    toast({
-      title: "Quick Fill Complete",
-      description: "Hoka Hopara 2 data has been pre-filled. You can now save the review.",
-    });
-  };
-
   useEffect(() => {
     checkSchema();
     // Reset state when switching between reviews or starting new
@@ -553,30 +492,6 @@ export default function AdminReviewForm() {
         <h1 className="font-heading text-2xl font-bold text-foreground">
           {isEdit ? "แก้ไขรีวิว" : "เพิ่มรีวิวใหม่"}
         </h1>
-        {!isEdit && (
-          <div className="ml-auto flex gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              className="bg-primary/5 border-primary/20 text-primary hover:bg-primary/10"
-              onClick={quickFillHoka}
-            >
-              ใส่ข้อมูล Hoka Hopara 2 อัตโนมัติ
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              className="bg-accent/5 border-accent/20 text-accent hover:bg-accent/10"
-              onClick={async () => {
-                quickFillHoka();
-                setTimeout(() => handleSave(), 500);
-              }}
-              disabled={saving}
-            >
-              {saving ? "กำลังทดสอบ..." : "ทดสอบใส่ข้อมูลและบันทึกทันที"}
-            </Button>
-          </div>
-        )}
       </div>
 
       <div className="grid lg:grid-cols-3 gap-6">
