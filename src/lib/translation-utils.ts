@@ -100,36 +100,39 @@ export function translateArray(data: Record<string, unknown>, field: string, lan
   const ensureArray = (val: unknown): string[] => {
     if (!val) return [];
 
-    let parsed = val;
-    // Handle cases where JSON is stored as a string accidentally (Supabase double encoding)
-    if (typeof val === 'string' && (val.trim().startsWith('[') || val.trim().startsWith('{'))) {
-      try {
-        parsed = JSON.parse(val);
-      } catch (e) {
-        // Not JSON, continue with original string
-      }
-    }
+    let current = val;
+    let iterations = 0;
+    const MAX_ITERATIONS = 5;
 
-    if (Array.isArray(parsed)) {
-      // Handle special case where a single element array contains a JSON string (double encoding)
-      if (parsed.length === 1 && typeof parsed[0] === 'string' && parsed[0].trim().startsWith('[')) {
+    // Deeply unpack potential multi-layered JSON encoding
+    while (iterations < MAX_ITERATIONS) {
+      if (typeof current === 'string' && (current.trim().startsWith('[') || current.trim().startsWith('{'))) {
         try {
-          const innerParsed = JSON.parse(parsed[0]);
-          if (Array.isArray(innerParsed)) return innerParsed.map(item => String(item)).filter(s => s && s !== 'null' && s.trim());
-        } catch (e) {
-          // Not JSON, continue with original
-        }
+          current = JSON.parse(current);
+          iterations++;
+          continue;
+        } catch (e) { break; }
       }
-
-      // Even if it's an array, check if the first element is a long string with bullets
-      if (parsed.length === 1 && typeof parsed[0] === 'string' && (parsed[0].includes('•') || parsed[0].includes('\n'))) {
-        return parsed[0].split(/\n|•/).map(s => s.trim()).filter(s => s && s !== 'null' && !s.includes('จุดเด่น') && !s.includes('ข้อสังเกต') && !s.includes('Pros') && !s.includes('Cons'));
+      if (Array.isArray(current) && current.length === 1 && typeof current[0] === 'string' && current[0].trim().startsWith('[')) {
+        try {
+          current = JSON.parse(current[0]);
+          iterations++;
+          continue;
+        } catch (e) { break; }
       }
-      return (parsed as unknown[]).map(item => String(item)).filter(s => s && s !== 'null' && s.trim());
+      break;
     }
 
-    if (typeof parsed === 'string' && parsed.trim()) {
-      return parsed.split(/\n|•/).map(s => s.trim()).filter(s => s && s !== 'null' && !s.includes('จุดเด่น') && !s.includes('ข้อสังเกต') && !s.includes('Pros') && !s.includes('Cons'));
+    if (Array.isArray(current)) {
+      // Even if it's an array, check if the first element is a long string with bullets
+      if (current.length === 1 && typeof current[0] === 'string' && (current[0].includes('•') || current[0].includes('\n'))) {
+        return current[0].split(/\n|•/).map(s => s.trim()).filter(s => s && s !== 'null' && !s.includes('จุดเด่น') && !s.includes('ข้อสังเกต') && !s.includes('Pros') && !s.includes('Cons'));
+      }
+      return (current as unknown[]).map(item => String(item)).filter(s => s && s !== 'null' && s.trim());
+    }
+
+    if (typeof current === 'string' && current.trim()) {
+      return current.split(/\n|•/).map(s => s.trim()).filter(s => s && s !== 'null' && !s.includes('จุดเด่น') && !s.includes('ข้อสังเกต') && !s.includes('Pros') && !s.includes('Cons'));
     }
     return [];
   };
