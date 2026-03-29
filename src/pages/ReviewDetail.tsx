@@ -54,6 +54,47 @@ const fallbackData: Record<string, ReviewData> = {
     shopee_url: "https://shope.ee/test",
     lazada_url: "https://s.lazada.co.th/test"
   },
+  "hoka-hopara-2": {
+    name: "Hoka Hopara 2", brand: "Hoka", category: "รองเท้าเดินป่า", price: "฿5,200",
+    image_url: "https://images.unsplash.com/photo-1620138546344-7b2c0b051ed3?w=1200&h=800&fit=crop",
+    images: [],
+    badge: "New Arrival", overall_rating: 4.5,
+    ratings: [
+      { label: "Protection", score: 4.8 },
+      { label: "Traction", score: 4.7 },
+      { label: "Comfort", score: 4.4 },
+      { label: "Breathability", score: 3.8 }
+    ],
+    specs: [
+      { label: "Weight", value: "366g", highlight: true },
+      { label: "Lugs", value: "4mm", highlight: true },
+      { label: "Material", value: "Cordura® Mesh / Sugarcane EVA" }
+    ],
+    pros_en: [
+      "Enhanced Protection: The new Cordura® Mesh layer effectively keeps debris like rocks, sand, and gravel out of the shoe while maintaining water drainage.",
+      "Eco-Friendly Materials: Features a 30% Sugarcane EVA midsole and 100% recycled knit/mesh materials, making it a sustainable choice.",
+      "Superior Traction: The 4mm multidirectional lugs provide exceptional grip on diverse terrains, including wet rocks and muddy trails.",
+      "Customizable Fit: Equipped with an adjustable heel strap and a quick-toggle lace system for a secure, personalized lockdown.",
+      "Water Repellent: Treated with a PFC-free water repellency coating to prevent the materials from soaking up water during stream crossings."
+    ],
+    cons_en: [
+      "Weight: At approximately 366g, it is slightly heavier than the original Hopara and significantly heavier than standard sports sandals.",
+      "Reduced Airflow: The added mesh coverage provides better protection but results in slightly less direct ventilation compared to the more \"open\" design of the first version.",
+      "Bulkier Profile: The robust construction and thick midsole might feel a bit bulky for those used to minimalist hiking sandals."
+    ],
+    intro_en: "The Hoka Hopara 2 is a major upgrade to the versatile hiking sandal, featuring a new Cordura mesh shroud for better protection without sacrificing water performance.",
+    sections: [
+      { type: 'hero' },
+      { type: 'quick_decision' },
+      { type: 'score_breakdown' },
+      { type: 'specs' },
+      { type: 'verdict' }
+    ],
+    verdict_en: "A rugged, high-protection hiking sandal that blurs the line between a shoe and a sandal, perfect for technical water crossings and rocky trails.",
+    affiliate_url: "#",
+    cta_text_en: "Check Price",
+    slug: "hoka-hopara-2"
+  },
 };
 
 export default function ReviewDetail() {
