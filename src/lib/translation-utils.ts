@@ -98,15 +98,28 @@ export function translateArray(data: Record<string, unknown>, field: string, lan
 
   // Helper to split bulleted strings into arrays if they accidentally come in as a single string
   const ensureArray = (val: unknown): string[] => {
-    if (Array.isArray(val)) {
-      // Even if it's an array, check if the first element is a long string with bullets
-      if (val.length === 1 && typeof val[0] === 'string' && (val[0].includes('•') || val[0].includes('\n'))) {
-        return val[0].split(/\n|•/).map(s => s.trim()).filter(s => s && s !== 'null' && !s.includes('จุดเด่น') && !s.includes('ข้อสังเกต') && !s.includes('Pros') && !s.includes('Cons'));
+    if (!val) return [];
+
+    let parsed = val;
+    // Handle cases where JSON is stored as a string accidentally (Supabase double encoding)
+    if (typeof val === 'string' && (val.trim().startsWith('[') || val.trim().startsWith('{'))) {
+      try {
+        parsed = JSON.parse(val);
+      } catch (e) {
+        // Not JSON, continue with original string
       }
-      return (val as unknown[]).map(item => String(item)).filter(s => s && s !== 'null' && s.trim());
     }
-    if (typeof val === 'string' && val.trim()) {
-      return val.split(/\n|•/).map(s => s.trim()).filter(s => s && s !== 'null' && !s.includes('จุดเด่น') && !s.includes('ข้อสังเกต') && !s.includes('Pros') && !s.includes('Cons'));
+
+    if (Array.isArray(parsed)) {
+      // Even if it's an array, check if the first element is a long string with bullets
+      if (parsed.length === 1 && typeof parsed[0] === 'string' && (parsed[0].includes('•') || parsed[0].includes('\n'))) {
+        return parsed[0].split(/\n|•/).map(s => s.trim()).filter(s => s && s !== 'null' && !s.includes('จุดเด่น') && !s.includes('ข้อสังเกต') && !s.includes('Pros') && !s.includes('Cons'));
+      }
+      return (parsed as unknown[]).map(item => String(item)).filter(s => s && s !== 'null' && s.trim());
+    }
+
+    if (typeof parsed === 'string' && parsed.trim()) {
+      return parsed.split(/\n|•/).map(s => s.trim()).filter(s => s && s !== 'null' && !s.includes('จุดเด่น') && !s.includes('ข้อสังเกต') && !s.includes('Pros') && !s.includes('Cons'));
     }
     return [];
   };

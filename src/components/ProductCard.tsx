@@ -100,31 +100,35 @@ export function ProductCard({ name, brand, image, rating, price, badge, pros, co
 
         {/* Pros / Cons Compact */}
         <div className="grid grid-cols-1 gap-4 pt-1">
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-2 md:gap-4">
             <div className="space-y-2.5">
-              <p className="text-[10px] font-bold text-emerald-600/60 uppercase tracking-widest flex items-center gap-1.5">
-                <ThumbsUp className="h-3 w-3" /> {language === 'th' ? 'จุดเด่น' : 'PROS'}
+              <p className="text-[10px] font-bold text-emerald-600/60 uppercase tracking-widest flex items-center gap-1.5 whitespace-nowrap">
+                <ThumbsUp className="h-3 w-3" /> {t('common.pros')}
               </p>
               <div className="space-y-2">
-                {pros.slice(0, 2).map((p, idx) => (
+                {pros.length > 0 ? pros.slice(0, 2).map((p, idx) => (
                   <div key={idx} className="flex items-start gap-2 text-emerald-600">
                     <div className="h-1 w-1 rounded-full bg-emerald-500 mt-1.5 shrink-0" />
                     <span className="text-slate-600 text-[11px] md:text-xs line-clamp-2 leading-tight font-medium">{p}</span>
                   </div>
-                ))}
+                )) : (
+                  <span className="text-slate-300 text-[10px] italic">No data</span>
+                )}
               </div>
             </div>
-            <div className="space-y-2.5 border-l border-slate-100 pl-4">
-              <p className="text-[10px] font-bold text-rose-500/60 uppercase tracking-widest flex items-center gap-1.5">
-                <ThumbsDown className="h-3 w-3" /> {language === 'th' ? 'จุดด้อย' : 'CONS'}
+            <div className="space-y-2.5 border-l border-slate-100 pl-2 md:pl-4">
+              <p className="text-[10px] font-bold text-rose-500/60 uppercase tracking-widest flex items-center gap-1.5 whitespace-nowrap">
+                <ThumbsDown className="h-3 w-3" /> {t('common.cons')}
               </p>
               <div className="space-y-2">
-                {cons.slice(0, 2).map((c, idx) => (
+                {cons.length > 0 ? cons.slice(0, 2).map((c, idx) => (
                   <div key={idx} className="flex items-start gap-2 text-rose-500">
                     <div className="h-1 w-1 rounded-full bg-rose-400 mt-1.5 shrink-0" />
                     <span className="text-slate-600 text-[11px] md:text-xs line-clamp-2 leading-tight font-medium">{c}</span>
                   </div>
-                ))}
+                )) : (
+                  <span className="text-slate-300 text-[10px] italic">No data</span>
+                )}
               </div>
             </div>
           </div>
