@@ -139,16 +139,33 @@ export default function AdminReviewForm() {
           const loadedSpecs = Array.isArray(data.specs) ? (data.specs as unknown as SpecItem[]) : [];
           setSpecs(loadedSpecs.length > 0 ? loadedSpecs : [{ label: "", label_en: "", value: "", value_en: "", highlight: false }]);
 
-          const loadedPros = Array.isArray(data.pros) ? (data.pros as unknown as string[]) : [];
+          // Helper to split bulleted strings into clean arrays for the form
+          const splitBullets = (val: unknown): string[] => {
+            if (Array.isArray(val)) {
+              // If it's an array, check if it contains strings with bullets that need splitting
+              return val.flatMap(item => {
+                if (typeof item === 'string' && (item.includes('•') || item.includes('\n'))) {
+                  return item.split(/\n|•/).map(s => s.trim()).filter(Boolean);
+                }
+                return String(item);
+              }).filter(s => s && s !== 'null' && !s.includes('จุดเด่น') && !s.includes('ข้อสังเกต') && !s.includes('Pros') && !s.includes('Cons'));
+            }
+            if (typeof val === 'string' && val.trim()) {
+              return val.split(/\n|•/).map(s => s.trim()).filter(s => s && s !== 'null' && !s.includes('จุดเด่น') && !s.includes('ข้อสังเกต') && !s.includes('Pros') && !s.includes('Cons'));
+            }
+            return [];
+          };
+
+          const loadedPros = splitBullets(data.pros);
           setPros(loadedPros.length > 0 ? loadedPros : [""]);
 
-          const loadedProsEn = Array.isArray(d.pros_en) ? (d.pros_en as string[]) : [];
+          const loadedProsEn = splitBullets(d.pros_en);
           setProsEn(loadedProsEn.length > 0 ? loadedProsEn : [""]);
 
-          const loadedCons = Array.isArray(data.cons) ? (data.cons as unknown as string[]) : [];
+          const loadedCons = splitBullets(data.cons);
           setCons(loadedCons.length > 0 ? loadedCons : [""]);
 
-          const loadedConsEn = Array.isArray(d.cons_en) ? (d.cons_en as string[]) : [];
+          const loadedConsEn = splitBullets(d.cons_en);
           setConsEn(loadedConsEn.length > 0 ? loadedConsEn : [""]);
 
           setSections(Array.isArray(data.sections) ? (data.sections as unknown as ReviewSectionData[]) : []);
@@ -193,6 +210,16 @@ export default function AdminReviewForm() {
     setSaving(true);
     toast({ title: "กำลังบันทึกข้อมูล...", description: "กรุณารอสักครู่" });
 
+    // Helper to split any accidental single-string-with-bullets before saving
+    const sanitizeArray = (arr: string[]): string[] => {
+      return arr.flatMap(item => {
+        if (typeof item === 'string' && (item.includes('•') || item.includes('\n'))) {
+          return item.split(/\n|•/).map(s => s.trim()).filter(Boolean);
+        }
+        return item;
+      }).filter(p => typeof p === 'string' && p.trim() && !p.includes('จุดเด่น') && !p.includes('ข้อสังเกต') && !p.includes('Pros') && !p.includes('Cons'));
+    };
+
     try {
       // Construction of payload
       // We use Record<string, unknown> to satisfy lint, with casts for Supabase
@@ -223,10 +250,10 @@ export default function AdminReviewForm() {
         test_conditions_en: form.test_conditions_en || null,
         ratings: ratings.filter((r) => r.label?.trim()).map(r => ({ ...r, score: Math.round(Number(r.score) * 10) / 10 })),
         specs: specs.filter((s) => s.label?.trim()),
-        pros: pros.filter(p => typeof p === 'string' && p.trim()) || [],
-        pros_en: pros_en.filter(p => typeof p === 'string' && p.trim()) || [],
-        cons: cons.filter(c => typeof c === 'string' && c.trim()) || [],
-        cons_en: cons_en.filter(c => typeof c === 'string' && c.trim()) || [],
+        pros: sanitizeArray(pros),
+        pros_en: sanitizeArray(pros_en),
+        cons: sanitizeArray(cons),
+        cons_en: sanitizeArray(cons_en),
         sections: sections || [],
         images: images.filter(Boolean) || [],
       };

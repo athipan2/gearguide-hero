@@ -96,8 +96,23 @@ export function translateArray(data: Record<string, unknown>, field: string, lan
   // @ts-expect-error - dynamic field access
   const enVal = data[enField];
 
-  const thArray = Array.isArray(thVal) ? (thVal as unknown[]).map(item => String(item)).filter(s => s && s !== 'null' && s.trim()) : [];
-  const enArray = Array.isArray(enVal) ? (enVal as unknown[]).map(item => String(item)).filter(s => s && s !== 'null' && s.trim()) : [];
+  // Helper to split bulleted strings into arrays if they accidentally come in as a single string
+  const ensureArray = (val: unknown): string[] => {
+    if (Array.isArray(val)) {
+      // Even if it's an array, check if the first element is a long string with bullets
+      if (val.length === 1 && typeof val[0] === 'string' && (val[0].includes('•') || val[0].includes('\n'))) {
+        return val[0].split(/\n|•/).map(s => s.trim()).filter(s => s && s !== 'null' && !s.includes('จุดเด่น') && !s.includes('ข้อสังเกต') && !s.includes('Pros') && !s.includes('Cons'));
+      }
+      return (val as unknown[]).map(item => String(item)).filter(s => s && s !== 'null' && s.trim());
+    }
+    if (typeof val === 'string' && val.trim()) {
+      return val.split(/\n|•/).map(s => s.trim()).filter(s => s && s !== 'null' && !s.includes('จุดเด่น') && !s.includes('ข้อสังเกต') && !s.includes('Pros') && !s.includes('Cons'));
+    }
+    return [];
+  };
+
+  const thArray = ensureArray(thVal);
+  const enArray = ensureArray(enVal);
 
   // Explicit priority logic
   if (lang === 'en') {
