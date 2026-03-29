@@ -60,15 +60,22 @@ const fallbackData: Record<string, ReviewData> = {
     images: [],
     badge: "New Arrival", overall_rating: 4.5,
     ratings: [
-      { label: "Protection", score: 4.8 },
-      { label: "Traction", score: 4.7 },
-      { label: "Comfort", score: 4.4 },
-      { label: "Breathability", score: 3.8 }
+      { label: "การป้องกัน", label_en: "Protection", score: 4.8 },
+      { label: "การยึดเกาะ", label_en: "Traction", score: 4.7 },
+      { label: "ความสบาย", label_en: "Comfort", score: 4.4 },
+      { label: "การระบายอากาศ", label_en: "Breathability", score: 3.8 }
     ],
     specs: [
-      { label: "Weight", value: "366g", highlight: true },
-      { label: "Lugs", value: "4mm", highlight: true },
-      { label: "Material", value: "Cordura® Mesh / Sugarcane EVA" }
+      { label: "น้ำหนัก", label_en: "Weight", value: "366g", highlight: true },
+      { label: "ปุ่มยึดเกาะ", label_en: "Lugs", value: "4mm", highlight: true },
+      { label: "วัสดุ", label_en: "Material", value: "Cordura® Mesh / Sugarcane EVA" }
+    ],
+    pros: [
+      "การป้องกันที่เหนือกว่า: เลเยอร์ Cordura® Mesh ใหม่ช่วยป้องกันเศษหิน ทราย และกรวดได้อย่างมีประสิทธิภาพ ในขณะที่ยังระบายน้ำได้ดี",
+      "วัสดุเป็นมิตรต่อสิ่งแวดล้อม: ใช้พื้นชั้นกลาง Sugarcane EVA 30% และวัสดุรีไซเคิล 100% เป็นทางเลือกที่ยั่งยืน",
+      "การยึดเกาะที่ยอดเยี่ยม: ปุ่มรองเท้า 4 มม. แบบหลายทิศทางให้การยึดเกาะที่ดีเยี่ยมในทุกสภาพพื้นผิว",
+      "การปรับแต่งความกระชับ: มาพร้อมสายรัดส้นเท้าที่ปรับได้และระบบเชือกรูดที่รวดเร็ว",
+      "เคลือบกันละอองน้ำ: เคลือบสารกันน้ำแบบไร้ PFC ช่วยป้องกันไม่ให้วัสดุดูดซับน้ำ"
     ],
     pros_en: [
       "Enhanced Protection: The new Cordura® Mesh layer effectively keeps debris like rocks, sand, and gravel out of the shoe while maintaining water drainage.",
@@ -77,11 +84,17 @@ const fallbackData: Record<string, ReviewData> = {
       "Customizable Fit: Equipped with an adjustable heel strap and a quick-toggle lace system for a secure, personalized lockdown.",
       "Water Repellent: Treated with a PFC-free water repellency coating to prevent the materials from soaking up water during stream crossings."
     ],
+    cons: [
+      "น้ำหนัก: ที่ประมาณ 366 กรัม หนักกว่ารุ่นเดิมเล็กน้อยและหนักกว่ารองเท้าแซนดัลกีฬาทั่วไป",
+      "การระบายอากาศลดลง: การเพิ่ม Mesh เข้ามาช่วยป้องกันได้ดีขึ้น แต่ส่งผลให้การระบายอากาศโดยตรงลดลงเล็กน้อย",
+      "รูปทรงที่เทอะทะ: โครงสร้างที่แข็งแรงและพื้นรองเท้าที่หนาอาจรู้สึกเทอะทะสำหรับผู้ที่คุ้นเคยกับรองเท้าแซนดัลสายมินิมอล"
+    ],
     cons_en: [
       "Weight: At approximately 366g, it is slightly heavier than the original Hopara and significantly heavier than standard sports sandals.",
       "Reduced Airflow: The added mesh coverage provides better protection but results in slightly less direct ventilation compared to the more \"open\" design of the first version.",
       "Bulkier Profile: The robust construction and thick midsole might feel a bit bulky for those used to minimalist hiking sandals."
     ],
+    intro: "Hoka Hopara 2 เป็นการอัปเกรดครั้งสำคัญของรองเท้าแซนดัลเดินป่าอเนกประสงค์ โดยมีการเพิ่มแผ่นตาข่าย Cordura ใหม่เพื่อการปกป้องที่ดียิ่งขึ้นโดยไม่เสียประสิทธิภาพในการลุยน้ำ",
     intro_en: "The Hoka Hopara 2 is a major upgrade to the versatile hiking sandal, featuring a new Cordura mesh shroud for better protection without sacrificing water performance.",
     sections: [
       { type: 'hero' },
@@ -90,8 +103,10 @@ const fallbackData: Record<string, ReviewData> = {
       { type: 'specs' },
       { type: 'verdict' }
     ],
+    verdict: "รองเท้าแซนดัลเดินป่าที่ทนทานและให้การปกป้องสูง ซึ่งลบเส้นแบ่งระหว่างรองเท้ากับรองเท้าแซนดัล เหมาะอย่างยิ่งสำหรับการข้ามลำธารทางเทคนิคและเส้นทางที่มีหิน",
     verdict_en: "A rugged, high-protection hiking sandal that blurs the line between a shoe and a sandal, perfect for technical water crossings and rocky trails.",
     affiliate_url: "#",
+    cta_text: "ดูราคาล่าสุด",
     cta_text_en: "Check Price",
     slug: "hoka-hopara-2"
   },

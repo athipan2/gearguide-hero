@@ -62,6 +62,67 @@ export default function AdminReviewForm() {
   const [uploadingGallery, setUploadingGallery] = useState(false);
   const [dbError, setDbError] = useState<string | null>(null);
 
+  const quickFillHoka = () => {
+    updateField("name", "Hoka Hopara 2");
+    updateField("name_en", "Hoka Hopara 2");
+    updateField("brand", "Hoka");
+    updateField("brand_en", "Hoka");
+    updateField("category", "รองเท้าเดินป่า");
+    updateField("category_en", "Hiking Sandals");
+    updateField("price", "฿5,200");
+    updateField("overall_rating", 4.5);
+    updateField("intro", "Hoka Hopara 2 เป็นการอัปเกรดครั้งสำคัญของรองเท้าแซนดัลเดินป่าอเนกประสงค์ โดยมีการเพิ่มแผ่นตาข่าย Cordura ใหม่เพื่อการปกป้องที่ดียิ่งขึ้นโดยไม่เสียประสิทธิภาพในการลุยน้ำ");
+    updateField("intro_en", "The Hoka Hopara 2 is a major upgrade to the versatile hiking sandal, featuring a new Cordura mesh shroud for better protection without sacrificing water performance.");
+    updateField("verdict", "รองเท้าแซนดัลเดินป่าที่ทนทานและให้การปกป้องสูง ซึ่งลบเส้นแบ่งระหว่างรองเท้ากับรองเท้าแซนดัล เหมาะอย่างยิ่งสำหรับการข้ามลำธารทางเทคนิคและเส้นทางที่มีหิน");
+    updateField("verdict_en", "A rugged, high-protection hiking sandal that blurs the line between a shoe and a sandal, perfect for technical water crossings and rocky trails.");
+
+    setPros([
+      "การป้องกันที่เหนือกว่า: เลเยอร์ Cordura® Mesh ใหม่ช่วยป้องกันเศษหิน ทราย และกรวดได้อย่างมีประสิทธิภาพ ในขณะที่ยังระบายน้ำได้ดี",
+      "วัสดุเป็นมิตรต่อสิ่งแวดล้อม: ใช้พื้นชั้นกลาง Sugarcane EVA 30% และวัสดุรีไซเคิล 100% เป็นทางเลือกที่ยั่งยืน",
+      "การยึดเกาะที่ยอดเยี่ยม: ปุ่มรองเท้า 4 มม. แบบหลายทิศทางให้การยึดเกาะที่ดีเยี่ยมในทุกสภาพพื้นผิว",
+      "การปรับแต่งความกระชับ: มาพร้อมสายรัดส้นเท้าที่ปรับได้และระบบเชือกรูดที่รวดเร็ว",
+      "เคลือบกันละอองน้ำ: เคลือบสารกันน้ำแบบไร้ PFC ช่วยป้องกันไม่ให้วัสดุดูดซับน้ำ"
+    ]);
+
+    setProsEn([
+      "Enhanced Protection: The new Cordura® Mesh layer effectively keeps debris like rocks, sand, and gravel out of the shoe while maintaining water drainage.",
+      "Eco-Friendly Materials: Features a 30% Sugarcane EVA midsole and 100% recycled knit/mesh materials, making it a sustainable choice.",
+      "Superior Traction: The 4mm multidirectional lugs provide exceptional grip on diverse terrains, including wet rocks and muddy trails.",
+      "Customizable Fit: Equipped with an adjustable heel strap and a quick-toggle lace system for a secure, personalized lockdown.",
+      "Water Repellent: Treated with a PFC-free water repellency coating to prevent the materials from soaking up water during stream crossings."
+    ]);
+
+    setCons([
+      "น้ำหนัก: ที่ประมาณ 366 กรัม หนักกว่ารุ่นเดิมเล็กน้อยและหนักกว่ารองเท้าแซนดัลกีฬาทั่วไป",
+      "การระบายอากาศลดลง: การเพิ่ม Mesh เข้ามาช่วยป้องกันได้ดีขึ้น แต่ส่งผลให้การระบายอากาศโดยตรงลดลงเล็กน้อย",
+      "รูปทรงที่เทอะทะ: โครงสร้างที่แข็งแรงและพื้นรองเท้าที่หนาอาจรู้สึกเทอะทะสำหรับผู้ที่คุ้นเคยกับรองเท้าแซนดัลสายมินิมอล"
+    ]);
+
+    setConsEn([
+      "Weight: At approximately 366g, it is slightly heavier than the original Hopara and significantly heavier than standard sports sandals.",
+      "Reduced Airflow: The added mesh coverage provides better protection but results in slightly less direct ventilation compared to the more \"open\" design of the first version.",
+      "Bulkier Profile: The robust construction and thick midsole might feel a bit bulky for those used to minimalist hiking sandals."
+    ]);
+
+    setSpecs([
+      { label: "น้ำหนัก", label_en: "Weight", value: "366g", highlight: true },
+      { label: "ปุ่มยึดเกาะ", label_en: "Lugs", value: "4mm", highlight: true },
+      { label: "วัสดุ", label_en: "Material", value: "Cordura® Mesh / Sugarcane EVA", highlight: false }
+    ]);
+
+    setRatings([
+      { label: "การป้องกัน", label_en: "Protection", score: 4.8 },
+      { label: "การยึดเกาะ", label_en: "Traction", score: 4.7 },
+      { label: "ความสบาย", label_en: "Comfort", score: 4.4 },
+      { label: "การระบายอากาศ", label_en: "Breathability", score: 3.8 }
+    ]);
+
+    toast({
+      title: "Quick Fill Complete",
+      description: "Hoka Hopara 2 data has been pre-filled. You can now save the review.",
+    });
+  };
+
   useEffect(() => {
     // Reset state when switching between reviews or starting new
     setForm(defaultForm);
@@ -277,12 +338,13 @@ export default function AdminReviewForm() {
   };
 
   const generateSlug = (name: string) => {
+    // Basic slugification that handles both English and non-ASCII characters (Thai)
     return name
       .toLowerCase()
       .trim()
-      .replace(/[^\w\s-]/g, '')
-      .replace(/[\s_]+/g, '-')
-      .replace(/^-+|-+$/g, '');
+      .replace(/[\s_]+/g, '-')           // Replace spaces and underscores with -
+      .replace(/[^\w\u0E00-\u0E7F-]+/g, '') // Keep alphanumeric, Thai characters, and hyphens
+      .replace(/^-+|-+$/g, '');           // Remove leading/trailing hyphens
   };
 
   const updateField = (key: string, value: string | boolean | number | object | null) => {
@@ -294,6 +356,35 @@ export default function AdminReviewForm() {
       }
       return next;
     });
+  };
+
+  const handleSmartPaste = (e: React.ClipboardEvent, type: 'pros' | 'pros_en' | 'cons' | 'cons_en', index: number) => {
+    const text = e.clipboardData.getData('text');
+    if (!text) return;
+
+    // Detect if the text contains multiple lines or bullet points
+    const lines = text.split(/\n|•/).map(l => l.trim()).filter(Boolean);
+
+    if (lines.length > 1) {
+      e.preventDefault();
+
+      const setter = type === 'pros' ? setPros :
+                     type === 'pros_en' ? setProsEn :
+                     type === 'cons' ? setCons : setConsEn;
+
+      setter(prev => {
+        const next = [...prev];
+        // Replace current index with the first line, then insert subsequent lines after it
+        next[index] = lines[0];
+        next.splice(index + 1, 0, ...lines.slice(1));
+        return next;
+      });
+
+      toast({
+        title: "Smart Paste Active",
+        description: `Split pasted text into ${lines.length} items.`,
+      });
+    }
   };
 
   const handleCoverUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -403,6 +494,16 @@ export default function AdminReviewForm() {
         <h1 className="font-heading text-2xl font-bold text-foreground">
           {isEdit ? "แก้ไขรีวิว" : "เพิ่มรีวิวใหม่"}
         </h1>
+        {!isEdit && (
+          <Button
+            variant="outline"
+            size="sm"
+            className="ml-auto bg-primary/5 border-primary/20 text-primary hover:bg-primary/10"
+            onClick={quickFillHoka}
+          >
+            ใส่ข้อมูล Hoka Hopara 2 อัตโนมัติ
+          </Button>
+        )}
       </div>
 
       <div className="grid lg:grid-cols-3 gap-6">
@@ -756,7 +857,13 @@ export default function AdminReviewForm() {
                    <Label className="text-[10px] text-muted-foreground uppercase">Thai</Label>
                    {Array.isArray(pros) && pros.map((p, i) => (
                     <div key={i} className="flex gap-2">
-                      <Input value={p} onChange={(e) => { const n = [...pros]; n[i] = e.target.value; setPros(n); }} className="flex-1 h-8 text-sm" />
+                      <Input
+                        value={p}
+                        onChange={(e) => { const n = [...pros]; n[i] = e.target.value; setPros(n); }}
+                        onPaste={(e) => handleSmartPaste(e, 'pros', i)}
+                        className="flex-1 h-8 text-sm"
+                        placeholder="เพิ่มข้อดี..."
+                      />
                       <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setPros(pros.filter((_, j) => j !== i))}><X className="h-4 w-4" /></Button>
                     </div>
                   ))}
@@ -765,7 +872,13 @@ export default function AdminReviewForm() {
                    <Label className="text-[10px] text-muted-foreground uppercase">English</Label>
                    {Array.isArray(pros_en) && pros_en.map((p, i) => (
                     <div key={i} className="flex gap-2">
-                      <Input value={p} onChange={(e) => { const n = [...pros_en]; n[i] = e.target.value; setProsEn(n); }} className="flex-1 h-8 text-sm bg-slate-50/50" />
+                      <Input
+                        value={p}
+                        onChange={(e) => { const n = [...pros_en]; n[i] = e.target.value; setProsEn(n); }}
+                        onPaste={(e) => handleSmartPaste(e, 'pros_en', i)}
+                        className="flex-1 h-8 text-sm bg-slate-50/50"
+                        placeholder="Add pro..."
+                      />
                       <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setProsEn(pros_en.filter((_, j) => j !== i))}><X className="h-4 w-4" /></Button>
                     </div>
                   ))}
@@ -787,7 +900,13 @@ export default function AdminReviewForm() {
                    <Label className="text-[10px] text-muted-foreground uppercase">Thai</Label>
                    {Array.isArray(cons) && cons.map((c, i) => (
                     <div key={i} className="flex gap-2">
-                      <Input value={c} onChange={(e) => { const n = [...cons]; n[i] = e.target.value; setCons(n); }} className="flex-1 h-8 text-sm" />
+                      <Input
+                        value={c}
+                        onChange={(e) => { const n = [...cons]; n[i] = e.target.value; setCons(n); }}
+                        onPaste={(e) => handleSmartPaste(e, 'cons', i)}
+                        className="flex-1 h-8 text-sm"
+                        placeholder="เพิ่มข้อเสีย..."
+                      />
                       <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setCons(cons.filter((_, j) => j !== i))}><X className="h-4 w-4" /></Button>
                     </div>
                   ))}
@@ -796,7 +915,13 @@ export default function AdminReviewForm() {
                    <Label className="text-[10px] text-muted-foreground uppercase">English</Label>
                    {Array.isArray(cons_en) && cons_en.map((c, i) => (
                     <div key={i} className="flex gap-2">
-                      <Input value={c} onChange={(e) => { const n = [...cons_en]; n[i] = e.target.value; setConsEn(n); }} className="flex-1 h-8 text-sm bg-slate-50/50" />
+                      <Input
+                        value={c}
+                        onChange={(e) => { const n = [...cons_en]; n[i] = e.target.value; setConsEn(n); }}
+                        onPaste={(e) => handleSmartPaste(e, 'cons_en', i)}
+                        className="flex-1 h-8 text-sm bg-slate-50/50"
+                        placeholder="Add con..."
+                      />
                       <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setConsEn(cons_en.filter((_, j) => j !== i))}><X className="h-4 w-4" /></Button>
                     </div>
                   ))}
