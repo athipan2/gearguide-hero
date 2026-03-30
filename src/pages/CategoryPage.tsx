@@ -113,11 +113,27 @@ function FilterContent({
   );
 }
 
-const CATEGORY_META: Record<string, { label: string; description: string }> = {
-  "รองเท้าวิ่งถนน": { label: "รองเท้าวิ่งถนน", description: "รีวิวรองเท้าวิ่งถนนจากแบรนด์ชั้นนำ ทดสอบจริง" },
-  "อุปกรณ์วิ่งเทรล": { label: "อุปกรณ์วิ่งเทรล", description: "รีวิวอุปกรณ์วิ่งเทรล เดินป่า ทดสอบจริง" },
-  "camping-gear": { label: "Camping Gear", description: "รีวิวอุปกรณ์แคมป์ปิ้ง เต็นท์ ถุงนอน" },
-  "นาฬิกา-gps": { label: "นาฬิกา GPS", description: "รีวิวนาฬิกา GPS สำหรับวิ่งและกิจกรรมกลางแจ้ง" },
+const CATEGORY_META: Record<string, { label: string; description: string; translationKey?: string }> = {
+  "รองเท้าวิ่งถนน": {
+    label: "รองเท้าวิ่งถนน",
+    description: "รีวิวรองเท้าวิ่งถนนจากแบรนด์ชั้นนำ ทดสอบจริง",
+    translationKey: "category.road_running"
+  },
+  "อุปกรณ์วิ่งเทรล": {
+    label: "อุปกรณ์วิ่งเทรล",
+    description: "รีวิวอุปกรณ์วิ่งเทรล เดินป่า ทดสอบจริง",
+    translationKey: "category.trail_gear"
+  },
+  "camping-gear": {
+    label: "Camping Gear",
+    description: "รีวิวอุปกรณ์แคมป์ปิ้ง เต็นท์ ถุงนอน",
+    translationKey: "category.camping"
+  },
+  "นาฬิกา-gps": {
+    label: "นาฬิกา GPS",
+    description: "รีวิวนาฬิกา GPS สำหรับวิ่งและกิจกรรมกลางแจ้ง",
+    translationKey: "category.gps_watches"
+  },
 };
 
 type SortOption = "newest" | "rating-desc" | "price-asc" | "price-desc";
@@ -355,7 +371,11 @@ export default function CategoryPage() {
   }, [reviews, searchQuery, selectedBrands, priceRange, sortBy, minRating]);
 
   const meta = category ? CATEGORY_META[decodeURIComponent(category)] : null;
-  const pageTitle = meta ? (language === 'en' ? (t(`category.${category.toLowerCase().replace(/ /g, '_')}` as any) || meta.label) : meta.label) : t('category.all_products');
+  const pageTitle = meta
+    ? (language === 'en' && meta.translationKey
+      ? t(meta.translationKey as Parameters<typeof t>[0])
+      : meta.label)
+    : t('category.all_products');
   const pageDescription = meta ? (language === 'en' ? t('index.seo_description') : meta.description) : t('index.seo_description');
 
   return (

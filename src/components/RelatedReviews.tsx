@@ -139,14 +139,14 @@ export function RelatedReviews({ currentReview, isCompact }: RelatedReviewsProps
         {related.map((rev) => (
           <ProductCard
             key={rev.id}
-            name={translateData(rev as any, 'name', language)}
-            brand={translateData(rev as any, 'brand', language)}
+            name={translateData(rev as unknown as Record<string, unknown>, 'name', language)}
+            brand={translateData(rev as unknown as Record<string, unknown>, 'brand', language)}
             image={rev.image_url || ""}
             rating={Number(rev.overall_rating)}
             price={rev.price}
-            badge={translateData(rev as any, 'badge', language) || undefined}
-            pros={translateArray(rev as any, 'pros', language)}
-            cons={translateArray(rev as any, 'cons', language)}
+            badge={translateData(rev as unknown as Record<string, unknown>, 'badge', language) || undefined}
+            pros={translateArray(rev as unknown as Record<string, unknown>, 'pros', language)}
+            cons={translateArray(rev as unknown as Record<string, unknown>, 'cons', language)}
             specs={Array.isArray(rev.specs) ? (rev.specs as { label: string; value: string }[]) : []}
             ratings={Array.isArray(rev.ratings) ? (rev.ratings as { label: string; score: number }[]) : []}
             slug={rev.slug}

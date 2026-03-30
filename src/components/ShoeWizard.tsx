@@ -512,7 +512,7 @@ export function ShoeWizard({ onClose }: { onClose: () => void }) {
                       </div>
 
                       <div className="flex flex-wrap gap-2 mb-4">
-                        {translateArray(rec as any, 'pros', language).slice(0, 2).map(pro => (
+                        {translateArray(rec as unknown as Record<string, unknown>, 'pros', language).slice(0, 2).map(pro => (
                           <span key={pro} className="text-[10px] bg-green-500/10 text-green-600 px-2 py-1 rounded-full font-semibold">✓ {pro}</span>
                         ))}
                       </div>
