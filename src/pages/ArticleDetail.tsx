@@ -26,6 +26,7 @@ const fallbackArticles: Record<string, Article> = {
   "how-to-choose-running-shoes": {
     id: "1",
     title: "วิธีเลือกซื้อรองเท้าวิ่งปี 2026: คู่มือฉบับสมบูรณ์",
+    title_en: "How to Choose Running Shoes 2026: Complete Guide",
     content: `การเลือกซื้อรองเท้าวิ่งที่เหมาะกับเท้าและลักษณะการวิ่งของคุณจะช่วยลดอาการบาดเจ็บและเพิ่มประสิทธิภาพการวิ่งได้อย่างมาก
 
 1. ทราบประเภทของเท้า (Arch Type)
@@ -39,13 +40,28 @@ const fallbackArticles: Record<string, Article> = {
 
 4. เลือกระดับการรับแรงกระแทก (Cushioning)
 ตามระยะทางที่วิ่งและความชอบส่วนตัว`,
+    content_en: `Choosing the right running shoes for your feet and running style will significantly reduce injury risk and improve performance.
+
+1. Know your Arch Type
+Whether you have flat feet or a high arch, it affects shock absorption.
+
+2. Understand your Pronation
+Runners who overpronate may need stability shoes.
+
+3. Choose the right size
+Leave about 0.5 - 1 cm of space in the front, as feet expand during long runs.
+
+4. Select Cushioning level
+Based on your distance and personal preference.`,
     category: "ความรู้พื้นฐาน",
+    category_en: "Basics",
     image_url: "https://images.unsplash.com/photo-1476480862126-209bfaa8edc8?w=800&h=600&fit=crop",
     created_at: new Date().toISOString(),
   },
   "trail-running-for-beginners": {
     id: "2",
     title: "เริ่มวิ่งเทรลอย่างไรดี? 5 สิ่งที่มือใหม่ต้องรู้",
+    title_en: "How to start Trail Running? 5 things beginners must know",
     content: `จากถนนสู่ป่า การวิ่งเทรลมีความแตกต่างทั้งด้านอุปกรณ์และทักษะ นี่คือคู่มือเบื้องต้นสำหรับคนที่อยากลองสนามเทรลครั้งแรก
 
 1. รองเท้าเทรลเป็นหัวใจสำคัญ
@@ -59,7 +75,21 @@ const fallbackArticles: Record<string, Article> = {
 
 4. การเติมพลังงาน
 การวิ่งเทรลมักใช้เวลานานกว่าถนนในระยะทางที่เท่ากัน การวางแผนน้ำและพลังงานจึงสำคัญมาก`,
+    content_en: `Transitioning from road to trail requires different gear and skills. Here's a basic guide for trail beginners.
+
+1. Trail shoes are core
+The outsole must have good lugs for traction on dirt or rocks.
+
+2. Don't overlook safety
+Always carry basic gear like a whistle and emergency blanket when entering the woods.
+
+3. Running up and down hills
+Muscle usage techniques differ from flat road running. Use short steps.
+
+4. Nutrition and Hydration
+Trail running often takes longer than road running for the same distance. Planning is key.`,
     category: "วิ่งเทรล",
+    category_en: "Trail Running",
     image_url: "https://images.unsplash.com/photo-1551632811-561732d1e306?w=800&h=600&fit=crop",
     created_at: new Date().toISOString(),
   }
