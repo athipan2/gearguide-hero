@@ -2,21 +2,29 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { ProductCard } from "./ProductCard";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "@/hooks/useTranslation";
+import { translateData, translateArray } from "@/lib/translation-utils";
 
 interface RelatedReview {
   id: string;
   name: string;
+  name_en?: string;
   brand: string;
+  brand_en?: string;
   category: string;
+  category_en?: string;
   price: string;
   image_url: string | null;
   overall_rating: number;
   slug: string;
   pros: unknown;
+  pros_en?: unknown;
   cons: unknown;
+  cons_en?: unknown;
   specs: unknown;
   ratings: unknown;
   badge: string | null;
+  badge_en?: string | null;
   affiliate_url: string | null;
   created_at: string;
   score?: number;
@@ -43,6 +51,7 @@ const parsePrice = (priceStr: string): number => {
 export function RelatedReviews({ currentReview, isCompact }: RelatedReviewsProps) {
   const [related, setRelated] = useState<RelatedReview[]>([]);
   const [loading, setLoading] = useState(true);
+  const { t, language } = useTranslation();
 
   useEffect(() => {
     const fetchRelated = async () => {
@@ -117,10 +126,10 @@ export function RelatedReviews({ currentReview, isCompact }: RelatedReviewsProps
           isCompact ? "text-xl md:text-2xl" : "text-2xl md:text-4xl"
         )}>
           <span className={cn("bg-accent rounded-full", isCompact ? "h-6 md:h-8 w-1.5" : "h-8 md:h-10 w-1.5")} />
-          รีวิวที่เกี่ยวข้อง
+          {t('common.related_reviews')}
         </h2>
         <p className={cn("text-muted-foreground mt-2 font-medium", isCompact ? "text-xs md:text-base" : "text-sm md:text-lg")}>
-          สินค้าที่คุณอาจจะสนใจตามความใกล้เคียงของสเปคและราคา
+          {language === 'th' ? 'สินค้าที่คุณอาจจะสนใจตามความใกล้เคียงของสเปคและราคา' : 'Gear you might be interested in based on specs and price.'}
         </p>
       </div>
       <div className={cn(
@@ -130,14 +139,14 @@ export function RelatedReviews({ currentReview, isCompact }: RelatedReviewsProps
         {related.map((rev) => (
           <ProductCard
             key={rev.id}
-            name={rev.name}
-            brand={rev.brand}
+            name={translateData(rev as any, 'name', language)}
+            brand={translateData(rev as any, 'brand', language)}
             image={rev.image_url || ""}
             rating={Number(rev.overall_rating)}
             price={rev.price}
-            badge={rev.badge || undefined}
-            pros={Array.isArray(rev.pros) ? (rev.pros as string[]) : []}
-            cons={Array.isArray(rev.cons) ? (rev.cons as string[]) : []}
+            badge={translateData(rev as any, 'badge', language) || undefined}
+            pros={translateArray(rev as any, 'pros', language)}
+            cons={translateArray(rev as any, 'cons', language)}
             specs={Array.isArray(rev.specs) ? (rev.specs as { label: string; value: string }[]) : []}
             ratings={Array.isArray(rev.ratings) ? (rev.ratings as { label: string; score: number }[]) : []}
             slug={rev.slug}

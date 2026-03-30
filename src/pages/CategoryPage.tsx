@@ -59,7 +59,7 @@ function FilterContent({
             </Badge>
           ))}
           {allBrands.length === 0 && (
-            <p className="text-xs text-muted-foreground">ไม่มีแบรนด์</p>
+            <p className="text-xs text-muted-foreground">{t('common.no_results')}</p>
           )}
         </div>
       </div>
@@ -355,8 +355,8 @@ export default function CategoryPage() {
   }, [reviews, searchQuery, selectedBrands, priceRange, sortBy, minRating]);
 
   const meta = category ? CATEGORY_META[decodeURIComponent(category)] : null;
-  const pageTitle = meta?.label || "สินค้าทั้งหมด";
-  const pageDescription = meta?.description || "รีวิวสินค้าทั้งหมด ทดสอบจริง อัปเดตล่าสุด";
+  const pageTitle = meta ? (language === 'en' ? (t(`category.${category.toLowerCase().replace(/ /g, '_')}` as any) || meta.label) : meta.label) : t('category.all_products');
+  const pageDescription = meta ? (language === 'en' ? t('index.seo_description') : meta.description) : t('index.seo_description');
 
   return (
     <div className="min-h-screen bg-background">

@@ -7,12 +7,17 @@ import { supabase } from "@/integrations/supabase/client";
 import { CommentSection } from "@/components/CommentSection";
 import { Button } from "@/components/ui/button";
 import { Loader2, ArrowLeft, Calendar, User } from "lucide-react";
+import { useTranslation } from "@/hooks/useTranslation";
+import { translateData } from "@/lib/translation-utils";
 
 interface Article {
   id: string;
   title: string;
+  title_en?: string;
   category: string;
+  category_en?: string;
   content: string;
+  content_en?: string;
   image_url: string | null;
   created_at: string;
 }
@@ -64,13 +69,14 @@ export default function ArticleDetail() {
   const { slug } = useParams<{ slug: string }>();
   const [article, setArticle] = useState<Article | null>(null);
   const [loading, setLoading] = useState(true);
+  const { t, language } = useTranslation();
 
   useEffect(() => {
     const fetchArticle = async () => {
       setLoading(true);
       const { data, error } = await supabase
         .from("articles")
-        .select("id, title, category, content, image_url, created_at")
+        .select("id, title, title_en, category, category_en, content, content_en, image_url, created_at")
         .eq("slug", slug)
         .eq("published", true)
         .maybeSingle();
@@ -103,19 +109,23 @@ export default function ArticleDetail() {
       <div className="min-h-screen bg-background">
         <Navbar />
         <div className="container mx-auto px-4 py-20 text-center">
-          <h1 className="text-2xl font-semibold mb-4">ไม่พบบทความ</h1>
-          <Link to="/guides"><Button>กลับไปหน้าคู่มือ</Button></Link>
+          <h1 className="text-2xl font-semibold mb-4">{t('common.no_results')}</h1>
+          <Link to="/guides"><Button>{t('guides.back_home')}</Button></Link>
         </div>
         <Footer />
       </div>
     );
   }
 
+  const title = translateData(article, 'title', language);
+  const content = translateData(article, 'content', language);
+  const category = translateData(article, 'category', language);
+
   return (
     <div className="min-h-screen bg-background">
       <SEOHead
-        title={`${article.title} — GearTrail`}
-        description={article.title}
+        title={`${title} — GearTrail`}
+        description={title}
         image={article.image_url || undefined}
       />
       <Navbar />
@@ -123,26 +133,26 @@ export default function ArticleDetail() {
       <main className="container mx-auto px-4 py-8 max-w-4xl">
         <Link to="/guides" className="inline-flex items-center text-primary hover:text-accent mb-8 transition-colors">
           <ArrowLeft className="h-4 w-4 mr-2" />
-          กลับไปหน้าคู่มือ
+          {t('guides.back_home')}
         </Link>
 
         <header className="mb-12">
           <div className="flex items-center gap-2 mb-6">
             <span className="text-xs font-semibold text-accent uppercase tracking-[0.3em]">
-              {article.category}
+              {category}
             </span>
           </div>
           <h1 className="font-heading text-3xl md:text-6xl font-semibold text-primary mb-8 leading-[0.9] tracking-tighter uppercase">
-            {article.title}
+            {title}
           </h1>
           <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-8 text-[10px] sm:text-xs font-semibold uppercase tracking-widest text-muted-foreground border-t border-b border-primary/5 py-4">
             <div className="flex items-center gap-2">
               <User className="h-4 w-4 text-accent" />
-              <span>ทีมงาน GearTrail</span>
+              <span>{language === 'th' ? 'ทีมงาน GearTrail' : 'GearTrail Team'}</span>
             </div>
             <div className="flex items-center gap-2">
               <Calendar className="h-4 w-4 text-accent" />
-              <span>{new Date(article.created_at).toLocaleDateString('th-TH', {
+              <span>{new Date(article.created_at).toLocaleDateString(language === 'th' ? 'th-TH' : 'en-US', {
                 year: 'numeric',
                 month: 'long',
                 day: 'numeric'
@@ -155,7 +165,7 @@ export default function ArticleDetail() {
           <div className="rounded-2xl md:rounded-[2rem] overflow-hidden mb-8 md:mb-16 aspect-[16/9] md:aspect-[21/9] shadow-2xl relative">
             <img
               src={article.image_url}
-              alt={article.title}
+              alt={title}
               className="w-full h-full object-cover"
             />
             <div className="absolute inset-0 ring-1 ring-inset ring-black/10" />
@@ -163,7 +173,7 @@ export default function ArticleDetail() {
         )}
 
         <div className="prose prose-base md:prose-lg max-w-none prose-headings:font-heading prose-headings:font-semibold prose-p:text-muted-foreground prose-p:leading-relaxed whitespace-pre-wrap">
-          {article.content}
+          {content}
         </div>
 
         {/* Comments Section */}
