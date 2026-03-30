@@ -18,7 +18,9 @@ type Step = "category_select" | "entry" | "express_brand" | "express_details" | 
 interface Recommendation {
   id: string;
   name: string;
+  name_en?: string;
   brand: string;
+  brand_en?: string;
   image_url: string;
   rating: number;
   price: string;
@@ -26,7 +28,9 @@ interface Recommendation {
   weight?: string;
   drop?: string;
   pros?: string[];
+  pros_en?: string[];
   cons?: string[];
+  cons_en?: string[];
   ratings?: { label: string; score: number }[];
 }
 
@@ -87,15 +91,19 @@ export function ShoeWizard({ onClose }: { onClose: () => void }) {
         const results = data.map(item => ({
           id: item.id,
           name: item.name,
+          name_en: item.name_en,
           brand: item.brand,
+          brand_en: item.brand_en,
           image_url: item.image_url,
           rating: item.rating || 4.5,
           price: item.price,
           slug: item.slug,
-          weight: item.specs?.find((s: Spec) => s.label === "น้ำหนัก")?.value,
-          drop: item.specs?.find((s: Spec) => s.label === "Drop")?.value,
+          weight: item.specs?.find((s: Spec) => s.label === "น้ำหนัก" || s.label.toLowerCase() === "weight")?.value,
+          drop: item.specs?.find((s: Spec) => s.label.toLowerCase() === "drop")?.value,
           pros: item.pros,
+          pros_en: item.pros_en,
           cons: item.cons,
+          cons_en: item.cons_en,
           ratings: item.ratings
         }));
         setRecommendations(results);
@@ -499,12 +507,12 @@ export function ShoeWizard({ onClose }: { onClose: () => void }) {
 
                     <div className="flex-1 flex flex-col">
                       <div className="mb-2">
-                        <p className="text-[10px] font-semibold uppercase text-accent tracking-widest">{rec.brand}</p>
-                        <h4 className="text-xl font-semibold">{rec.name}</h4>
+                        <p className="text-[10px] font-semibold uppercase text-accent tracking-widest">{translateData(rec, 'brand', language)}</p>
+                        <h4 className="text-xl font-semibold">{translateData(rec, 'name', language)}</h4>
                       </div>
 
                       <div className="flex flex-wrap gap-2 mb-4">
-                        {rec.pros?.slice(0, 2).map(pro => (
+                        {translateArray(rec as unknown as Record<string, unknown>, 'pros', language).slice(0, 2).map(pro => (
                           <span key={pro} className="text-[10px] bg-green-500/10 text-green-600 px-2 py-1 rounded-full font-semibold">✓ {pro}</span>
                         ))}
                       </div>

@@ -7,6 +7,7 @@ import { Upload, Trash2, Copy, Search, Image as ImageIcon, Loader2 } from "lucid
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { getOptimizedImageUrl } from "@/lib/utils";
+import { useTranslation } from "@/hooks/useTranslation";
 
 interface MediaItem {
   id: string;
@@ -25,6 +26,7 @@ export default function AdminMedia() {
   const fileRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
   const { user } = useAuth();
+  const { t } = useTranslation();
 
   const fetchMedia = useCallback(async () => {
     try {
@@ -36,7 +38,7 @@ export default function AdminMedia() {
       if (error) {
         console.error("Fetch media error:", error);
         toast({
-          title: "ไม่สามารถโหลดข้อมูลสื่อได้",
+          title: t('common.loading') + " " + t('404.title'),
           description: error.message,
           variant: "destructive",
         });
@@ -46,7 +48,7 @@ export default function AdminMedia() {
     } catch (err) {
       console.error("Fetch media unexpected error:", err);
     }
-  }, [toast]);
+  }, [toast, t]);
 
   useEffect(() => { fetchMedia(); }, [fetchMedia]);
 
@@ -64,7 +66,7 @@ export default function AdminMedia() {
         .upload(path, file, { contentType: file.type });
 
       if (uploadError) {
-        toast({ title: `อัปโหลด ${file.name} ไม่สำเร็จ`, description: uploadError.message, variant: "destructive" });
+        toast({ title: `${t('admin.upload')} ${file.name} ${t('404.title')}`, description: uploadError.message, variant: "destructive" });
         continue;
       }
 
@@ -78,18 +80,18 @@ export default function AdminMedia() {
 
       if (insertError) {
         console.error("Insert error:", insertError);
-        toast({ title: `บันทึกข้อมูล ${file.name} ไม่สำเร็จ`, description: insertError.message, variant: "destructive" });
+        toast({ title: `${t('common.save')} ${file.name} ${t('404.title')}`, description: insertError.message, variant: "destructive" });
       }
     }
 
     setUploading(false);
     fetchMedia();
-    toast({ title: "อัปโหลดสำเร็จ" });
+    toast({ title: t('admin.upload') + " OK" });
     if (fileRef.current) fileRef.current.value = "";
   };
 
   const deleteMedia = async (item: MediaItem) => {
-    if (!confirm(`คุณแน่ใจหรือไม่ว่าต้องการลบ "${item.file_name}"?`)) return;
+    if (!confirm(`${t('common.delete')} "${item.file_name}"?`)) return;
 
     setDeletingId(item.id);
     try {
@@ -102,8 +104,8 @@ export default function AdminMedia() {
         console.error("Storage delete error:", storageError);
         // Show warning but continue to delete DB record
         toast({
-          title: "มีข้อผิดพลาดกับ Storage",
-          description: `ไม่สามารถลบไฟล์จากที่เก็บข้อมูลได้ แต่ระบบจะลองลบจากฐานข้อมูลต่อ (${storageError.message})`,
+          title: "Storage Error",
+          description: `Could not remove from storage but trying DB... (${storageError.message})`,
           variant: "destructive"
         });
       }
@@ -117,22 +119,22 @@ export default function AdminMedia() {
       if (dbError) {
         console.error("Database delete error:", dbError);
         toast({
-          title: "ลบไม่สำเร็จ",
-          description: `ไม่สามารถลบข้อมูลจากฐานข้อมูลได้: ${dbError.message}`,
+          title: t('common.delete') + " " + t('404.title'),
+          description: dbError.message,
           variant: "destructive"
         });
       } else {
         toast({
-          title: "ลบสำเร็จ",
-          description: `ลบไฟล์ ${item.file_name} เรียบร้อยแล้ว`,
+          title: t('common.delete') + " OK",
+          description: item.file_name,
         });
         await fetchMedia();
       }
     } catch (error) {
       console.error("Unexpected delete error:", error);
       toast({
-        title: "เกิดข้อผิดพลาดไม่คาดคิด",
-        description: error instanceof Error ? error.message : "ไม่สามารถลบไฟล์ได้",
+        title: t('404.title'),
+        description: error instanceof Error ? error.message : "Error",
         variant: "destructive"
       });
     } finally {
@@ -143,7 +145,7 @@ export default function AdminMedia() {
   const copyUrl = (path: string) => {
     const { data } = supabase.storage.from("review-media").getPublicUrl(path);
     navigator.clipboard.writeText(data.publicUrl);
-    toast({ title: "คัดลอก URL แล้ว" });
+    toast({ title: t('admin.copy_url') + " OK" });
   };
 
   const getPublicUrl = (path: string) => {
@@ -156,25 +158,25 @@ export default function AdminMedia() {
   return (
     <AdminLayout>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="font-heading text-2xl font-bold text-foreground">Media Library</h1>
+        <h1 className="font-heading text-2xl font-bold text-foreground">{t('admin.manage_media')}</h1>
         <div>
           <input ref={fileRef} type="file" multiple accept="image/*" onChange={handleUpload} className="hidden" />
           <Button onClick={() => fileRef.current?.click()} disabled={uploading}>
             <Upload className="mr-2 h-4 w-4" />
-            {uploading ? "กำลังอัปโหลด..." : "อัปโหลด"}
+            {uploading ? t('admin.uploading') : t('admin.upload')}
           </Button>
         </div>
       </div>
 
       <div className="relative mb-4">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-        <Input placeholder="ค้นหาไฟล์..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9" />
+        <Input placeholder={t('admin.search_files')} value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9" />
       </div>
 
       {filtered.length === 0 ? (
         <div className="text-center py-16 text-muted-foreground">
           <ImageIcon className="h-12 w-12 mx-auto mb-3 opacity-50" />
-          <p>ยังไม่มีไฟล์</p>
+          <p>{t('admin.no_files')}</p>
         </div>
       ) : (
         <div className="bg-card border rounded-xl overflow-hidden">
@@ -182,10 +184,10 @@ export default function AdminMedia() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b bg-muted/50">
-                  <th className="text-left px-4 py-3 font-medium text-muted-foreground w-16">ID</th>
-                  <th className="text-left px-4 py-3 font-medium text-muted-foreground w-24">รูปภาพ</th>
-                  <th className="text-left px-4 py-3 font-medium text-muted-foreground">คำอธิบาย</th>
-                  <th className="text-right px-4 py-3 font-medium text-muted-foreground w-32">จัดการ</th>
+                  <th className="text-left px-4 py-3 font-medium text-muted-foreground w-16">{t('admin.id')}</th>
+                  <th className="text-left px-4 py-3 font-medium text-muted-foreground w-24">{t('admin.preview')}</th>
+                  <th className="text-left px-4 py-3 font-medium text-muted-foreground">{t('admin.description')}</th>
+                  <th className="text-right px-4 py-3 font-medium text-muted-foreground w-32">{t('admin.actions')}</th>
                 </tr>
               </thead>
               <tbody>

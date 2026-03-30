@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Plus, Search, Pencil, Trash2, Eye, EyeOff } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useTranslation } from "@/hooks/useTranslation";
 
 interface ReviewRow {
   id: string;
@@ -25,6 +26,7 @@ export default function AdminReviews() {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { t } = useTranslation();
 
   const fetchReviews = async () => {
     setLoading(true);
@@ -41,21 +43,21 @@ export default function AdminReviews() {
   const togglePublish = async (id: string, published: boolean) => {
     const { error } = await supabase.from("reviews").update({ published: !published }).eq("id", id);
     if (error) {
-      toast({ title: "ดำเนินการไม่สำเร็จ", description: error.message, variant: "destructive" });
+      toast({ title: t('common.save') + " " + t('404.title'), description: error.message, variant: "destructive" });
     } else {
       fetchReviews();
-      toast({ title: !published ? "เผยแพร่แล้ว" : "ถอนเผยแพร่แล้ว" });
+      toast({ title: !published ? t('admin.published') : t('admin.drafts') });
     }
   };
 
   const deleteReview = async (id: string, name: string) => {
-    if (!confirm(`ลบรีวิว "${name}"?`)) return;
+    if (!confirm(`${t('common.delete')} "${name}"?`)) return;
     const { error } = await supabase.from("reviews").delete().eq("id", id);
     if (error) {
-      toast({ title: "ลบรีวิวไม่สำเร็จ", description: error.message, variant: "destructive" });
+      toast({ title: t('common.delete') + " " + t('404.title'), description: error.message, variant: "destructive" });
     } else {
       fetchReviews();
-      toast({ title: "ลบรีวิวแล้ว" });
+      toast({ title: t('common.delete') + " OK" });
     }
   };
 
@@ -66,16 +68,16 @@ export default function AdminReviews() {
   return (
     <AdminLayout>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="font-heading text-2xl font-bold text-foreground">จัดการรีวิว</h1>
+        <h1 className="font-heading text-2xl font-bold text-foreground">{t('admin.manage_reviews')}</h1>
         <Button onClick={() => navigate("/admin/reviews/new")}>
-          <Plus className="mr-2 h-4 w-4" /> เพิ่มรีวิว
+          <Plus className="mr-2 h-4 w-4" /> {t('admin.add_review')}
         </Button>
       </div>
 
       <div className="relative mb-4">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input
-          placeholder="ค้นหารีวิว..."
+          placeholder={t('admin.search_reviews')}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="pl-9"
@@ -87,12 +89,12 @@ export default function AdminReviews() {
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b bg-muted/50">
-                <th className="text-left px-4 py-3 font-medium text-muted-foreground">ชื่อสินค้า</th>
-                <th className="text-left px-4 py-3 font-medium text-muted-foreground hidden md:table-cell">แบรนด์</th>
-                <th className="text-left px-4 py-3 font-medium text-muted-foreground hidden md:table-cell">หมวดหมู่</th>
-                <th className="text-center px-4 py-3 font-medium text-muted-foreground">คะแนน</th>
-                <th className="text-center px-4 py-3 font-medium text-muted-foreground">สถานะ</th>
-                <th className="text-right px-4 py-3 font-medium text-muted-foreground">จัดการ</th>
+                <th className="text-left px-4 py-3 font-medium text-muted-foreground">{t('admin.product_name')}</th>
+                <th className="text-left px-4 py-3 font-medium text-muted-foreground hidden md:table-cell">{t('admin.brand')}</th>
+                <th className="text-left px-4 py-3 font-medium text-muted-foreground hidden md:table-cell">{t('admin.category')}</th>
+                <th className="text-center px-4 py-3 font-medium text-muted-foreground">{t('admin.score')}</th>
+                <th className="text-center px-4 py-3 font-medium text-muted-foreground">{t('admin.status')}</th>
+                <th className="text-right px-4 py-3 font-medium text-muted-foreground">{t('admin.actions')}</th>
               </tr>
             </thead>
             <tbody>
@@ -104,12 +106,12 @@ export default function AdminReviews() {
                   <td className="px-4 py-3 text-center text-foreground">{r.overall_rating}</td>
                   <td className="px-4 py-3 text-center">
                     <Badge variant={r.published ? "default" : "secondary"}>
-                      {r.published ? "เผยแพร่" : "แบบร่าง"}
+                      {r.published ? t('admin.published') : t('admin.drafts')}
                     </Badge>
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex items-center justify-end gap-1">
-                      <Button variant="ghost" size="icon" onClick={() => togglePublish(r.id, r.published)} title={r.published ? "ถอนเผยแพร่" : "เผยแพร่"}>
+                      <Button variant="ghost" size="icon" onClick={() => togglePublish(r.id, r.published)} title={r.published ? t('admin.drafts') : t('admin.published')}>
                         {r.published ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                       </Button>
                       <Button variant="ghost" size="icon" onClick={() => navigate(`/admin/reviews/${r.id}`)}>
@@ -123,7 +125,7 @@ export default function AdminReviews() {
                 </tr>
               ))}
               {filtered.length === 0 && (
-                <tr><td colSpan={6} className="text-center py-8 text-muted-foreground">{loading ? "กำลังโหลด..." : "ไม่พบรีวิว"}</td></tr>
+                <tr><td colSpan={6} className="text-center py-8 text-muted-foreground">{loading ? t('common.loading') : t('common.no_results')}</td></tr>
               )}
             </tbody>
           </table>

@@ -10,17 +10,22 @@ import {
   CommandList,
 } from "@/components/ui/command";
 import { supabase } from "@/integrations/supabase/client";
+import { useTranslation } from "@/hooks/useTranslation";
+import { translateData } from "@/lib/translation-utils";
 
 interface SearchResult {
   name: string;
+  name_en?: string;
   slug: string;
   category: string;
+  category_en?: string;
 }
 
 export function SearchDialog({ open, onOpenChange }: { open: boolean, onOpenChange: (open: boolean) => void }) {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<SearchResult[]>([]);
   const navigate = useNavigate();
+  const { t, language } = useTranslation();
 
   useEffect(() => {
     const fetchResults = async () => {
@@ -31,8 +36,8 @@ export function SearchDialog({ open, onOpenChange }: { open: boolean, onOpenChan
 
       const { data } = await supabase
         .from("reviews")
-        .select("name, slug, category")
-        .ilike("name", `%${query}%`)
+        .select("name, name_en, slug, category, category_en")
+        .or(`name.ilike.%${query}%,name_en.ilike.%${query}%`)
         .eq("published", true)
         .limit(5);
 
@@ -58,14 +63,14 @@ export function SearchDialog({ open, onOpenChange }: { open: boolean, onOpenChan
   return (
     <CommandDialog open={open} onOpenChange={onOpenChange}>
       <CommandInput
-        placeholder="ค้นหารีวิวสินค้า..."
+        placeholder={t('common.search_placeholder')}
         value={query}
         onValueChange={setQuery}
       />
       <CommandList>
-        <CommandEmpty>ไม่พบผลลัพธ์ที่ค้นหา</CommandEmpty>
+        <CommandEmpty>{t('common.no_results')}</CommandEmpty>
         {results.length > 0 && (
-          <CommandGroup heading="ผลการค้นหา">
+          <CommandGroup heading={t('nav.search')}>
             {results.map((res) => (
               <CommandItem
                 key={res.slug}
@@ -73,18 +78,18 @@ export function SearchDialog({ open, onOpenChange }: { open: boolean, onOpenChan
                 className="cursor-pointer"
               >
                 <div className="flex flex-col">
-                  <span className="font-medium">{res.name}</span>
-                  <span className="text-xs text-muted-foreground">{res.category}</span>
+                  <span className="font-medium">{translateData(res, 'name', language)}</span>
+                  <span className="text-xs text-muted-foreground">{translateData(res, 'category', language)}</span>
                 </div>
               </CommandItem>
             ))}
           </CommandGroup>
         )}
         {query.length > 0 && (
-          <CommandGroup heading="การทำงาน">
+          <CommandGroup heading={t('admin.actions')}>
             <CommandItem onSelect={handleSearchAll} className="cursor-pointer text-primary">
               <Search className="mr-2 h-4 w-4" />
-              ค้นหา "{query}" ในสินค้าทั้งหมด
+              {t('nav.search')} "{query}" {t('category.all_products')}
             </CommandItem>
           </CommandGroup>
         )}
