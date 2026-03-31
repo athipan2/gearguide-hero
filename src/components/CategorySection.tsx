@@ -24,7 +24,7 @@ export function CategorySection() {
               <span className="text-[10px] md:text-xs font-bold text-accent uppercase tracking-sporty">{t('footer.categories').toUpperCase()}</span>
             </div>
             <h2 className="font-heading text-2xl md:text-4xl font-semibold text-foreground uppercase tracking-tight-compact">
-              {language === 'th' ? 'ค้นหา' : 'EXPLORE'} <span className="text-primary/40">{language === 'th' ? 'อุปกรณ์' : 'GEAR'}</span>
+              {t('category.explore')} <span className="text-primary/40">{t('category.gear')}</span>
             </h2>
           </div>
           <p className="hidden md:block text-muted-foreground font-bold uppercase tracking-sporty text-[10px]">
