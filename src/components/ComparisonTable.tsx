@@ -125,13 +125,13 @@ export function ComparisonTable() {
             <Scale className="h-10 w-10" />
           </div>
           <div className="space-y-2">
-            <p className="text-2xl font-semibold text-primary/60 uppercase tracking-tight">{language === 'th' ? 'ยังไม่มีสินค้าที่เลือก' : 'No items selected'}</p>
+            <p className="text-2xl font-semibold text-primary/60 uppercase tracking-tight">{t('compare.no_items')}</p>
             <p className="text-muted-foreground max-w-xs mx-auto">
-              {language === 'th' ? 'กดปุ่ม "เทียบ" ที่หน้าสินค้าเพื่อเริ่มการเปรียบเทียบ (เลือกได้สูงสุด 2 รุ่น)' : 'Click "Compare" on a product to start (up to 2 models)'}
+              {t('compare.click_compare')}
             </p>
           </div>
           <Button variant="cta" className="rounded-full" asChild>
-            <Link to="/">{language === 'th' ? 'ไปเลือกสินค้า' : 'Go choose products'}</Link>
+            <Link to="/">{t('compare.go_choose')}</Link>
           </Button>
         </div>
       </div>
@@ -221,8 +221,8 @@ export function ComparisonTable() {
                 <Plus className="h-4 w-4 md:h-8 md:w-8" />
               </div>
               <div className="text-center">
-                <p className="font-semibold uppercase tracking-widest text-primary text-[9px] md:text-sm">{language === 'th' ? 'เพิ่มอีกรุ่น' : 'Add another'}</p>
-                <p className="text-[8px] md:text-xs text-muted-foreground mt-0.5 hidden md:block">{language === 'th' ? 'เพื่อเปรียบเทียบให้เห็นภาพ' : 'For visual comparison'}</p>
+                <p className="font-semibold uppercase tracking-widest text-primary text-[9px] md:text-sm">{t('compare.add_another')}</p>
+                <p className="text-[8px] md:text-xs text-muted-foreground mt-0.5 hidden md:block">{t('compare.for_visual')}</p>
               </div>
             </Link>
           )}
@@ -235,7 +235,7 @@ export function ComparisonTable() {
             <div className="flex items-center gap-2 md:gap-3 mb-6 md:mb-8">
               <div className="h-px flex-1 bg-primary/10" />
               <div className="flex items-center gap-1.5 md:gap-2 text-primary font-semibold uppercase tracking-[0.15em] md:tracking-[0.2em] text-[10px] md:text-xs">
-                <Award className="h-3.5 w-3.5 md:h-4 md:w-4" /> {language === 'th' ? 'คะแนนทดสอบ' : 'Test Scores'}
+                <Award className="h-3.5 w-3.5 md:h-4 md:w-4" /> {t('compare.test_scores')}
               </div>
               <div className="h-px flex-1 bg-primary/10" />
             </div>

@@ -9,12 +9,13 @@ import { ArrowLeft, Scale } from "lucide-react";
 
 const ComparePage = () => {
   const { selectedItems } = useComparisonStore();
+  const { t } = useTranslation();
 
   return (
     <div className="min-h-screen bg-background bg-noise">
       <SEOHead
-        title="เปรียบเทียบสเปคอุปกรณ์ — GearTrail"
-        description="เปรียบเทียบสเปคและราคารองเท้าวิ่ง อุปกรณ์เทรล และอุปกรณ์แคมป์ปิ้งแบบเจาะลึก"
+        title={t('compare.seo_title')}
+        description={t('compare.seo_description')}
         canonical="https://gearguide-hero.lovable.app/compare"
       />
       <Navbar />
@@ -22,7 +23,7 @@ const ComparePage = () => {
         <div className="container mx-auto px-4 mb-4 md:mb-8">
           <Link to="/" className="inline-flex items-center text-xs md:text-sm font-medium text-muted-foreground hover:text-primary transition-colors mb-4 md:mb-6">
             <ArrowLeft className="mr-2 h-4 w-4" />
-            กลับหน้าหลัก
+            {t('common.back')}
           </Link>
 
           <div className="flex flex-col gap-1 md:gap-2">
@@ -31,7 +32,7 @@ const ComparePage = () => {
               Comparison Center
             </div>
             <h1 className="font-heading text-3xl md:text-6xl font-semibold text-primary tracking-tighter uppercase leading-tight">
-              เปรียบเทียบสเปค
+              {t('compare.title')}
             </h1>
           </div>
         </div>

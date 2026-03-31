@@ -106,7 +106,7 @@ export default function ArticleDetail() {
       setLoading(true);
       const { data, error } = await supabase
         .from("articles")
-        .select("id, title, title_en, category, category_en, content, content_en, image_url, created_at")
+        .select("id, title, category, content, image_url, created_at")
         .eq("slug", slug)
         .eq("published", true)
         .maybeSingle();
@@ -178,7 +178,7 @@ export default function ArticleDetail() {
           <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-8 text-[10px] sm:text-xs font-semibold uppercase tracking-widest text-muted-foreground border-t border-b border-primary/5 py-4">
             <div className="flex items-center gap-2">
               <User className="h-4 w-4 text-accent" />
-              <span>{language === 'th' ? 'ทีมงาน GearTrail' : 'GearTrail Team'}</span>
+              <span>{t('guides.author')}</span>
             </div>
             <div className="flex items-center gap-2">
               <Calendar className="h-4 w-4 text-accent" />

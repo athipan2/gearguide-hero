@@ -9,6 +9,8 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
+import { DialogTitle } from "@/components/ui/dialog";
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { supabase } from "@/integrations/supabase/client";
 import { useTranslation } from "@/hooks/useTranslation";
 import { translateData } from "@/lib/translation-utils";
@@ -62,6 +64,9 @@ export function SearchDialog({ open, onOpenChange }: { open: boolean, onOpenChan
 
   return (
     <CommandDialog open={open} onOpenChange={onOpenChange}>
+      <VisuallyHidden>
+        <DialogTitle>{t('nav.search')}</DialogTitle>
+      </VisuallyHidden>
       <CommandInput
         placeholder={t('common.search_placeholder')}
         value={query}

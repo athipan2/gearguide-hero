@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { useTranslation } from "@/hooks/useTranslation";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { MessageSquare, Send, User, Star } from "lucide-react";
@@ -57,10 +58,12 @@ export function CommentSection({ reviewId, articleId, isCompact }: CommentSectio
     fetchComments();
   }, [fetchComments]);
 
+  const { t, language } = useTranslation();
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) {
-      toast.error("กรุณาเข้าสู่ระบบเพื่อแสดงความคิดเห็น");
+      toast.error(t('comments.login_required'));
       return;
     }
     if (!newComment.trim()) return;
@@ -69,18 +72,18 @@ export function CommentSection({ reviewId, articleId, isCompact }: CommentSectio
     const { error } = await supabase.from("comments").insert({
       content: newComment,
       user_id: user.id,
-      user_name: user.email?.split("@")[0] || "ผู้ใช้งาน",
+      user_name: user.email?.split("@")[0] || t('comments.default_user_name'),
       review_id: reviewId,
       article_id: articleId,
       rating: rating > 0 ? rating : null,
     });
 
     if (error) {
-      toast.error("เกิดข้อผิดพลาดในการส่งข้อความ");
+      toast.error(t('comments.error'));
     } else {
       setNewComment("");
       setRating(0);
-      toast.success("ส่งข้อความแล้ว");
+      toast.success(t('comments.success'));
       fetchComments();
     }
     setSubmitting(false);
@@ -97,10 +100,10 @@ export function CommentSection({ reviewId, articleId, isCompact }: CommentSectio
           isCompact ? "text-xl md:text-2xl" : "text-2xl md:text-4xl"
         )}>
           <span className={cn("bg-accent rounded-full", isCompact ? "h-6 md:h-8 w-1.5" : "h-8 md:h-10 w-1.5")} />
-          ถาม-ตอบ & ความคิดเห็น
+          {t('comments.title')}
         </h2>
         <p className={cn("text-muted-foreground mt-2 font-medium", isCompact ? "text-xs md:text-base" : "text-sm md:text-lg")}>
-          ร่วมพูดคุย สอบถาม หรือแชร์ประสบการณ์การใช้งานของคุณ
+          {t('comments.subtitle')}
         </p>
       </div>
 
@@ -110,12 +113,12 @@ export function CommentSection({ reviewId, articleId, isCompact }: CommentSectio
           "font-heading font-semibold mb-6 flex items-center gap-2 text-primary",
           isCompact ? "text-base md:text-lg" : "text-lg md:text-xl"
         )}>
-          {user ? `ร่วมแบ่งปันประสบการณ์ในฐานะ ${user.email?.split("@")[0]}` : "ร่วมพูดคุยกับเรา"}
+          {user ? t('comments.user_label', { name: user.email?.split("@")[0] }) : t('comments.guest_label')}
         </h3>
         <form onSubmit={handleSubmit} className="space-y-6">
           {reviewId && (
             <div className="flex flex-col gap-3 mb-4">
-              <span className="text-xs font-semibold uppercase tracking-widest text-muted-foreground/70">ให้คะแนนรองเท้าคู่นี้:</span>
+              <span className="text-xs font-semibold uppercase tracking-widest text-muted-foreground/70">{t('comments.rating_label')}</span>
               <div className="flex gap-2">
                 {[1, 2, 3, 4, 5].map((star) => (
                   <button
@@ -142,7 +145,7 @@ export function CommentSection({ reviewId, articleId, isCompact }: CommentSectio
             </div>
           )}
           <Textarea
-            placeholder={user ? "เขียนคำถามหรือความคิดเห็นของคุณที่นี่..." : "กรุณาเข้าสู่ระบบเพื่อร่วมแสดงความคิดเห็น"}
+            placeholder={user ? t('comments.placeholder_user') : t('comments.placeholder_guest')}
             value={newComment}
             onChange={(e) => setNewComment(e.target.value)}
             disabled={!user || submitting}
@@ -158,7 +161,7 @@ export function CommentSection({ reviewId, articleId, isCompact }: CommentSectio
               variant="cta"
               className="h-12 px-8 rounded-full font-semibold shadow-lg shadow-primary/10 transition-all hover:scale-105"
             >
-              {submitting ? "กำลังส่ง..." : "ส่งความเห็น"}
+              {submitting ? t('comments.submitting') : t('comments.submit')}
               <Send className="ml-2 h-4 w-4" />
             </Button>
           </div>
@@ -168,10 +171,10 @@ export function CommentSection({ reviewId, articleId, isCompact }: CommentSectio
       {/* List */}
       <div className="space-y-6">
         {loading ? (
-          <p className="text-center text-muted-foreground py-10">กำลังโหลดความเห็น...</p>
+          <p className="text-center text-muted-foreground py-10">{t('comments.loading')}</p>
         ) : comments.length === 0 ? (
           <div className="text-center py-10 bg-muted/20 rounded-xl">
-            <p className="text-muted-foreground">ยังไม่มีใครถามเลย เป็นคนแรกที่เริ่มการสนทนาสิ!</p>
+            <p className="text-muted-foreground">{t('comments.empty')}</p>
           </div>
         ) : (
           comments.map((comment) => (
@@ -190,7 +193,7 @@ export function CommentSection({ reviewId, articleId, isCompact }: CommentSectio
                     </div>
                   )}
                   <span className="text-xs text-muted-foreground">
-                    {new Date(comment.created_at).toLocaleDateString("th-TH", {
+                    {new Date(comment.created_at).toLocaleDateString(language === 'th' ? "th-TH" : "en-US", {
                       year: "numeric",
                       month: "short",
                       day: "numeric",

@@ -48,7 +48,7 @@ export function LatestGuides() {
     const fetchArticles = async () => {
       const { data } = await supabase
         .from("articles")
-        .select("id, slug, title, title_en, category, category_en, image_url, created_at")
+        .select("*")
         .eq("published", true)
         .order("created_at", { ascending: false })
         .limit(3);
@@ -70,7 +70,7 @@ export function LatestGuides() {
         <div className="space-y-1">
           <div className="flex items-center gap-2">
             <span className="w-8 h-1 bg-accent rounded-full" />
-            <span className="text-[10px] md:text-xs font-bold text-accent uppercase tracking-sporty">TIPS & GUIDES</span>
+            <span className="text-[10px] md:text-xs font-bold text-accent uppercase tracking-sporty">{t('guides.tips')}</span>
           </div>
           <h2 className="font-heading text-2xl md:text-3xl font-semibold text-foreground uppercase tracking-tight-compact">{t('guides.title')}</h2>
           <p className="text-xs md:text-sm text-muted-foreground mt-1 max-w-md">{t('guides.subtitle')}</p>
@@ -118,7 +118,7 @@ export function LatestGuides() {
 
       <div className="mt-8 md:hidden text-center">
         <Link to="/guides" className="inline-flex items-center text-sm font-medium text-primary">
-          {t('common.all')} {t('guides.title')} <ArrowRight className="ml-1 h-4 w-4" />
+          {t('common.all')} <ArrowRight className="ml-1 h-4 w-4" />
         </Link>
       </div>
     </section>

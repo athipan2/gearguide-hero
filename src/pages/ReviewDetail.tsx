@@ -233,7 +233,7 @@ export default function ReviewDetail() {
       <main className="max-w-[1400px] mx-auto">
         <div className="px-4 py-6 md:px-8">
            <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-slate-400 mb-8 overflow-x-auto whitespace-nowrap scrollbar-hide">
-            <Link to="/" className="hover:text-primary transition-colors shrink-0">HOME</Link>
+            <Link to="/" className="hover:text-primary transition-colors shrink-0">{t('common.home')}</Link>
             <ChevronRight className="h-3 w-3 shrink-0" />
             <Link to={`/category/${encodeURIComponent(review.category)}`} className="hover:text-primary transition-colors shrink-0">{translateData(review, 'category', language) || review.category}</Link>
             <ChevronRight className="h-3 w-3 shrink-0" />
@@ -255,7 +255,7 @@ export default function ReviewDetail() {
         {review.id && (
           <div className="mt-16 max-w-[800px] mx-auto px-4">
             <div className="bg-white border-t pt-12">
-              <h2 className="font-heading text-2xl font-bold mb-8">{language === 'th' ? 'ความเห็นจากผู้ใช้งาน' : 'User Reviews'}</h2>
+              <h2 className="font-heading text-2xl font-bold mb-8">{t('common.user_reviews')}</h2>
               <CommentSection reviewId={review.id} isCompact={true} />
             </div>
           </div>

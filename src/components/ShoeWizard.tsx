@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import { getOptimizedImageUrl } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "@/hooks/useTranslation";
+import { translateData, translateArray } from "@/lib/translation-utils";
 
 type Step = "category_select" | "entry" | "express_brand" | "express_details" | "consult_goal" | "consult_feeling" | "consult_foot" | "result";
 
@@ -65,113 +66,155 @@ export function ShoeWizard({ onClose }: { onClose: () => void }) {
 
   const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
 
+  const FALLBACK_DATA: Recommendation[] = [
+    {
+      id: "fallback-1",
+      name: "Nike Alphafly 3",
+      brand: "Nike",
+      image_url: "https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?w=800",
+      rating: 4.9,
+      price: "฿9,400",
+      slug: "nike-alphafly-3",
+      weight: "218g",
+      drop: "8mm",
+      pros: ["เด้งมาก", "เบาพิเศษ"],
+      cons: ["ราคาสูง", "ความทนทานจำกัด"]
+    },
+    {
+      id: "fallback-2",
+      name: "Hoka Speedgoat 5",
+      brand: "Hoka",
+      image_url: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=800",
+      rating: 4.8,
+      price: "฿5,600",
+      slug: "hoka-speedgoat-5",
+      weight: "291g",
+      drop: "4mm",
+      pros: ["ยึดเกาะดีเยี่ยม", "ซัพพอร์ตดี"],
+      cons: ["หน้ารัดเล็กน้อย"]
+    },
+    {
+      id: "fallback-3",
+      name: "Saucony Endorphin Speed 4",
+      brand: "Saucony",
+      image_url: "https://images.unsplash.com/photo-1539185441755-769473a23570?w=800",
+      rating: 4.7,
+      price: "฿6,900",
+      slug: "saucony-endorphin-speed-4",
+      weight: "233g",
+      drop: "8mm",
+      pros: ["เอนกประสงค์", "มั่นคง"],
+      cons: ["ไม่นุ่มเท่า Pro"]
+    }
+  ];
+
   const fetchRecommendations = async (overrideCriteria?: Criteria) => {
     setLoading(true);
     try {
-      let query = supabase.from("reviews").select("*");
+      const activeGoal = overrideCriteria?.goal || goal;
+      const activeFeeling = overrideCriteria?.feeling || feeling;
+      const activeFootType = overrideCriteria?.footType || footType;
 
-      const currentGoal = overrideCriteria?.goal || goal;
-      const currentFeeling = overrideCriteria?.feeling || feeling;
-      const currentFootType = overrideCriteria?.footType || footType;
+      // NOTE: Schema safe fetch - using select("*") to avoid 400 error on missing columns
+      // and filtering in memory for maximum resilience.
+      let query = supabase.from("reviews").select("*").eq("published", true);
 
-      if (step === "express_details") {
+      if (step === "express_details" && brandSearch) {
         query = query.ilike("name", `%${brandSearch}%`);
-      } else {
-        // Simple recommendation logic based on tags/columns
-        if (currentGoal) query = query.contains("suitable_for", [currentGoal]);
-        if (currentFeeling) query = query.eq("feeling", currentFeeling);
-        if (currentFootType) query = query.eq("foot_type", currentFootType);
       }
 
-      const { data, error } = await query.limit(3);
+      const { data, error } = await query.limit(20);
 
-      if (error) throw error;
-
-      if (data && data.length > 0) {
-        const results = data.map(item => ({
-          id: item.id,
-          name: item.name,
-          name_en: item.name_en,
-          brand: item.brand,
-          brand_en: item.brand_en,
-          image_url: item.image_url,
-          rating: item.rating || 4.5,
-          price: item.price,
-          slug: item.slug,
-          weight: item.specs?.find((s: Spec) => s.label === "น้ำหนัก" || s.label.toLowerCase() === "weight")?.value,
-          drop: item.specs?.find((s: Spec) => s.label.toLowerCase() === "drop")?.value,
-          pros: item.pros,
-          pros_en: item.pros_en,
-          cons: item.cons,
-          cons_en: item.cons_en,
-          ratings: item.ratings
-        }));
-        setRecommendations(results);
-
-        // Automatically add to comparison
-        results.forEach((rec, index) => {
-          useComparisonStore.getState().addItem({
-            name: rec.name,
-            brand: rec.brand,
-            image: rec.image_url,
-            rating: rec.rating,
-            price: rec.price,
-            slug: rec.slug,
-            badge: index === 0 ? "Top Pick" : undefined,
-            weight: rec.weight,
-            drop: rec.drop,
-            aspectRatings: rec.ratings
-          });
-        });
-      } else {
-        // Fallback mockup data if DB is empty
-        const fallback = [
-          {
-            id: "1",
-            name: "Nike Alphafly 3",
-            brand: "Nike",
-            image_url: "https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?w=800",
-            rating: 4.9,
-            price: "฿9,400",
-            slug: "nike-alphafly-3",
-            weight: "218g",
-            drop: "8mm",
-            pros: ["เด้งมาก", "เบาพิเศษ"],
-            cons: ["ราคาสูง", "ความทนทานจำกัด"]
-          },
-          {
-            id: "2",
-            name: "Hoka Speedgoat 5",
-            brand: "Hoka",
-            image_url: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=800",
-            rating: 4.8,
-            price: "฿5,600",
-            slug: "hoka-speedgoat-5",
-            weight: "291g",
-            drop: "4mm",
-            pros: ["ยึดเกาะดีเยี่ยม", "ซัพพอร์ตดี"],
-            cons: ["หน้ารัดเล็กน้อย"]
-          }
-        ].slice(0, 3);
-        setRecommendations(fallback);
-
-        fallback.forEach((rec, index) => {
-          useComparisonStore.getState().addItem({
-            name: rec.name,
-            brand: rec.brand,
-            image: rec.image_url,
-            rating: rec.rating,
-            price: rec.price,
-            slug: rec.slug,
-            badge: index === 0 ? "Top Pick" : undefined,
-            weight: rec.weight,
-            drop: rec.drop
-          });
-        });
+      if (error || !data || data.length === 0) {
+        console.error("Supabase query error or no data, using fallback data:", error);
+        throw new Error("Using fallback");
       }
+
+      // Memory filtering logic to restore functionality
+      let filtered = data.map(item => ({
+        id: item.id,
+        name: item.name,
+        name_en: item.name_en,
+        brand: item.brand,
+        brand_en: item.brand_en,
+        image_url: item.image_url,
+        rating: item.rating || 4.5,
+        price: item.price,
+        slug: item.slug,
+        weight: item.specs?.find((s: Spec) => s.label === "น้ำหนัก" || s.label.toLowerCase() === "weight")?.value,
+        drop: item.specs?.find((s: Spec) => s.label.toLowerCase() === "drop")?.value,
+        pros: item.pros,
+        pros_en: item.pros_en,
+        cons: item.cons,
+        cons_en: item.cons_en,
+        ratings: item.ratings,
+        // Helper fields for filtering if they exist in DB
+        category: item.category,
+        suitable_for: item.suitable_for || item.test_conditions?.terrain || "",
+        feeling_tag: item.feeling || ""
+      }));
+
+      // Apply Consultation Filters
+      if (activeGoal) {
+        filtered = filtered.filter(f =>
+          f.suitable_for?.toLowerCase().includes(activeGoal.toLowerCase()) ||
+          f.category?.toLowerCase().includes(activeGoal.toLowerCase()) ||
+          (activeGoal === 'trail' && f.category?.includes('เทรล'))
+        );
+      }
+
+      if (activeFeeling) {
+        filtered = filtered.filter(f =>
+          f.feeling_tag?.toLowerCase().includes(activeFeeling.toLowerCase()) ||
+          (activeFeeling === 'soft' && f.pros?.some((p: string) => p.includes('นุ่ม'))) ||
+          (activeFeeling === 'responsive' && f.pros?.some((p: string) => p.includes('เด้ง')))
+        );
+      }
+
+      // Final results - top 5
+      const finalResults = filtered.slice(0, 5);
+
+      if (finalResults.length === 0) throw new Error("No matches");
+
+      setRecommendations(finalResults);
+
+      // Automatically add to comparison
+      finalResults.forEach((rec, index) => {
+        useComparisonStore.getState().addItem({
+          name: rec.name,
+          brand: rec.brand,
+          image: rec.image_url,
+          rating: rec.rating,
+          price: rec.price,
+          slug: rec.slug,
+          badge: index === 0 ? "Top Pick" : undefined,
+          weight: rec.weight,
+          drop: rec.drop,
+          aspectRatings: rec.ratings
+        });
+      });
+
     } catch (err) {
-      console.error(err);
-      toast.error("ไม่สามารถดึงข้อมูลได้");
+      console.error("Fetch failed, reverting to fallback data", err);
+      setRecommendations(FALLBACK_DATA);
+
+      FALLBACK_DATA.forEach((rec, index) => {
+        useComparisonStore.getState().addItem({
+          name: rec.name,
+          brand: rec.brand,
+          image: rec.image_url,
+          rating: rec.rating,
+          price: rec.price,
+          slug: rec.slug,
+          badge: index === 0 ? "Top Pick" : undefined,
+          weight: rec.weight,
+          drop: rec.drop
+        });
+      });
+
+      if (err instanceof Error && err.message !== "Using fallback" && err.message !== "No matches") {
+        toast.error(t('wizard.error_fetch'));
+      }
     } finally {
       setLoading(false);
       setStep("result");
@@ -191,7 +234,7 @@ export function ShoeWizard({ onClose }: { onClose: () => void }) {
       drop: rec.drop,
       aspectRatings: rec.ratings
     });
-    toast.success(`เพิ่ม ${rec.name} ในตารางเปรียบเทียบแล้ว`);
+    toast.success(t('wizard.add_success', { name: rec.name }));
   };
 
   return (
@@ -215,7 +258,7 @@ export function ShoeWizard({ onClose }: { onClose: () => void }) {
               <div className="h-[2px] w-8 bg-accent"></div>
             </div>
             <h2 className="font-heading text-2xl md:text-4xl font-semibold uppercase tracking-tighter">
-              {step === 'result' ? t('wizard.picked_for_you') : (language === 'th' ? 'ค้นหาอุปกรณ์ที่ใช่สำหรับคุณ' : 'Find Your Perfect Gear')}
+              {step === 'result' ? t('wizard.picked_for_you') : t('wizard.find_perfect')}
             </h2>
           </div>
         </div>
@@ -302,11 +345,11 @@ export function ShoeWizard({ onClose }: { onClose: () => void }) {
                 <ChevronLeft className="h-4 w-4" /> {t('common.back')}
               </button>
               <div className="space-y-4">
-                <h3 className="text-2xl font-semibold">{language === 'th' ? 'ระบุแบรนด์หรือรุ่นที่คุณมองหา' : 'Search for a brand or model'}</h3>
+                <h3 className="text-2xl font-semibold">{t('wizard.search_brand')}</h3>
                 <div className="relative">
                   <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                   <Input
-                    placeholder={language === 'th' ? 'เช่น Nike Alphafly, Hoka Speedgoat...' : 'e.g. Nike Alphafly, Hoka Speedgoat...'}
+                    placeholder={t('wizard.placeholder_brand')}
                     className="pl-12 h-14 text-lg rounded-2xl"
                     value={brandSearch}
                     onChange={(e) => setBrandSearch(e.target.value)}
@@ -318,7 +361,7 @@ export function ShoeWizard({ onClose }: { onClose: () => void }) {
                 className="w-full h-14 rounded-2xl text-lg gap-2"
                 onClick={() => setStep("express_details")}
               >
-                {language === 'th' ? 'ต่อไป' : 'Next'} <ChevronRight className="h-5 w-5" />
+                {t('wizard.next')} <ChevronRight className="h-5 w-5" />
               </Button>
             </div>
           )}
@@ -329,23 +372,23 @@ export function ShoeWizard({ onClose }: { onClose: () => void }) {
               <button onClick={() => setStep("express_brand")} className="flex items-center gap-1 text-sm text-muted-foreground hover:text-primary">
                 <ChevronLeft className="h-4 w-4" /> {t('common.back')}
               </button>
-              <h3 className="text-2xl font-semibold">{language === 'th' ? 'รายละเอียดเพิ่มเติม' : 'Additional Details'}</h3>
+              <h3 className="text-2xl font-semibold">{t('wizard.more_details')}</h3>
 
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="text-sm font-semibold text-muted-foreground mb-2 block uppercase">{language === 'th' ? 'ไซส์ที่ต้องการ' : 'Preferred Size'}</label>
+                    <label className="text-sm font-semibold text-muted-foreground mb-2 block uppercase">{t('wizard.size')}</label>
                     <Input
-                      placeholder={language === 'th' ? 'เช่น 10 US / 44 EU' : 'e.g. 10 US / 44 EU'}
+                      placeholder={t('wizard.placeholder_size')}
                       value={size}
                       onChange={(e) => setSize(e.target.value)}
                       className="h-12 rounded-xl"
                     />
                   </div>
                   <div>
-                    <label className="text-sm font-semibold text-muted-foreground mb-2 block uppercase">{language === 'th' ? 'สีที่ชอบ' : 'Preferred Color'}</label>
+                    <label className="text-sm font-semibold text-muted-foreground mb-2 block uppercase">{t('wizard.color')}</label>
                     <Input
-                      placeholder={language === 'th' ? 'เช่น สีส้ม, ขาว' : 'e.g. Orange, White'}
+                      placeholder={t('wizard.placeholder_color')}
                       value={color}
                       onChange={(e) => setColor(e.target.value)}
                       className="h-12 rounded-xl"
@@ -354,19 +397,19 @@ export function ShoeWizard({ onClose }: { onClose: () => void }) {
                 </div>
 
                 <div>
-                  <label className="text-sm font-semibold text-muted-foreground mb-2 block uppercase">{language === 'th' ? 'ลักษณะการใช้งาน' : 'Usage Type'}</label>
+                  <label className="text-sm font-semibold text-muted-foreground mb-2 block uppercase">{t('wizard.usage')}</label>
                   <div className="grid grid-cols-2 gap-3">
                     <button
                       onClick={() => setUsage("train")}
                       className={`p-4 rounded-xl border-2 transition-all font-semibold ${usage === "train" ? "border-primary bg-primary/5 text-primary" : "border-muted text-muted-foreground hover:border-primary/20"}`}
                     >
-                      {language === 'th' ? 'ซ้อมทั่วไป' : 'Training'}
+                      {t('wizard.training')}
                     </button>
                     <button
                       onClick={() => setUsage("race")}
                       className={`p-4 rounded-xl border-2 transition-all font-semibold ${usage === "race" ? "border-primary bg-primary/5 text-primary" : "border-muted text-muted-foreground hover:border-primary/20"}`}
                     >
-                      {language === 'th' ? 'ใส่ลงแข่ง' : 'Racing'}
+                      {t('wizard.racing')}
                     </button>
                   </div>
                 </div>
@@ -377,7 +420,7 @@ export function ShoeWizard({ onClose }: { onClose: () => void }) {
                 onClick={() => fetchRecommendations({})}
                 loading={loading}
               >
-                {language === 'th' ? 'ดูผลลัพธ์' : 'View Results'}
+                {t('wizard.view_results')}
               </Button>
             </div>
           )}
@@ -388,14 +431,14 @@ export function ShoeWizard({ onClose }: { onClose: () => void }) {
               <button onClick={() => setStep("entry")} className="flex items-center gap-1 text-sm text-muted-foreground hover:text-primary">
                 <ChevronLeft className="h-4 w-4" /> {t('common.back')}
               </button>
-              <h3 className="text-2xl font-semibold text-center">{language === 'th' ? 'เป้าหมายหลักในการวิ่งคืออะไร?' : 'What is your primary running goal?'}</h3>
+              <h3 className="text-2xl font-semibold text-center">{t('wizard.goal_title')}</h3>
               <div className="grid grid-cols-1 gap-3">
                 {[
-                  { id: "health", label: language === 'th' ? "วิ่งเพื่อสุขภาพ / ลดน้ำหนัก" : "Health & Fitness", icon: <Sparkles className="h-5 w-5" /> },
-                  { id: "marathon", label: language === 'th' ? "วิ่งมาราธอน (Road Race)" : "Marathon / Road Race", icon: <Zap className="h-5 w-5" /> },
-                  { id: "road-long", label: language === 'th' ? "วิ่งระยะไกล (Long Run)" : "Long Distance / Road", icon: <Footprints className="h-5 w-5" /> },
-                  { id: "trail", label: language === 'th' ? "วิ่งเทล (Trail Running)" : "Trail Running", icon: <Target className="h-5 w-5" /> },
-                  { id: "ultra-trail", label: language === 'th' ? "วิ่งเทลระยะไกล (Ultra Trail)" : "Ultra Trail", icon: <Zap className="h-5 w-5" /> }
+                  { id: "health", label: t('wizard.goal_health'), icon: <Sparkles className="h-5 w-5" /> },
+                  { id: "marathon", label: t('wizard.goal_marathon'), icon: <Zap className="h-5 w-5" /> },
+                  { id: "road-long", label: t('wizard.goal_long'), icon: <Footprints className="h-5 w-5" /> },
+                  { id: "trail", label: t('wizard.goal_trail'), icon: <Target className="h-5 w-5" /> },
+                  { id: "ultra-trail", label: t('wizard.goal_ultra'), icon: <Zap className="h-5 w-5" /> }
                 ].map((item) => (
                   <button
                     key={item.id}
@@ -419,7 +462,7 @@ export function ShoeWizard({ onClose }: { onClose: () => void }) {
               <button onClick={() => setStep("consult_goal")} className="flex items-center gap-1 text-sm text-muted-foreground hover:text-primary">
                 <ChevronLeft className="h-4 w-4" /> {t('common.back')}
               </button>
-              <h3 className="text-2xl font-semibold text-center">{language === 'th' ? 'ชอบฟีลลิ่งรองเท้าแบบไหน?' : 'Preferred shoe feeling?'}</h3>
+              <h3 className="text-2xl font-semibold text-center">{t('wizard.feeling_title')}</h3>
               <div className="grid grid-cols-2 gap-4">
                 <button
                   onClick={() => { setFeeling("soft"); setStep("consult_foot"); }}
@@ -428,8 +471,8 @@ export function ShoeWizard({ onClose }: { onClose: () => void }) {
                   <div className="h-16 w-16 mx-auto rounded-full bg-primary/10 flex items-center justify-center">
                     <span className="text-3xl">☁️</span>
                   </div>
-                  <h4 className="font-semibold text-xl">{language === 'th' ? 'นุ่มซัพพอร์ต' : 'Cushioned & Soft'}</h4>
-                  <p className="text-xs text-muted-foreground">{language === 'th' ? 'ปกป้องเท้า ถนอมเข่า' : 'Maximum protection'}</p>
+                  <h4 className="font-semibold text-xl">{t('wizard.feeling_soft')}</h4>
+                  <p className="text-xs text-muted-foreground">{t('wizard.feeling_soft_desc')}</p>
                 </button>
                 <button
                   onClick={() => { setFeeling("responsive"); setStep("consult_foot"); }}
@@ -438,8 +481,8 @@ export function ShoeWizard({ onClose }: { onClose: () => void }) {
                   <div className="h-16 w-16 mx-auto rounded-full bg-accent/10 flex items-center justify-center">
                     <span className="text-3xl">⚡</span>
                   </div>
-                  <h4 className="font-semibold text-xl">{language === 'th' ? 'เบาเด้งทำเวลา' : 'Light & Responsive'}</h4>
-                  <p className="text-xs text-muted-foreground">{language === 'th' ? 'เน้นความเร็ว ตอบสนองดี' : 'Built for speed'}</p>
+                  <h4 className="font-semibold text-xl">{t('wizard.feeling_responsive')}</h4>
+                  <p className="text-xs text-muted-foreground">{t('wizard.feeling_responsive_desc')}</p>
                 </button>
               </div>
             </div>
@@ -451,7 +494,7 @@ export function ShoeWizard({ onClose }: { onClose: () => void }) {
               <button onClick={() => setStep("consult_feeling")} className="flex items-center gap-1 text-sm text-muted-foreground hover:text-primary">
                 <ChevronLeft className="h-4 w-4" /> {t('common.back')}
               </button>
-              <h3 className="text-2xl font-semibold text-center">{language === 'th' ? 'สรีระเท้าของคุณเป็นอย่างไร?' : 'What is your foot type?'}</h3>
+              <h3 className="text-2xl font-semibold text-center">{t('wizard.foot_title')}</h3>
               <div className="grid grid-cols-2 gap-4">
                 <button
                   onClick={() => {
@@ -463,7 +506,7 @@ export function ShoeWizard({ onClose }: { onClose: () => void }) {
                   <div className="h-16 w-16 mx-auto border-2 border-dashed border-primary/20 rounded-full flex items-center justify-center overflow-hidden p-2">
                     <img src="https://images.unsplash.com/photo-1560769629-975ec94e6a86?w=100" className="opacity-40 grayscale" alt="Normal Foot" />
                   </div>
-                  <h4 className="font-semibold text-xl">{language === 'th' ? 'อุ้งเท้าปกติ' : 'Normal Arch'}</h4>
+                  <h4 className="font-semibold text-xl">{t('wizard.foot_normal')}</h4>
                 </button>
                 <button
                   onClick={() => {
@@ -475,7 +518,7 @@ export function ShoeWizard({ onClose }: { onClose: () => void }) {
                   <div className="h-16 w-16 mx-auto border-2 border-dashed border-primary/20 rounded-full flex items-center justify-center overflow-hidden p-2">
                      <img src="https://images.unsplash.com/photo-1560769629-975ec94e6a86?w=100" className="opacity-40 grayscale scale-x-125" alt="Flat Foot" />
                   </div>
-                  <h4 className="font-semibold text-xl">{language === 'th' ? 'เท้าแบน' : 'Flat Foot'}</h4>
+                  <h4 className="font-semibold text-xl">{t('wizard.foot_flat')}</h4>
                 </button>
               </div>
             </div>
@@ -551,8 +594,8 @@ export function ShoeWizard({ onClose }: { onClose: () => void }) {
                     <Scale className="h-6 w-6 text-primary" />
                   </div>
                   <div>
-                    <h5 className="font-semibold">{language === 'th' ? 'ต้องการเทียบจุดต่าง?' : 'Want to compare?'}</h5>
-                    <p className="text-xs text-muted-foreground">{language === 'th' ? 'เรานำรุ่นที่แนะนำใส่ในตารางเปรียบเทียบให้แล้ว' : "We've added these to the comparison table for you."}</p>
+                    <h5 className="font-semibold">{t('wizard.want_compare')}</h5>
+                    <p className="text-xs text-muted-foreground">{t('wizard.compare_desc')}</p>
                   </div>
                 </div>
                 <Button

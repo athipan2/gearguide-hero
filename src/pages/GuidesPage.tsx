@@ -58,7 +58,7 @@ export default function GuidesPage() {
     const fetchArticles = async () => {
       const { data, error } = await supabase
         .from("articles")
-        .select("id, slug, title, title_en, category, category_en, excerpt, excerpt_en, image_url, created_at")
+        .select("id, slug, title, category, excerpt, image_url, created_at")
         .eq("published", true)
         .order("created_at", { ascending: false });
 

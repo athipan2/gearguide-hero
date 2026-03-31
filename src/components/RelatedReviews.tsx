@@ -129,7 +129,7 @@ export function RelatedReviews({ currentReview, isCompact }: RelatedReviewsProps
           {t('common.related_reviews')}
         </h2>
         <p className={cn("text-muted-foreground mt-2 font-medium", isCompact ? "text-xs md:text-base" : "text-sm md:text-lg")}>
-          {language === 'th' ? 'สินค้าที่คุณอาจจะสนใจตามความใกล้เคียงของสเปคและราคา' : 'Gear you might be interested in based on specs and price.'}
+          {t('related.subtitle')}
         </p>
       </div>
       <div className={cn(
