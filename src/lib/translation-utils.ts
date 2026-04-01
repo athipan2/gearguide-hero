@@ -12,6 +12,13 @@ export const technicalTerms: Record<string, string> = {
   'ความสูงส้น': 'Stack Height',
   'พื้นผิว': 'Surface',
   'เส้นทาง': 'Terrain',
+  'การคืนตัว': 'Energy Return',
+  'ความทนทาน': 'Durability',
+  'ความสบาย': 'Comfort',
+  'การระบายอากาศ': 'Breathability',
+  'การยึดเกาะ': 'Traction',
+  'ความมั่นคง': 'Stability',
+  'การตอบสนอง': 'Responsiveness',
 
   // Values
   'ถนน': 'Road',
