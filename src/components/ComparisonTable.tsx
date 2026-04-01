@@ -23,10 +23,12 @@ const getSpecIcon = (label: string) => {
 
 const getRatingIcon = (label: string) => {
   const l = label.toLowerCase();
-  if (l.includes('คืนตัว') || l.includes('energy') || l.includes('bounce')) return <Zap className="h-4 w-4" />;
+  if (l.includes('คืนตัว') || l.includes('energy') || l.includes('bounce') || l.includes('responsiveness')) return <Zap className="h-4 w-4" />;
   if (l.includes('ทนทาน') || l.includes('durability')) return <Shield className="h-4 w-4" />;
-  if (l.includes('สบาย') || l.includes('comfort')) return <Heart className="h-4 w-4" />;
+  if (l.includes('สบาย') || l.includes('comfort') || l.includes('cushioning') || l.includes('นุ่ม')) return <Heart className="h-4 w-4" />;
   if (l.includes('เบา') || l.includes('lightweight')) return <Weight className="h-4 w-4" />;
+  if (l.includes('มั่นคง') || l.includes('stability')) return <Shield className="h-4 w-4" />;
+  if (l.includes('เกาะ') || l.includes('traction') || l.includes('grip')) return <Shield className="h-4 w-4" />;
   return <Star className="h-4 w-4" />;
 };
 

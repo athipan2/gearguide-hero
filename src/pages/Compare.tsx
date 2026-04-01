@@ -3,6 +3,7 @@ import { Footer } from "@/components/Footer";
 import { ComparisonTable } from "@/components/ComparisonTable";
 import { SEOHead } from "@/components/SEOHead";
 import { useComparisonStore } from "@/lib/comparison-store";
+import { useTranslation } from "@/hooks/useTranslation";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { ArrowLeft, Scale } from "lucide-react";
