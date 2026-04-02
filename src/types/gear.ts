@@ -5,7 +5,7 @@ export interface BaseGear {
   name: string;
   brand: string;
   category: Category;
-  price: string;
+  price: number;
   overall_rating: number;
   image_url: string | null;
   slug: string;
@@ -17,6 +17,7 @@ export interface ShoeSpecs {
   stackHeightMm?: number;
   cushioning: 'Soft' | 'Firm' | 'Responsive' | 'Max';
   bestFor: string[];
+  energyReturn?: number; // 0-100
 }
 
 export interface WatchSpecs {
@@ -25,6 +26,7 @@ export interface WatchSpecs {
   hasMaps: boolean;
   waterResistance: string;
   weightG: number;
+  hrAccuracy?: number; // 0-100
 }
 
 export type RunningShoe = BaseGear & {
