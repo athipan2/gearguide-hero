@@ -144,6 +144,11 @@ const CATEGORY_META: Record<string, { label: string; description: string; transl
     description: "รีวิวอุปกรณ์วิ่งเทรล เดินป่า ทดสอบจริง",
     translationKey: "category.trail_gear"
   },
+  "gps-watches": {
+    label: "นาฬิกา GPS",
+    description: "รีวิวนาฬิกา GPS สำหรับวิ่งและกิจกรรมกลางแจ้ง",
+    translationKey: "category.gps_watches"
+  },
 };
 
 type SortOption = "newest" | "rating-desc" | "price-asc" | "price-desc";
@@ -256,6 +261,7 @@ export default function CategoryPage() {
         let dbCategory = decodeURIComponent(category);
         if (category === 'running-shoes') dbCategory = 'รองเท้าวิ่งถนน';
         if (category === 'trail-gear') dbCategory = 'อุปกรณ์วิ่งเทรล';
+        if (category === 'gps-watches') dbCategory = 'นาฬิกา-gps';
 
         query = query.eq("category", dbCategory);
       }
@@ -286,6 +292,7 @@ export default function CategoryPage() {
         let dbCategory = decodeURIComponent(category);
         if (category === 'running-shoes') dbCategory = 'รองเท้าวิ่งถนน';
         if (category === 'trail-gear') dbCategory = 'อุปกรณ์วิ่งเทรล';
+        if (category === 'gps-watches') dbCategory = 'นาฬิกา-gps';
 
         items = items.length > 0 ? items : fallbackReviews.filter(r => r.category === dbCategory);
       }

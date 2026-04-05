@@ -22,7 +22,7 @@ export function Footer() {
               <li><Link to="/category/running-shoes" className="hover:text-primary-foreground transition-colors">{t('nav.running_shoes')}</Link></li>
               <li><Link to="/category/trail-gear" className="hover:text-primary-foreground transition-colors">{t('nav.trail_gear')}</Link></li>
               <li><Link to="/category/camping-gear" className="hover:text-primary-foreground transition-colors">{t('nav.camping')}</Link></li>
-              <li><Link to={`/category/${encodeURIComponent('นาฬิกา-gps')}`} className="hover:text-primary-foreground transition-colors">{t('category.gps_watches')}</Link></li>
+              <li><Link to="/category/gps-watches" className="hover:text-primary-foreground transition-colors">{t('category.gps_watches')}</Link></li>
             </ul>
           </div>
           <div>

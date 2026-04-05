@@ -28,8 +28,17 @@ class ErrorBoundary extends Component<Props, State> {
   public render() {
     if (this.state.hasError) {
       // Manual translation since we can't use hooks in Class Components
-      const stored = localStorage.getItem("language-storage");
-      const lang: Language = stored ? (JSON.parse(stored).state?.language || 'th') : 'th';
+      let lang: Language = 'th';
+      try {
+        const stored = localStorage.getItem("language-storage");
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          lang = parsed?.state?.language || 'th';
+        }
+      } catch (e) {
+        console.error("Failed to parse language from localStorage", e);
+      }
+
       const t = (key: string) => {
         const parts = key.split('.');
         let result: unknown = translations[lang];

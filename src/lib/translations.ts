@@ -208,6 +208,9 @@ export const translations = {
     'category.trail_gear': 'อุปกรณ์วิ่งเทรล',
     'category.camping': 'Camping Gear',
     'category.gps_watches': 'นาฬิกา GPS',
+    'category.top_pick': 'แนะนำที่สุด',
+    'category.add_to_compare': 'เพิ่มในตารางเปรียบเทียบ',
+    'category.comparison_mode': 'โหมดเปรียบเทียบ',
 
     // Compare
     'compare.seo_title': 'เปรียบเทียบสเปคอุปกรณ์ — GearTrail',
@@ -468,6 +471,9 @@ export const translations = {
     'category.trail_gear': 'Trail Gear',
     'category.camping': 'Camping Gear',
     'category.gps_watches': 'GPS Watches',
+    'category.top_pick': 'Top Pick',
+    'category.add_to_compare': 'Add to Comparison',
+    'category.comparison_mode': 'Comparison Mode',
 
     // Compare
     'compare.seo_title': 'Compare Gear Specs — GearTrail',
