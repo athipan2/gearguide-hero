@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Mountain, LogIn, Mail, ArrowLeft } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { ToastAction } from "@/components/ui/toast";
+import { useTranslation } from "@/hooks/useTranslation";
 
 export default function AdminLogin() {
   const [email, setEmail] = useState("");
@@ -15,6 +16,7 @@ export default function AdminLogin() {
   const { signIn, resendConfirmation } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { t } = useTranslation();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,8 +27,8 @@ export default function AdminLogin() {
 
     if (!supabaseUrl || !supabaseKey || supabaseUrl.includes("placeholder")) {
       toast({
-        title: "การตั้งค่าไม่สมบูรณ์",
-        description: "ไม่พบการตั้งค่า Supabase กรุณาตรวจสอบ Environment Variables (VITE_SUPABASE_URL และ VITE_SUPABASE_PUBLISHABLE_KEY)",
+        title: t('admin.config_incomplete'),
+        description: t('admin.supabase_not_found'),
         variant: "destructive",
       });
       return;
@@ -40,8 +42,8 @@ export default function AdminLogin() {
 
         if (error.message === "Email not confirmed") {
           toast({
-            title: "อีเมลยังไม่ได้รับการยืนยัน",
-            description: "กรุณาตรวจสอบอีเมลของคุณเพื่อยืนยันการใช้งาน",
+            title: t('admin.email_unconfirmed'),
+            description: t('admin.email_unconfirmed_desc'),
             variant: "default",
             action: (
               <ToastAction
@@ -50,28 +52,28 @@ export default function AdminLogin() {
                   const { error: resendError } = await resendConfirmation(email);
                   if (resendError) {
                     toast({
-                      title: "เกิดข้อผิดพลาด",
-                      description: "ไม่สามารถส่งอีเมลยืนยันได้อีกครั้ง",
+                      title: "Error",
+                      description: t('admin.resend_error'),
                       variant: "destructive"
                     });
                   } else {
                     toast({
-                      title: "ส่งอีเมลยืนยันแล้ว",
-                      description: "กรุณาตรวจสอบกล่องจดหมายของคุณ",
+                      title: t('admin.resend_success'),
+                      description: t('admin.resend_success_desc'),
                     });
                   }
                 }}
               >
                 <Mail className="mr-2 h-4 w-4" />
-                ส่งอีกครั้ง
+                {t('admin.resend_confirmation')}
               </ToastAction>
             )
           });
         } else {
           toast({
-            title: "เข้าสู่ระบบไม่สำเร็จ",
+            title: t('admin.login_failed'),
             description: error.message === "Load failed"
-              ? "ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้ (Load failed) กรุณาตรวจสอบอินเทอร์เน็ตหรือการตั้งค่า Supabase"
+              ? t('admin.login_error_connection')
               : error.message,
             variant: "destructive"
           });
@@ -82,8 +84,8 @@ export default function AdminLogin() {
     } catch (err) {
       console.error("Unexpected login error:", err);
       toast({
-        title: "เกิดข้อผิดพลาดไม่คาดคิด",
-        description: "กรุณาลองใหม่อีกครั้ง",
+        title: t('admin.unexpected_error'),
+        description: t('admin.try_again'),
         variant: "destructive",
       });
     } finally {
@@ -99,28 +101,28 @@ export default function AdminLogin() {
           className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-2"
         >
           <ArrowLeft className="h-4 w-4" />
-          กลับสู่หน้าเว็บไซต์
+          {t('admin.back_to_site')}
         </Link>
         <div className="text-center space-y-2">
           <div className="inline-flex items-center gap-2 text-primary">
             <Mountain className="h-8 w-8" />
             <span className="font-heading text-2xl font-bold">GearTrail</span>
           </div>
-          <p className="text-muted-foreground">เข้าสู่ระบบจัดการ</p>
+          <p className="text-muted-foreground">{t('admin.login_title')}</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4 bg-card border rounded-xl p-6">
           <div className="space-y-2">
-            <Label htmlFor="email">อีเมล</Label>
+            <Label htmlFor="email">{t('admin.email')}</Label>
             <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="password">รหัสผ่าน</Label>
+            <Label htmlFor="password">{t('admin.password')}</Label>
             <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
           </div>
           <Button type="submit" className="w-full" disabled={loading}>
             <LogIn className="mr-2 h-4 w-4" />
-            {loading ? "กำลังเข้าสู่ระบบ..." : "เข้าสู่ระบบ"}
+            {loading ? t('admin.logging_in') : t('admin.login')}
           </Button>
         </form>
       </div>

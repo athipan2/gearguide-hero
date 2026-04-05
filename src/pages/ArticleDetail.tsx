@@ -106,7 +106,7 @@ export default function ArticleDetail() {
       setLoading(true);
       const { data, error } = await supabase
         .from("articles")
-        .select("id, title, category, content, image_url, created_at")
+        .select("*")
         .eq("slug", slug)
         .eq("published", true)
         .maybeSingle();
@@ -169,7 +169,7 @@ export default function ArticleDetail() {
         <header className="mb-12">
           <div className="flex items-center gap-2 mb-6">
             <span className="text-xs font-semibold text-accent uppercase tracking-[0.3em]">
-              {category}
+              {translateTerm(category, language)}
             </span>
           </div>
           <h1 className="font-heading text-3xl md:text-6xl font-semibold text-primary mb-8 leading-[0.9] tracking-tighter uppercase">

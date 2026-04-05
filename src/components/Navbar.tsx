@@ -27,8 +27,8 @@ export function Navbar({ className, forceWhite }: NavbarProps) {
   const selectedCount = useComparisonStore((state) => state.selectedItems.length);
 
   const navLinks = [
-    { label: t('nav.running_shoes'), href: "/category/รองเท้าวิ่งถนน" },
-    { label: t('nav.trail_gear'), href: "/category/อุปกรณ์วิ่งเทรล" },
+    { label: t('nav.running_shoes'), href: "/category/running-shoes" },
+    { label: t('nav.trail_gear'), href: "/category/trail-gear" },
     { label: t('nav.camping'), href: "/category/camping-gear" },
     { label: t('nav.guides'), href: "/guides" },
     { label: t('nav.best_of'), href: "#" },

@@ -4,29 +4,30 @@ import { useAuth } from "@/hooks/useAuth";
 import { Mountain, LayoutDashboard, FileText, Image, LogOut, ChevronLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-const navItems = [
-  { label: "Dashboard", icon: LayoutDashboard, href: "/admin" },
-  { label: "รีวิว", icon: FileText, href: "/admin/reviews" },
-  { label: "Media", icon: Image, href: "/admin/media" },
-];
-
 export function AdminLayout({ children }: { children: ReactNode }) {
   const { user, signOut, isAdmin, isEditor } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
+  const { t } = useTranslation();
+
+  const navItems = [
+    { label: t('admin.dashboard'), icon: LayoutDashboard, href: "/admin" },
+    { label: t('admin.reviews'), icon: FileText, href: "/admin/reviews" },
+    { label: t('admin.media'), icon: Image, href: "/admin/media" },
+  ];
 
   if (!user || (!isAdmin && !isEditor)) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center space-y-4">
-          <p className="text-muted-foreground">ไม่มีสิทธิ์เข้าถึง</p>
+          <p className="text-muted-foreground">{t('admin.access_denied')}</p>
           <div className="flex flex-col sm:flex-row gap-2 justify-center">
             <Button variant="outline" onClick={() => navigate("/")}>
               <Mountain className="mr-2 h-4 w-4" />
-              กลับหน้าหลัก
+              {t('admin.back_to_main')}
             </Button>
             <Button onClick={() => navigate("/admin/login")}>
-              เข้าสู่ระบบ
+              {t('admin.login')}
             </Button>
           </div>
         </div>
@@ -62,13 +63,13 @@ export function AdminLayout({ children }: { children: ReactNode }) {
         </nav>
         <div className="p-3 border-t space-y-2">
           <Link to="/" className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground px-3 py-2">
-            <ChevronLeft className="h-4 w-4" /> กลับหน้าเว็บ
+            <ChevronLeft className="h-4 w-4" /> {t('admin.back_to_site')}
           </Link>
           <button
             onClick={signOut}
             className="flex items-center gap-2 text-sm text-muted-foreground hover:text-destructive px-3 py-2 w-full"
           >
-            <LogOut className="h-4 w-4" /> ออกจากระบบ
+            <LogOut className="h-4 w-4" /> {t('admin.logout')}
           </button>
         </div>
       </aside>

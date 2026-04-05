@@ -19,10 +19,10 @@ export function Footer() {
           <div>
             <h4 className="font-heading font-semibold mb-3">{t('footer.categories')}</h4>
             <ul className="space-y-2 text-sm text-primary-foreground/70">
-              <li><Link to="/category/รองเท้าวิ่งถนน" className="hover:text-primary-foreground transition-colors">{t('nav.running_shoes')}</Link></li>
-              <li><Link to="/category/อุปกรณ์วิ่งเทรล" className="hover:text-primary-foreground transition-colors">{t('nav.trail_gear')}</Link></li>
+              <li><Link to="/category/running-shoes" className="hover:text-primary-foreground transition-colors">{t('nav.running_shoes')}</Link></li>
+              <li><Link to="/category/trail-gear" className="hover:text-primary-foreground transition-colors">{t('nav.trail_gear')}</Link></li>
               <li><Link to="/category/camping-gear" className="hover:text-primary-foreground transition-colors">{t('nav.camping')}</Link></li>
-              <li><Link to="/category/นาฬิกา-gps" className="hover:text-primary-foreground transition-colors">{t('category.gps_watches')}</Link></li>
+              <li><Link to="/category/gps-watches" className="hover:text-primary-foreground transition-colors">{t('category.gps_watches')}</Link></li>
             </ul>
           </div>
           <div>

@@ -150,7 +150,8 @@ export function ShoeWizard({ onClose }: { onClose: () => void }) {
         ratings: item.ratings,
         // Helper fields for filtering if they exist in DB
         category: item.category,
-        suitable_for: item.suitable_for || item.test_conditions?.terrain || "",
+        category_en: item.category_en,
+        suitable_for: item.suitable_for || item.test_conditions?.terrain || item.test_conditions_en?.terrain || "",
         feeling_tag: item.feeling || ""
       }));
 
@@ -159,15 +160,15 @@ export function ShoeWizard({ onClose }: { onClose: () => void }) {
         filtered = filtered.filter(f =>
           f.suitable_for?.toLowerCase().includes(activeGoal.toLowerCase()) ||
           f.category?.toLowerCase().includes(activeGoal.toLowerCase()) ||
-          (activeGoal === 'trail' && f.category?.includes('เทรล'))
+          (activeGoal === 'trail' && (f.category?.includes('เทรล') || f.category_en?.toLowerCase().includes('trail')))
         );
       }
 
       if (activeFeeling) {
         filtered = filtered.filter(f =>
           f.feeling_tag?.toLowerCase().includes(activeFeeling.toLowerCase()) ||
-          (activeFeeling === 'soft' && f.pros?.some((p: string) => p.includes('นุ่ม'))) ||
-          (activeFeeling === 'responsive' && f.pros?.some((p: string) => p.includes('เด้ง')))
+          (activeFeeling === 'soft' && (f.pros?.some((p: string) => p.includes('นุ่ม')) || f.pros_en?.some((p: string) => p.toLowerCase().includes('soft') || p.toLowerCase().includes('cushion')))) ||
+          (activeFeeling === 'responsive' && (f.pros?.some((p: string) => p.includes('เด้ง')) || f.pros_en?.some((p: string) => p.toLowerCase().includes('responsive') || p.toLowerCase().includes('energy'))))
         );
       }
 
@@ -187,7 +188,7 @@ export function ShoeWizard({ onClose }: { onClose: () => void }) {
           rating: rec.rating,
           price: rec.price,
           slug: rec.slug,
-          badge: index === 0 ? "Top Pick" : undefined,
+          badge: index === 0 ? t('category.top_pick') : undefined,
           weight: rec.weight,
           drop: rec.drop,
           aspectRatings: rec.ratings
@@ -206,7 +207,7 @@ export function ShoeWizard({ onClose }: { onClose: () => void }) {
           rating: rec.rating,
           price: rec.price,
           slug: rec.slug,
-          badge: index === 0 ? "Top Pick" : undefined,
+          badge: index === 0 ? t('category.top_pick') : undefined,
           weight: rec.weight,
           drop: rec.drop
         });
@@ -229,7 +230,7 @@ export function ShoeWizard({ onClose }: { onClose: () => void }) {
       rating: rec.rating,
       price: rec.price,
       slug: rec.slug,
-      badge: index === 0 ? "Top Pick" : undefined,
+      badge: index === 0 ? t('category.top_pick') : undefined,
       weight: rec.weight,
       drop: rec.drop,
       aspectRatings: rec.ratings
@@ -275,9 +276,9 @@ export function ShoeWizard({ onClose }: { onClose: () => void }) {
               <div className="grid grid-cols-2 gap-4">
                 {[
                   { id: "shoes", label: t('nav.running_shoes'), icon: <Footprints className="h-6 w-6" />, color: "bg-primary/10 text-primary" },
-                  { id: "trail", label: t('nav.trail_gear'), icon: <Mountain className="h-6 w-6" />, color: "bg-accent/10 text-accent", slug: "อุปกรณ์วิ่งเทรล" },
+                  { id: "trail", label: t('nav.trail_gear'), icon: <Mountain className="h-6 w-6" />, color: "bg-accent/10 text-accent", slug: "trail-gear" },
                   { id: "camping", label: t('nav.camping'), icon: <Tent className="h-6 w-6" />, color: "bg-green-500/10 text-green-600", slug: "camping-gear" },
-                  { id: "watch", label: "นาฬิกา GPS", icon: <Watch className="h-6 w-6" />, color: "bg-blue-500/10 text-blue-600", slug: "นาฬิกา-gps" }
+                  { id: "watch", label: t('category.gps_watches'), icon: <Watch className="h-6 w-6" />, color: "bg-blue-500/10 text-blue-600", slug: "gps-watches" }
                 ].map((cat) => (
                   <button
                     key={cat.id}
@@ -540,7 +541,7 @@ export function ShoeWizard({ onClose }: { onClose: () => void }) {
                   <div key={rec.id} className="relative group bg-card rounded-3xl border border-primary/5 overflow-hidden flex flex-col md:flex-row gap-6 p-6 hover:shadow-xl transition-all">
                     {index === 0 && (
                       <div className="absolute top-0 left-0 bg-accent text-white px-4 py-1 text-[10px] font-semibold uppercase rounded-br-xl">
-                        Top Pick
+                        {t('category.top_pick')}
                       </div>
                     )}
 
@@ -568,7 +569,7 @@ export function ShoeWizard({ onClose }: { onClose: () => void }) {
                             size="sm"
                             className="rounded-full h-10 w-10 p-0"
                             onClick={() => handleAddToCompare(rec, index)}
-                            title="เพิ่มลงตารางเปรียบเทียบ"
+                            title={t('category.add_to_compare')}
                           >
                             <Scale className="h-4 w-4" />
                           </Button>
@@ -607,7 +608,7 @@ export function ShoeWizard({ onClose }: { onClose: () => void }) {
                     onClose();
                   }}
                 >
-                  <Sparkles className="h-4 w-4 mr-2" /> Comparison Mode
+                  <Sparkles className="h-4 w-4 mr-2" /> {t('category.comparison_mode')}
                 </Button>
               </div>
             </div>
