@@ -19,6 +19,10 @@ export const technicalTerms: Record<string, string> = {
   'การยึดเกาะ': 'Traction',
   'ความมั่นคง': 'Stability',
   'การตอบสนอง': 'Responsiveness',
+  'ความรู้พื้นฐาน': 'Basics',
+  'วิ่งเทรล': 'Trail Running',
+  'รีวิวอุปกรณ์': 'Gear Reviews',
+  'เทคนิคการวิ่ง': 'Running Techniques',
 
   // Values
   'ถนน': 'Road',

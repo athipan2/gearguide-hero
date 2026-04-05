@@ -134,6 +134,16 @@ const CATEGORY_META: Record<string, { label: string; description: string; transl
     description: "รีวิวนาฬิกา GPS สำหรับวิ่งและกิจกรรมกลางแจ้ง",
     translationKey: "category.gps_watches"
   },
+  "running-shoes": {
+    label: "รองเท้าวิ่งถนน",
+    description: "รีวิวรองเท้าวิ่งถนนจากแบรนด์ชั้นนำ ทดสอบจริง",
+    translationKey: "category.road_running"
+  },
+  "trail-gear": {
+    label: "อุปกรณ์วิ่งเทรล",
+    description: "รีวิวอุปกรณ์วิ่งเทรล เดินป่า ทดสอบจริง",
+    translationKey: "category.trail_gear"
+  },
 };
 
 type SortOption = "newest" | "rating-desc" | "price-asc" | "price-desc";
@@ -242,9 +252,12 @@ export default function CategoryPage() {
         .eq("published", true);
 
       if (category) {
-        // Decode category slug back to actual value
-        const decoded = decodeURIComponent(category);
-        query = query.eq("category", decoded);
+        // Handle mapping from SEO slugs to DB categories
+        let dbCategory = decodeURIComponent(category);
+        if (category === 'running-shoes') dbCategory = 'รองเท้าวิ่งถนน';
+        if (category === 'trail-gear') dbCategory = 'อุปกรณ์วิ่งเทรล';
+
+        query = query.eq("category", dbCategory);
       }
 
       let { data, error } = await query.order("created_at", { ascending: false });
@@ -270,8 +283,11 @@ export default function CategoryPage() {
         items = fallbackReviews;
       } else if (category) {
         // If specific category requested and no data, filter fallback
-        const decoded = decodeURIComponent(category);
-        items = items.length > 0 ? items : fallbackReviews.filter(r => r.category === decoded);
+        let dbCategory = decodeURIComponent(category);
+        if (category === 'running-shoes') dbCategory = 'รองเท้าวิ่งถนน';
+        if (category === 'trail-gear') dbCategory = 'อุปกรณ์วิ่งเทรล';
+
+        items = items.length > 0 ? items : fallbackReviews.filter(r => r.category === dbCategory);
       }
 
       setRawReviews(items);

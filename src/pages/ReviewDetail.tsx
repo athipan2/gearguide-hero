@@ -218,12 +218,16 @@ export default function ReviewDetail() {
   }
 
   const localizedName = translateData(review, 'name', language);
+  const localizedBrand = translateData(review, 'brand', language);
 
   return (
-    <div className="min-h-screen bg-white pb-[120px] md:pb-20">
+    <div className="min-h-screen bg-white pb-[160px] md:pb-20">
       <SEOHead
         title={`${localizedName} ${t('common.verdict')} — GearTrail`}
-        description={`รีวิว ${localizedName} จาก ${translateData(review, 'brand', language)}: ${(translateData(review, 'intro', language) || "").slice(0, 120)}...`}
+        description={language === 'th'
+          ? `รีวิว ${localizedName} จาก ${localizedBrand}: ${(translateData(review, 'intro', language) || "").slice(0, 120)}...`
+          : `Review: ${localizedName} by ${localizedBrand}: ${(translateData(review, 'intro', language) || "").slice(0, 120)}...`
+        }
         image={review.image_url || undefined}
         canonical={`https://gearguide-hero.lovable.app/review/${slug}`}
         jsonLd={jsonLd}

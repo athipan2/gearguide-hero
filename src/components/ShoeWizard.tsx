@@ -150,7 +150,8 @@ export function ShoeWizard({ onClose }: { onClose: () => void }) {
         ratings: item.ratings,
         // Helper fields for filtering if they exist in DB
         category: item.category,
-        suitable_for: item.suitable_for || item.test_conditions?.terrain || "",
+        category_en: item.category_en,
+        suitable_for: item.suitable_for || item.test_conditions?.terrain || item.test_conditions_en?.terrain || "",
         feeling_tag: item.feeling || ""
       }));
 
@@ -159,15 +160,15 @@ export function ShoeWizard({ onClose }: { onClose: () => void }) {
         filtered = filtered.filter(f =>
           f.suitable_for?.toLowerCase().includes(activeGoal.toLowerCase()) ||
           f.category?.toLowerCase().includes(activeGoal.toLowerCase()) ||
-          (activeGoal === 'trail' && f.category?.includes('เทรล'))
+          (activeGoal === 'trail' && (f.category?.includes('เทรล') || f.category_en?.toLowerCase().includes('trail')))
         );
       }
 
       if (activeFeeling) {
         filtered = filtered.filter(f =>
           f.feeling_tag?.toLowerCase().includes(activeFeeling.toLowerCase()) ||
-          (activeFeeling === 'soft' && f.pros?.some((p: string) => p.includes('นุ่ม'))) ||
-          (activeFeeling === 'responsive' && f.pros?.some((p: string) => p.includes('เด้ง')))
+          (activeFeeling === 'soft' && (f.pros?.some((p: string) => p.includes('นุ่ม')) || f.pros_en?.some((p: string) => p.toLowerCase().includes('soft') || p.toLowerCase().includes('cushion')))) ||
+          (activeFeeling === 'responsive' && (f.pros?.some((p: string) => p.includes('เด้ง')) || f.pros_en?.some((p: string) => p.toLowerCase().includes('responsive') || p.toLowerCase().includes('energy'))))
         );
       }
 

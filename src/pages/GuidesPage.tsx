@@ -58,7 +58,7 @@ export default function GuidesPage() {
     const fetchArticles = async () => {
       const { data, error } = await supabase
         .from("articles")
-        .select("id, slug, title, category, excerpt, image_url, created_at")
+        .select("*")
         .eq("published", true)
         .order("created_at", { ascending: false });
 
@@ -129,7 +129,7 @@ export default function GuidesPage() {
                   <div className="p-6 flex flex-col flex-1">
                     <div className="flex items-center gap-2 mb-3">
                       <span className="text-xs font-bold text-primary uppercase tracking-wider bg-primary/10 px-2 py-1 rounded">
-                        {category}
+                        {translateTerm(category, language)}
                       </span>
                       <span className="text-xs text-muted-foreground flex items-center gap-1">
                         <Clock className="h-3 w-3" />
