@@ -56,7 +56,7 @@ describe("SectionRenderer Filtering", () => {
   });
 
   it('should filter out English technical specs like Distance/Drop/Stack/Weight', () => {
-    const mockReviewWithEnglishSpecs = {
+    const mockReviewWithEnglishSpecs: ReviewData = {
       ...mockReview,
       specs: [
         { label: 'Suitable for', value: 'Marathon' },
@@ -68,13 +68,12 @@ describe("SectionRenderer Filtering", () => {
     };
 
     const section: ReviewSectionData = {
-      id: 'who_is_this_for',
       type: 'who_is_this_for'
     };
 
     render(
       <MemoryRouter>
-        <SectionRenderer section={section} review={mockReviewWithEnglishSpecs as any} />
+        <SectionRenderer section={section} review={mockReviewWithEnglishSpecs} />
       </MemoryRouter>
     );
 
