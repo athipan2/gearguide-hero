@@ -28,6 +28,8 @@ const fallbackData: Record<string, ReviewData> = {
     specs: [
       { label: "Weight", value: "232g (US 9)", highlight: true },
       { label: "Drop", value: "8mm", highlight: true },
+      { label: "ระยะดรอป", value: "5 mm", highlight: true },
+      { label: "ระยะที่แนะนำ", value: "มาราธอน", highlight: true },
       { label: "Stack", value: "40mm / 32mm", highlight: true },
       { label: "Material", value: "ZoomX / Carbon Plate" },
       { label: "Width", value: "Standard" }
