@@ -19,6 +19,24 @@ interface SectionRendererProps {
   userRating?: { average: number; count: number } | null;
 }
 
+const isSuitabilitySpec = (label: string) => {
+  const l = label.toLowerCase();
+  // Include suitability and usage distance keywords
+  const isSuitability = l.includes('เหมาะกับ') || l.includes('suitable');
+  const isDistance = l.includes('ระยะ') || l.includes('distance') || l.includes('usage');
+
+  // Exclude technical measurements that might be mistakenly matched
+  const isTechnical =
+    l.includes('ดรอป') ||
+    l.includes('หุ้ม') ||
+    l.includes('drop') ||
+    l.includes('stack') ||
+    l.includes('weight') ||
+    l.includes('น้ำหนัก');
+
+  return isSuitability || (isDistance && !isTechnical);
+};
+
 export const SectionRenderer = ({ section, review, userRating }: SectionRendererProps) => {
   const { t, language } = useTranslation();
 
@@ -28,7 +46,7 @@ export const SectionRenderer = ({ section, review, userRating }: SectionRenderer
 
     case 'quick_decision': {
       const suitable = (review.specs || [])
-        .filter(s => s.label.includes('เหมาะกับ') || s.label.includes('ระยะ') || s.label.includes('Suitable') || s.label.includes('Distance'))
+        .filter(s => isSuitabilitySpec(s.label))
         .map(s => translateTerm(s.value, language));
 
       const pros = translateArray(review, 'pros', language);
@@ -119,7 +137,7 @@ export const SectionRenderer = ({ section, review, userRating }: SectionRenderer
     case 'who_is_this_for': {
       const suitable = (review.specs || [])
         .map(s => translateSpec(s, language))
-        .filter(s => s.label.includes('เหมาะกับ') || s.label.includes('ระยะ') || s.label.includes('Suitable') || s.label.includes('Distance'))
+        .filter(s => isSuitabilitySpec(s.label))
         .map(s => s.value);
       return (
         <section className="px-4 md:px-8">
