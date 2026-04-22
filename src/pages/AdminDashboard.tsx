@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { AdminLayout } from "@/components/admin/AdminLayout";
-import { supabase } from "@/integrations/supabase/client";
+import { backend } from "@/lib/backend";
 import { FileText, Image, Eye, EyeOff } from "lucide-react";
 import { useTranslation } from "@/hooks/useTranslation";
 
@@ -11,15 +11,15 @@ export default function AdminDashboard() {
   useEffect(() => {
     const fetchStats = async () => {
       const [reviews, media] = await Promise.all([
-        supabase.from("reviews").select("id, published"),
-        supabase.from("media_library").select("id", { count: "exact", head: true }),
+        backend.getReviews(),
+        backend.getMedia(),
       ]);
-      const all = reviews.data || [];
+
       setStats({
-        total: all.length,
-        published: all.filter((r) => r.published).length,
-        drafts: all.filter((r) => !r.published).length,
-        media: media.count || 0,
+        total: reviews.length,
+        published: reviews.filter((r) => r.published).length,
+        drafts: reviews.filter((r) => !r.published).length,
+        media: media.length,
       });
     };
     fetchStats();

@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef, useCallback } from "react";
 import { AdminLayout } from "@/components/admin/AdminLayout";
-import { supabase } from "@/integrations/supabase/client";
+import { backend } from "@/lib/backend";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Upload, Trash2, Copy, Search, Image as ImageIcon, Loader2 } from "lucide-react";
@@ -30,21 +30,8 @@ export default function AdminMedia() {
 
   const fetchMedia = useCallback(async () => {
     try {
-      const { data, error } = await supabase
-        .from("media_library")
-        .select("*")
-        .order("created_at", { ascending: false });
-
-      if (error) {
-        console.error("Fetch media error:", error);
-        toast({
-          title: t('common.loading') + " " + t('404.title'),
-          description: error.message,
-          variant: "destructive",
-        });
-      } else {
-        setMedia(data || []);
-      }
+      const data = await backend.getMedia();
+      setMedia(data || []);
     } catch (err) {
       console.error("Fetch media unexpected error:", err);
     }
@@ -58,29 +45,11 @@ export default function AdminMedia() {
     setUploading(true);
 
     for (const file of Array.from(files)) {
-      const ext = file.name.split(".").pop();
-      const path = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+      const { error } = await backend.uploadMedia(file, "review-media");
 
-      const { error: uploadError } = await supabase.storage
-        .from("review-media")
-        .upload(path, file, { contentType: file.type });
-
-      if (uploadError) {
-        toast({ title: `${t('admin.upload')} ${file.name} ${t('404.title')}`, description: uploadError.message, variant: "destructive" });
+      if (error) {
+        toast({ title: `${t('admin.upload')} ${file.name} ${t('404.title')}`, description: error.message, variant: "destructive" });
         continue;
-      }
-
-      const { error: insertError } = await supabase.from("media_library").insert({
-        file_name: file.name,
-        file_path: path,
-        file_size: file.size,
-        mime_type: file.type,
-        uploaded_by: user.id,
-      });
-
-      if (insertError) {
-        console.error("Insert error:", insertError);
-        toast({ title: `${t('common.save')} ${file.name} ${t('404.title')}`, description: insertError.message, variant: "destructive" });
       }
     }
 
@@ -95,32 +64,12 @@ export default function AdminMedia() {
 
     setDeletingId(item.id);
     try {
-      // 1. Delete from storage first
-      const { error: storageError } = await supabase.storage
-        .from("review-media")
-        .remove([item.file_path]);
+      const { error } = await backend.deleteMedia(item.id, item.file_path, "review-media");
 
-      if (storageError) {
-        console.error("Storage delete error:", storageError);
-        // Show warning but continue to delete DB record
-        toast({
-          title: "Storage Error",
-          description: `Could not remove from storage but trying DB... (${storageError.message})`,
-          variant: "destructive"
-        });
-      }
-
-      // 2. Delete from database
-      const { error: dbError } = await supabase
-        .from("media_library")
-        .delete()
-        .eq("id", item.id);
-
-      if (dbError) {
-        console.error("Database delete error:", dbError);
+      if (error) {
         toast({
           title: t('common.delete') + " " + t('404.title'),
-          description: dbError.message,
+          description: error.message,
           variant: "destructive"
         });
       } else {
@@ -143,14 +92,13 @@ export default function AdminMedia() {
   };
 
   const copyUrl = (path: string) => {
-    const { data } = supabase.storage.from("review-media").getPublicUrl(path);
-    navigator.clipboard.writeText(data.publicUrl);
+    const url = backend.getMediaUrl(path, "review-media");
+    navigator.clipboard.writeText(url);
     toast({ title: t('admin.copy_url') + " OK" });
   };
 
   const getPublicUrl = (path: string) => {
-    const { data } = supabase.storage.from("review-media").getPublicUrl(path);
-    return data.publicUrl;
+    return backend.getMediaUrl(path, "review-media");
   };
 
   const filtered = media.filter((m) => m.file_name.toLowerCase().includes(search.toLowerCase()));
