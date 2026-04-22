@@ -1,6 +1,7 @@
 import { ReactNode } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
+import { useTranslation } from "@/hooks/useTranslation";
 import { Mountain, LayoutDashboard, FileText, Image, LogOut, ChevronLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 

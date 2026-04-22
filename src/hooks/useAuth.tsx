@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { backend } from "@/lib/backend";
 import type { User, Session } from "@supabase/supabase-js";
 
 interface AuthContextType {
@@ -24,16 +25,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isEditor, setIsEditor] = useState(false);
 
   const checkRoles = async (userId: string) => {
-    const { data } = await supabase
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", userId);
-    const roles = data?.map((r) => r.role) || [];
-    setIsAdmin(roles.includes("admin"));
-    setIsEditor(roles.includes("editor"));
+    const roles = await backend.checkRoles(userId);
+    setIsAdmin(roles.isAdmin);
+    setIsEditor(roles.isEditor);
   };
 
   useEffect(() => {
+    // Keep Supabase subscription for real-time features if needed,
+    // but check roles via backend service
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (_event, session) => {
         setSession(session);
@@ -41,28 +40,49 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (session?.user) {
           setTimeout(() => checkRoles(session.user.id), 0);
         } else {
-          setIsAdmin(false);
-          setIsEditor(false);
+          // If Supabase session is gone, check backend service for user (fallback)
+          const localUser = await backend.getUser();
+          if (localUser) {
+              setUser(localUser);
+              checkRoles(localUser.id);
+          } else {
+              setIsAdmin(false);
+              setIsEditor(false);
+          }
         }
         setLoading(false);
       }
     );
 
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      if (session?.user) {
-        checkRoles(session.user.id);
-      }
-      setLoading(false);
-    });
+    const initAuth = async () => {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session?.user) {
+            setSession(session);
+            setUser(session.user);
+            await checkRoles(session.user.id);
+        } else {
+            const localUser = await backend.getUser();
+            if (localUser) {
+                setUser(localUser);
+                await checkRoles(localUser.id);
+            }
+        }
+        setLoading(false);
+    };
+
+    initAuth();
 
     return () => subscription.unsubscribe();
   }, []);
 
   const signIn = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    return { error: error as Error | null };
+    const result = await backend.signIn(email, password);
+    if (!result.error && result.user) {
+        setUser(result.user);
+        setSession(result.session);
+        await checkRoles(result.user.id);
+    }
+    return { error: result.error };
   };
 
   const signUp = async (email: string, password: string) => {
@@ -84,7 +104,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const signOut = async () => {
-    await supabase.auth.signOut();
+    await backend.signOut();
+    setUser(null);
+    setSession(null);
+    setIsAdmin(false);
+    setIsEditor(false);
   };
 
   return (
