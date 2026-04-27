@@ -1,6 +1,7 @@
 import { AnalyticsEvent, EventType } from '../decision-engine/types';
 import { Category } from '../compare/v2/types';
 import { v4 as uuidv4 } from 'uuid';
+import { sheetsClient } from '@/lib/google-sheets';
 
 /**
  * PRODUCTION-READY BEHAVIOR TRACKING
@@ -66,15 +67,12 @@ class AnalyticsTracker {
     this.eventBuffer = [];
 
     try {
-      // production: send to Supabase Edge Function or Analytics Provider
-      console.log(`[Analytics] Shipping ${eventsToShip.length} events...`, eventsToShip);
+      // production: send to Google Sheets
+      console.log(`[Analytics] Shipping ${eventsToShip.length} events to Google Sheets...`, eventsToShip);
 
-      // In production, we'd use navigator.sendBeacon for better mobile reliability
-      // if (navigator.sendBeacon) {
-      //   navigator.sendBeacon('/api/v2/analytics', JSON.stringify(eventsToShip));
-      // } else {
-      //   await fetch('/api/v2/analytics', { method: 'POST', body: JSON.stringify(eventsToShip) });
-      // }
+      for (const event of eventsToShip) {
+        await sheetsClient.insert('analytics', event);
+      }
     } catch (err) {
       console.error('[Analytics] Failed to ship events', err);
       // fallback: recover events to retry later

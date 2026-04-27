@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { AdminLayout } from "@/components/admin/AdminLayout";
-import { supabase } from "@/integrations/supabase/client";
+import { dataService } from "@/lib/data-service";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -30,34 +30,35 @@ export default function AdminReviews() {
 
   const fetchReviews = async () => {
     setLoading(true);
-    const { data, error } = await supabase
-      .from("reviews")
-      .select("id, name, brand, category, overall_rating, published, slug, updated_at")
-      .order("updated_at", { ascending: false });
-    if (!error) setReviews(data || []);
+    try {
+      const data = await dataService.getReviews();
+      setReviews(data || []);
+    } catch (err) {
+      console.error("Error fetching reviews:", err);
+    }
     setLoading(false);
   };
 
   useEffect(() => { fetchReviews(); }, []);
 
   const togglePublish = async (id: string, published: boolean) => {
-    const { error } = await supabase.from("reviews").update({ published: !published }).eq("id", id);
-    if (error) {
-      toast({ title: t('common.save') + " " + t('404.title'), description: error.message, variant: "destructive" });
-    } else {
+    try {
+      await dataService.saveReview({ published: !published }, id);
       fetchReviews();
       toast({ title: !published ? t('admin.published') : t('admin.drafts') });
+    } catch (err) {
+      toast({ title: t('common.save') + " Error", variant: "destructive" });
     }
   };
 
   const deleteReview = async (id: string, name: string) => {
     if (!confirm(`${t('common.delete')} "${name}"?`)) return;
-    const { error } = await supabase.from("reviews").delete().eq("id", id);
-    if (error) {
-      toast({ title: t('common.delete') + " " + t('404.title'), description: error.message, variant: "destructive" });
-    } else {
+    try {
+      await dataService.deleteReview(id);
       fetchReviews();
       toast({ title: t('common.delete') + " OK" });
+    } catch (err) {
+      toast({ title: t('common.delete') + " Error", variant: "destructive" });
     }
   };
 

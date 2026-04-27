@@ -7,7 +7,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useComparisonStore } from "@/lib/comparison-store";
-import { supabase } from "@/integrations/supabase/client";
+import { dataService } from "@/lib/data-service";
 import { toast } from "sonner";
 import { getOptimizedImageUrl } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
@@ -115,18 +115,13 @@ export function ShoeWizard({ onClose }: { onClose: () => void }) {
       const activeFeeling = overrideCriteria?.feeling || feeling;
       const activeFootType = overrideCriteria?.footType || footType;
 
-      // NOTE: Schema safe fetch - using select("*") to avoid 400 error on missing columns
-      // and filtering in memory for maximum resilience.
-      let query = supabase.from("reviews").select("*").eq("published", true);
+      // Use dataService instead of direct supabase call
+      const data = await dataService.getReviews(
+        step === "express_details" && brandSearch ? { brand: brandSearch } : undefined
+      );
 
-      if (step === "express_details" && brandSearch) {
-        query = query.ilike("name", `%${brandSearch}%`);
-      }
-
-      const { data, error } = await query.limit(20);
-
-      if (error || !data || data.length === 0) {
-        console.error("Supabase query error or no data, using fallback data:", error);
+      if (!data || data.length === 0) {
+        console.error("Data fetch error or no data, using fallback data");
         throw new Error("Using fallback");
       }
 
