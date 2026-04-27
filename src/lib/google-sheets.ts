@@ -6,7 +6,7 @@ export type SheetAction = 'insert' | 'update' | 'delete' | 'select' | 'upload';
 export interface SheetRequest {
   action: SheetAction;
   table?: string;
-  data?: any;
+  data?: unknown;
   id?: string | number;
   fileName?: string;
   mimeType?: string;
@@ -54,16 +54,16 @@ class GoogleSheetsClient {
   async select<T>(table: string, id?: string | number): Promise<T[]> {
     const params: Record<string, string> = { action: 'select', table };
     if (id) params.id = String(id);
-    const result = await this.fetch<any>(params);
-    if (result.error) throw new Error(result.error);
-    return Array.isArray(result) ? result : [result];
+    const result = await this.fetch<Record<string, unknown>>(params);
+    if (result.error) throw new Error(String(result.error));
+    return Array.isArray(result) ? (result as T[]) : ([result] as unknown as T[]);
   }
 
-  async insert(table: string, data: any) {
+  async insert(table: string, data: unknown) {
     return this.postJson({ action: 'insert', table, data });
   }
 
-  async update(table: string, id: string | number, data: any) {
+  async update(table: string, id: string | number, data: unknown) {
     return this.postJson({ action: 'update', table, id, data });
   }
 
@@ -77,7 +77,7 @@ class GoogleSheetsClient {
       reader.onload = async () => {
         const base64Data = (reader.result as string).split(',')[1];
         try {
-          const result = await this.postJson<any>({
+          const result = await this.postJson<{ success: boolean, url: string, directLink: string }>({
             action: 'upload',
             fileName: file.name,
             mimeType: file.type,

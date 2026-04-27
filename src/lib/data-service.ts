@@ -8,7 +8,7 @@ const USE_GOOGLE_SHEETS = import.meta.env.VITE_USE_GOOGLE_SHEETS === 'true';
 export const dataService = {
   async getReviews(filter?: { brand?: string }) {
     if (USE_GOOGLE_SHEETS) {
-      let data = await sheetsClient.select<any>('reviews');
+      let data = await sheetsClient.select<Record<string, unknown>>('reviews');
       if (filter?.brand) {
         data = data.filter(r =>
           r.name?.toLowerCase().includes(filter.brand!.toLowerCase()) ||
@@ -28,7 +28,7 @@ export const dataService = {
 
   async getReviewById(id: string) {
     if (USE_GOOGLE_SHEETS) {
-      const results = await sheetsClient.select<any>('reviews', id);
+      const results = await sheetsClient.select<Record<string, unknown>>('reviews', id);
       return results[0] || null;
     }
     const { data, error } = await supabase.from("reviews").select("*").eq("id", id).maybeSingle();
@@ -36,7 +36,7 @@ export const dataService = {
     return data;
   },
 
-  async saveReview(payload: any, id?: string) {
+  async saveReview(payload: Record<string, unknown>, id?: string) {
     if (USE_GOOGLE_SHEETS) {
       if (id) {
         return sheetsClient.update('reviews', id, payload);
