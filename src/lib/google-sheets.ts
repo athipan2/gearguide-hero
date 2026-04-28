@@ -1,5 +1,5 @@
 
-const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz4nG0aLYoTYrVlgrrpzeLjbwNVqMRy2ld6MEEn9AwCe7m6p9zIA7QpfCG-l8ug9dIr/exec';
+const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyiak7La2xa0XAculLujpk1bIL8mc06cPCosrDmwR8u7lBjMeLgkT06ujGt_0TKUXZ7/exec';
 
 export type SheetAction = 'insert' | 'update' | 'delete' | 'select' | 'upload';
 

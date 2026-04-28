@@ -1,6 +1,6 @@
 import { useEffect, useState, useMemo } from "react";
 import { ProductCard } from "@/components/ProductCard";
-import { supabase } from "@/integrations/supabase/client";
+import { dataService } from "@/lib/data-service";
 import { FastFilters } from "./FastFilters";
 import { Link } from "react-router-dom";
 import { ProductCardSkeleton } from "./ReviewSkeleton";
@@ -85,26 +85,7 @@ export function FeaturedReviews() {
   useEffect(() => {
     const fetchReviews = async () => {
       try {
-        let { data, error } = await supabase
-          .from("reviews")
-          .select("name, name_en, brand, brand_en, image_url, overall_rating, price, badge, badge_en, pros, pros_en, cons, cons_en, specs, ratings, slug, affiliate_url, created_at, verdict, verdict_en")
-          .eq("published", true)
-          .order("created_at", { ascending: false })
-          .limit(8);
-
-        if (error) {
-          console.warn("Localized fetch failed, falling back to basic columns:", error);
-          const basicFetch = await supabase
-            .from("reviews")
-            .select("name, brand, image_url, overall_rating, price, badge, pros, cons, specs, ratings, slug, affiliate_url, created_at, verdict")
-            .eq("published", true)
-            .order("created_at", { ascending: false })
-            .limit(8);
-          data = basicFetch.data;
-          error = basicFetch.error;
-        }
-
-        if (error) throw error;
+        const data = await dataService.getReviews();
         setRawReviews((data as unknown as ReviewData[]) || []);
       } catch (error) {
         console.error("Error fetching reviews:", error);
