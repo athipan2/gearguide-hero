@@ -5,6 +5,15 @@ import { sheetsClient } from "./google-sheets";
 // Toggle this to switch between Supabase and Google Sheets
 const USE_GOOGLE_SHEETS = import.meta.env.VITE_USE_GOOGLE_SHEETS === 'true';
 
+interface SheetReview {
+  id: string;
+  name?: string;
+  brand?: string;
+  published?: boolean | string;
+  created_at?: string;
+  [key: string]: unknown;
+}
+
 export const dataService = {
   async getReviews(options?: {
     brand?: string;
@@ -15,7 +24,7 @@ export const dataService = {
     const { brand, limit, order, publishedOnly = true } = options || {};
 
     if (USE_GOOGLE_SHEETS) {
-      let data = await sheetsClient.select<Record<string, any>>('reviews');
+      let data = await sheetsClient.select<SheetReview>('reviews');
 
       // Filter published
       if (publishedOnly) {
@@ -25,8 +34,8 @@ export const dataService = {
       // Filter brand
       if (brand) {
         data = data.filter(r =>
-          r.name?.toLowerCase().includes(brand.toLowerCase()) ||
-          r.brand?.toLowerCase().includes(brand.toLowerCase())
+          (r.name && typeof r.name === 'string' && r.name.toLowerCase().includes(brand.toLowerCase())) ||
+          (r.brand && typeof r.brand === 'string' && r.brand.toLowerCase().includes(brand.toLowerCase()))
         );
       }
 
@@ -35,15 +44,20 @@ export const dataService = {
         data.sort((a, b) => {
           const valA = a[order.column];
           const valB = b[order.column];
-          if (valA < valB) return order.ascending ? -1 : 1;
-          if (valA > valB) return order.ascending ? 1 : -1;
+
+          // Safer comparison
+          const cmpA = (valA !== null && valA !== undefined) ? String(valA) : '';
+          const cmpB = (valB !== null && valB !== undefined) ? String(valB) : '';
+
+          if (cmpA < cmpB) return order.ascending ? -1 : 1;
+          if (cmpA > cmpB) return order.ascending ? 1 : -1;
           return 0;
         });
       } else {
         // Default sort by created_at desc
         data.sort((a, b) => {
-          const dateA = new Date(a.created_at || 0).getTime();
-          const dateB = new Date(b.created_at || 0).getTime();
+          const dateA = new Date(String(a.created_at || 0)).getTime();
+          const dateB = new Date(String(b.created_at || 0)).getTime();
           return dateB - dateA;
         });
       }

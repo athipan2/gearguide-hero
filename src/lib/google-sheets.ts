@@ -55,7 +55,7 @@ class GoogleSheetsClient {
     const params: Record<string, string> = { action: 'select', table };
     if (id) params.id = String(id);
     try {
-      const result = await this.fetch<any>(params);
+      const result = await this.fetch<Record<string, unknown>>(params);
       if (result && result.error) {
         console.warn(`Google Sheets Table "${table}" issue: ${result.error}`);
         return [];
