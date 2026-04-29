@@ -21,8 +21,8 @@ export default function AdminDashboard() {
 
         setStats({
           total: all.length,
-          published: all.filter((r: any) => r.published === true || r.published === 'TRUE' || r.published === 'true').length,
-          drafts: all.filter((r: any) => !(r.published === true || r.published === 'TRUE' || r.published === 'true')).length,
+          published: all.filter((r: Record<string, unknown>) => r.published === true || r.published === 'TRUE' || r.published === 'true').length,
+          drafts: all.filter((r: Record<string, unknown>) => !(r.published === true || r.published === 'TRUE' || r.published === 'true')).length,
           media: mediaList.length,
         });
       } catch (err) {
