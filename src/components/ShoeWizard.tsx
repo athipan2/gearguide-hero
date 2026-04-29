@@ -116,9 +116,11 @@ export function ShoeWizard({ onClose }: { onClose: () => void }) {
       const activeFootType = overrideCriteria?.footType || footType;
 
       // Use dataService instead of direct supabase call
-      const data = await dataService.getReviews(
-        step === "express_details" && brandSearch ? { brand: brandSearch } : undefined
-      );
+      const data = await dataService.getReviews({
+        brand: (step === "express_details" && brandSearch) ? brandSearch : undefined,
+        limit: 20,
+        order: { column: "created_at", ascending: false }
+      });
 
       if (!data || data.length === 0) {
         console.error("Data fetch error or no data, using fallback data");

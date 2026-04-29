@@ -31,10 +31,11 @@ export default function AdminReviews() {
   const fetchReviews = async () => {
     setLoading(true);
     try {
-      const data = await dataService.getReviews();
-      setReviews(data || []);
+      const data = await dataService.getReviews({ publishedOnly: false });
+      setReviews(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error("Error fetching reviews:", err);
+      setReviews([]);
     }
     setLoading(false);
   };
@@ -62,9 +63,9 @@ export default function AdminReviews() {
     }
   };
 
-  const filtered = reviews.filter((r) =>
-    `${r.name} ${r.brand} ${r.category}`.toLowerCase().includes(search.toLowerCase())
-  );
+  const filtered = Array.isArray(reviews) ? reviews.filter((r) =>
+    `${r.name || ""} ${r.brand || ""} ${r.category || ""}`.toLowerCase().includes(search.toLowerCase())
+  ) : [];
 
   return (
     <AdminLayout>

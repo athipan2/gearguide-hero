@@ -65,6 +65,10 @@ export default function AdminReviewForm() {
   const [schemaStatus, setSchemaStatus] = useState<{ checked: boolean; hasEnColumns: boolean; error?: string }>({ checked: false, hasEnColumns: false });
 
   const checkSchema = async () => {
+    if (import.meta.env.VITE_USE_GOOGLE_SHEETS === 'true') {
+      setSchemaStatus({ checked: true, hasEnColumns: true });
+      return;
+    }
     try {
       const { data, error } = await supabase.from("reviews").select("pros_en, cons_en").limit(1);
       if (error) {

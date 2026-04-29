@@ -85,7 +85,10 @@ export function FeaturedReviews() {
   useEffect(() => {
     const fetchReviews = async () => {
       try {
-        const data = await dataService.getReviews();
+        const data = await dataService.getReviews({
+          limit: 8,
+          order: { column: "created_at", ascending: false }
+        });
         setRawReviews((data as unknown as ReviewData[]) || []);
       } catch (error) {
         console.error("Error fetching reviews:", error);

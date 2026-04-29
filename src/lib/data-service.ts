@@ -6,21 +6,76 @@ import { sheetsClient } from "./google-sheets";
 const USE_GOOGLE_SHEETS = import.meta.env.VITE_USE_GOOGLE_SHEETS === 'true';
 
 export const dataService = {
-  async getReviews(filter?: { brand?: string }) {
+  async getReviews(options?: {
+    brand?: string;
+    limit?: number;
+    order?: { column: string; ascending?: boolean };
+    publishedOnly?: boolean;
+  }) {
+    const { brand, limit, order, publishedOnly = true } = options || {};
+
     if (USE_GOOGLE_SHEETS) {
-      let data = await sheetsClient.select<Record<string, unknown>>('reviews');
-      if (filter?.brand) {
+      let data = await sheetsClient.select<Record<string, any>>('reviews');
+
+      // Filter published
+      if (publishedOnly) {
+        data = data.filter(r => r.published === true || r.published === 'TRUE' || r.published === 'true');
+      }
+
+      // Filter brand
+      if (brand) {
         data = data.filter(r =>
-          r.name?.toLowerCase().includes(filter.brand!.toLowerCase()) ||
-          r.brand?.toLowerCase().includes(filter.brand!.toLowerCase())
+          r.name?.toLowerCase().includes(brand.toLowerCase()) ||
+          r.brand?.toLowerCase().includes(brand.toLowerCase())
         );
       }
+
+      // Sort
+      if (order) {
+        data.sort((a, b) => {
+          const valA = a[order.column];
+          const valB = b[order.column];
+          if (valA < valB) return order.ascending ? -1 : 1;
+          if (valA > valB) return order.ascending ? 1 : -1;
+          return 0;
+        });
+      } else {
+        // Default sort by created_at desc
+        data.sort((a, b) => {
+          const dateA = new Date(a.created_at || 0).getTime();
+          const dateB = new Date(b.created_at || 0).getTime();
+          return dateB - dateA;
+        });
+      }
+
+      // Limit
+      if (limit) {
+        data = data.slice(0, limit);
+      }
+
       return data;
     }
-    let query = supabase.from("reviews").select("*").eq("published", true);
-    if (filter?.brand) {
-      query = query.ilike("name", `%${filter.brand}%`);
+
+    let query = supabase.from("reviews").select("*");
+
+    if (publishedOnly) {
+      query = query.eq("published", true);
     }
+
+    if (brand) {
+      query = query.ilike("name", `%${brand}%`);
+    }
+
+    if (order) {
+      query = query.order(order.column, { ascending: order.ascending ?? false });
+    } else {
+      query = query.order("created_at", { ascending: false });
+    }
+
+    if (limit) {
+      query = query.limit(limit);
+    }
+
     const { data, error } = await query;
     if (error) throw error;
     return data;
@@ -28,8 +83,13 @@ export const dataService = {
 
   async getReviewById(id: string) {
     if (USE_GOOGLE_SHEETS) {
-      const results = await sheetsClient.select<Record<string, unknown>>('reviews', id);
-      return results[0] || null;
+      try {
+        const results = await sheetsClient.select<Record<string, unknown>>('reviews', id);
+        return results[0] || null;
+      } catch (err) {
+        console.error("Error getting review by id from sheets:", err);
+        return null;
+      }
     }
     const { data, error } = await supabase.from("reviews").select("*").eq("id", id).maybeSingle();
     if (error) throw error;
@@ -38,11 +98,16 @@ export const dataService = {
 
   async saveReview(payload: Record<string, unknown>, id?: string) {
     if (USE_GOOGLE_SHEETS) {
-      if (id) {
-        return sheetsClient.update('reviews', id, payload);
-      } else {
-        const newId = crypto.randomUUID();
-        return sheetsClient.insert('reviews', { ...payload, id: newId, created_at: new Date().toISOString() });
+      try {
+        if (id) {
+          return await sheetsClient.update('reviews', id, payload);
+        } else {
+          const newId = crypto.randomUUID();
+          return await sheetsClient.insert('reviews', { ...payload, id: newId, created_at: new Date().toISOString() });
+        }
+      } catch (err) {
+        console.error("Error saving review to sheets:", err);
+        throw err;
       }
     }
 

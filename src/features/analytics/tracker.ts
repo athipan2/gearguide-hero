@@ -66,12 +66,18 @@ class AnalyticsTracker {
     const eventsToShip = [...this.eventBuffer];
     this.eventBuffer = [];
 
-    try {
-      // production: send to Google Sheets
-      console.log(`[Analytics] Shipping ${eventsToShip.length} events to Google Sheets...`, eventsToShip);
+    const USE_GOOGLE_SHEETS = import.meta.env.VITE_USE_GOOGLE_SHEETS === 'true';
 
-      for (const event of eventsToShip) {
-        await sheetsClient.insert('analytics', event);
+    try {
+      if (USE_GOOGLE_SHEETS) {
+        console.log(`[Analytics] Shipping ${eventsToShip.length} events to Google Sheets...`, eventsToShip);
+        // Fire and forget individual inserts for now, or implement batch in sheets script
+        eventsToShip.forEach(event => {
+          sheetsClient.insert('analytics', event).catch(e => console.error('Individual analytics insert failed', e));
+        });
+      } else {
+        // Fallback or Supabase implementation
+        console.log(`[Analytics] Shipping ${eventsToShip.length} events (Local/Supabase mode)...`, eventsToShip);
       }
     } catch (err) {
       console.error('[Analytics] Failed to ship events', err);

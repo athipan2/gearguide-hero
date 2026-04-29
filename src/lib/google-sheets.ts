@@ -1,5 +1,5 @@
 
-const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyiak7La2xa0XAculLujpk1bIL8mc06cPCosrDmwR8u7lBjMeLgkT06ujGt_0TKUXZ7/exec';
+const GOOGLE_SCRIPT_URL = import.meta.env.VITE_GOOGLE_SCRIPT_URL;
 
 export type SheetAction = 'insert' | 'update' | 'delete' | 'select' | 'upload';
 
@@ -54,9 +54,18 @@ class GoogleSheetsClient {
   async select<T>(table: string, id?: string | number): Promise<T[]> {
     const params: Record<string, string> = { action: 'select', table };
     if (id) params.id = String(id);
-    const result = await this.fetch<Record<string, unknown>>(params);
-    if (result.error) throw new Error(String(result.error));
-    return Array.isArray(result) ? (result as T[]) : ([result] as unknown as T[]);
+    try {
+      const result = await this.fetch<any>(params);
+      if (result && result.error) {
+        console.warn(`Google Sheets Table "${table}" issue: ${result.error}`);
+        return [];
+      }
+      if (!result) return [];
+      return Array.isArray(result) ? (result as T[]) : ([result] as unknown as T[]);
+    } catch (err) {
+      console.error(`Failed to select from ${table}:`, err);
+      return [];
+    }
   }
 
   async insert(table: string, data: unknown) {
