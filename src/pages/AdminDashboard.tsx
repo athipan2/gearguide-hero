@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { AdminLayout } from "@/components/admin/AdminLayout";
-import { supabase } from "@/integrations/supabase/client";
+import { dataService } from "@/lib/data-service";
 import { FileText, Image, Eye, EyeOff } from "lucide-react";
 import { useTranslation } from "@/hooks/useTranslation";
 
@@ -10,17 +10,24 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     const fetchStats = async () => {
-      const [reviews, media] = await Promise.all([
-        supabase.from("reviews").select("id, published"),
-        supabase.from("media_library").select("id", { count: "exact", head: true }),
-      ]);
-      const all = reviews.data || [];
-      setStats({
-        total: all.length,
-        published: all.filter((r) => r.published).length,
-        drafts: all.filter((r) => !r.published).length,
-        media: media.count || 0,
-      });
+      try {
+        const [reviews, media] = await Promise.all([
+          dataService.getReviews({ publishedOnly: false }),
+          dataService.getMedia(),
+        ]);
+
+        const all = Array.isArray(reviews) ? reviews : [];
+        const mediaList = Array.isArray(media) ? media : [];
+
+        setStats({
+          total: all.length,
+          published: all.filter((r: any) => r.published === true || r.published === 'TRUE' || r.published === 'true').length,
+          drafts: all.filter((r: any) => !(r.published === true || r.published === 'TRUE' || r.published === 'true')).length,
+          media: mediaList.length,
+        });
+      } catch (err) {
+        console.error("Error fetching dashboard stats:", err);
+      }
     };
     fetchStats();
   }, []);

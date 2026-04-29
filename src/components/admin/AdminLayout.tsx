@@ -6,7 +6,7 @@ import { Mountain, LayoutDashboard, FileText, Image, LogOut, ChevronLeft } from 
 import { Button } from "@/components/ui/button";
 
 export function AdminLayout({ children }: { children: ReactNode }) {
-  const { user, signOut, isAdmin, isEditor } = useAuth();
+  const { user, signOut, isAdmin, isEditor, loading } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
   const { t } = useTranslation();
@@ -16,6 +16,17 @@ export function AdminLayout({ children }: { children: ReactNode }) {
     { label: t('admin.reviews'), icon: FileText, href: "/admin/reviews" },
     { label: t('admin.media'), icon: Image, href: "/admin/media" },
   ];
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center p-4 text-center">
+        <div className="space-y-4">
+          <Mountain className="h-10 w-10 text-primary animate-pulse mx-auto" />
+          <p className="text-muted-foreground animate-pulse">{t('common.loading')}</p>
+        </div>
+      </div>
+    );
+  }
 
   if (!user || (!isAdmin && !isEditor)) {
     return (

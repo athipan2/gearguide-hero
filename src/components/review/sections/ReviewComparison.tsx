@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Scale, ChevronRight, Check, X } from "lucide-react";
 import { RatingStars } from "@/components/RatingStars";
 import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { dataService } from "@/lib/data-service";
 
 interface ReviewComparisonProps {
   review: ReviewData;
@@ -15,16 +15,20 @@ export const ReviewComparison = ({ review }: ReviewComparisonProps) => {
 
   useEffect(() => {
     const fetchSimilar = async () => {
-      const { data } = await supabase
-        .from("reviews")
-        .select("*")
-        .eq("category", review.category)
-        .eq("published", true)
-        .neq("slug", review.slug)
-        .limit(2);
+      try {
+        const data = await dataService.getReviews({
+          limit: 10, // Fetch more to filter out current
+          publishedOnly: true
+        });
 
-      if (data) {
-        setSimilar(data as unknown as ReviewData[]);
+        if (data) {
+          const filtered = data
+            .filter(r => r.category === review.category && r.slug !== review.slug)
+            .slice(0, 2);
+          setSimilar(filtered as unknown as ReviewData[]);
+        }
+      } catch (err) {
+        console.error("Error fetching similar reviews:", err);
       }
     };
     fetchSimilar();

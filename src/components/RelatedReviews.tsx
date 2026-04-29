@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { dataService } from "@/lib/data-service";
 import { ProductCard } from "./ProductCard";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/hooks/useTranslation";
@@ -57,18 +57,15 @@ export function RelatedReviews({ currentReview, isCompact }: RelatedReviewsProps
     const fetchRelated = async () => {
       setLoading(true);
       try {
-        const { data, error } = await supabase
-          .from("reviews")
-          .select("*")
-          .eq("published", true)
-          .neq("slug", currentReview.slug || "");
-
-        if (error) throw error;
+        const data = await dataService.getReviews({ publishedOnly: true });
 
         if (data) {
           const currentPrice = parsePrice(currentReview.price);
 
-          const scored = (data as RelatedReview[]).map((rev) => {
+          // Filter out current review
+          const filtered = (data as unknown as RelatedReview[]).filter(r => r.slug !== currentReview.slug);
+
+          const scored = filtered.map((rev) => {
             let score = 0;
 
             // 1. Same category (+10 points)

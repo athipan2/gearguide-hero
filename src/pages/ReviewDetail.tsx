@@ -4,7 +4,7 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { SEOHead } from "@/components/SEOHead";
 import { Button } from "@/components/ui/button";
-import { supabase } from "@/integrations/supabase/client";
+import { dataService } from "@/lib/data-service";
 import { CommentSection } from "@/components/CommentSection";
 import { RelatedReviews } from "@/components/RelatedReviews";
 import { ReviewDetailSkeleton } from "@/components/ReviewSkeleton";
@@ -104,64 +104,67 @@ export default function ReviewDetail() {
     if (!slug) { setLoading(false); return; }
 
     const fetchReview = async () => {
-      const { data } = await supabase
-        .from("reviews")
-        .select("*")
-        .eq("slug", slug)
-        .eq("published", true)
-        .maybeSingle();
+      try {
+        const data = await dataService.getReviewBySlug(slug);
 
-      let currentReview: ReviewData | undefined;
+        let currentReview: ReviewData | undefined;
 
-      if (data) {
-        currentReview = {
-          id: data.id,
-          name: data.name, brand: data.brand, category: data.category, price: data.price,
-          image_url: data.image_url, badge: data.badge, overall_rating: Number(data.overall_rating),
-          images: (data.images as unknown as string[]) || [],
-          ratings: (data.ratings as unknown as ReviewData["ratings"]) || [],
-          specs: (data.specs as unknown as ReviewData["specs"]) || [],
-          pros: (data.pros as unknown as string[]) || [],
-          pros_en: (data.pros_en as unknown as string[]) || [],
-          cons: (data.cons as unknown as string[]) || [],
-          cons_en: (data.cons_en as unknown as string[]) || [],
-          intro: data.intro, verdict: data.verdict,
-          sections: (data.sections as unknown as ReviewSectionData[]) || [],
-          affiliate_url: data.affiliate_url, cta_text: data.cta_text,
-          slug: data.slug,
-          // @ts-expect-error adding these fields which might not be in the generated types yet but are in our extended ReviewData
-          shopee_url: data.shopee_url,
-          lazada_url: data.lazada_url,
-          test_conditions: data.test_conditions as ReviewData['test_conditions'],
-          name_en: data.name_en,
-          brand_en: data.brand_en,
-          category_en: data.category_en,
-          badge_en: data.badge_en,
-          verdict_en: data.verdict_en,
-          intro_en: data.intro_en,
-          cta_text_en: data.cta_text_en,
-          test_conditions_en: data.test_conditions_en
-        };
-        setReview(currentReview);
-      } else if (fallbackData[slug]) {
-        currentReview = fallbackData[slug];
-        currentReview.slug = slug;
-        setReview(currentReview);
-      }
+        if (data) {
+          currentReview = {
+            id: data.id,
+            name: data.name, brand: data.brand, category: data.category, price: data.price,
+            image_url: data.image_url, badge: data.badge, overall_rating: Number(data.overall_rating),
+            images: (data.images as unknown as string[]) || [],
+            ratings: (data.ratings as unknown as ReviewData["ratings"]) || [],
+            specs: (data.specs as unknown as ReviewData["specs"]) || [],
+            pros: (data.pros as unknown as string[]) || [],
+            pros_en: (data.pros_en as unknown as string[]) || [],
+            cons: (data.cons as unknown as string[]) || [],
+            cons_en: (data.cons_en as unknown as string[]) || [],
+            intro: data.intro, verdict: data.verdict,
+            sections: (data.sections as unknown as ReviewSectionData[]) || [],
+            affiliate_url: data.affiliate_url, cta_text: data.cta_text,
+            slug: data.slug,
+            // @ts-expect-error adding these fields which might not be in the generated types yet but are in our extended ReviewData
+            shopee_url: data.shopee_url,
+            lazada_url: data.lazada_url,
+            test_conditions: data.test_conditions as ReviewData['test_conditions'],
+            name_en: data.name_en,
+            brand_en: data.brand_en,
+            category_en: data.category_en,
+            badge_en: data.badge_en,
+            verdict_en: data.verdict_en,
+            intro_en: data.intro_en,
+            cta_text_en: data.cta_text_en,
+            test_conditions_en: data.test_conditions_en
+          };
+          setReview(currentReview);
+        } else if (fallbackData[slug]) {
+          currentReview = fallbackData[slug];
+          currentReview.slug = slug;
+          setReview(currentReview);
+        }
 
-      if (currentReview?.id) {
-        const { data: ratingData } = await supabase
-          .from("comments")
-          .select("rating")
-          .eq("review_id", currentReview.id)
-          .not("rating", "is", null);
+        // Comments still use direct Supabase for now as it's a dynamic user interaction
+        if (currentReview?.id && import.meta.env.VITE_USE_GOOGLE_SHEETS !== 'true') {
+          const { data: ratingData } = await (await import("@/integrations/supabase/client")).supabase
+            .from("comments")
+            .select("rating")
+            .eq("review_id", currentReview.id)
+            .not("rating", "is", null);
 
-        if (ratingData && ratingData.length > 0) {
-          const sum = ratingData.reduce((acc, curr) => acc + (curr.rating || 0), 0);
-          setUserRating({
-            average: sum / ratingData.length,
-            count: ratingData.length
-          });
+          if (ratingData && ratingData.length > 0) {
+            const sum = ratingData.reduce((acc, curr) => acc + (curr.rating || 0), 0);
+            setUserRating({
+              average: sum / ratingData.length,
+              count: ratingData.length
+            });
+          }
+        }
+      } catch (err) {
+        console.error("Error fetching review detail:", err);
+        if (fallbackData[slug]) {
+          setReview(fallbackData[slug]);
         }
       }
 

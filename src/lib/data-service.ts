@@ -14,6 +14,16 @@ interface SheetReview {
   [key: string]: unknown;
 }
 
+export interface MediaItem {
+  id: string;
+  file_name: string;
+  file_path: string;
+  file_size: number | null;
+  mime_type: string | null;
+  created_at: string;
+  uploaded_by?: string;
+}
+
 export const dataService = {
   async getReviews(options?: {
     brand?: string;
@@ -95,6 +105,51 @@ export const dataService = {
     return data;
   },
 
+  async getReviewBySlug(slug: string) {
+    if (USE_GOOGLE_SHEETS) {
+      try {
+        const results = await sheetsClient.select<Record<string, unknown>>('reviews');
+        return results.find(r => r.slug === slug) || null;
+      } catch (err) {
+        console.error("Error getting review by slug from sheets:", err);
+        return null;
+      }
+    }
+    const { data, error } = await supabase.from("reviews").select("*").eq("slug", slug).maybeSingle();
+    if (error) throw error;
+    return data;
+  },
+
+  async getArticles() {
+    if (USE_GOOGLE_SHEETS) {
+      try {
+        const data = await sheetsClient.select<Record<string, unknown>>('articles');
+        return data.filter(a => a.published === true || a.published === 'TRUE' || a.published === 'true');
+      } catch (err) {
+        console.error("Error getting articles from sheets:", err);
+        return [];
+      }
+    }
+    const { data, error } = await supabase.from("articles").select("*").eq("published", true).order("created_at", { ascending: false });
+    if (error) throw error;
+    return data;
+  },
+
+  async getArticleBySlug(slug: string) {
+    if (USE_GOOGLE_SHEETS) {
+      try {
+        const results = await sheetsClient.select<Record<string, unknown>>('articles');
+        return results.find(a => a.slug === slug) || null;
+      } catch (err) {
+        console.error("Error getting article by slug from sheets:", err);
+        return null;
+      }
+    }
+    const { data, error } = await supabase.from("articles").select("*").eq("slug", slug).maybeSingle();
+    if (error) throw error;
+    return data;
+  },
+
   async getReviewById(id: string) {
     if (USE_GOOGLE_SHEETS) {
       try {
@@ -139,12 +194,109 @@ export const dataService = {
     return supabase.from("reviews").delete().eq("id", id);
   },
 
-  async uploadImage(file: File) {
+  async getMedia() {
     if (USE_GOOGLE_SHEETS) {
-      return sheetsClient.upload(file);
+      try {
+        const data = await sheetsClient.select<MediaItem>('media_library');
+        // Filter out items that don't have a file_path (might be empty rows)
+        return data.filter(item => item.file_path);
+      } catch (err) {
+        console.error("Error getting media from sheets:", err);
+        return [];
+      }
     }
-    // Supabase upload logic would go here if needed,
-    // but usually it's handled via supabase.storage
-    throw new Error("Supabase upload not implemented in dataService yet");
+    const { data, error } = await supabase
+      .from("media_library")
+      .select("*")
+      .order("created_at", { ascending: false });
+    if (error) throw error;
+    return data || [];
+  },
+
+  async uploadImage(file: File, userId?: string) {
+    if (USE_GOOGLE_SHEETS) {
+      const result = await sheetsClient.upload(file);
+      if (result.success) {
+        // Record in media_library table as well
+        await sheetsClient.insert('media_library', {
+          id: crypto.randomUUID(),
+          file_name: file.name,
+          file_path: result.directLink || result.url,
+          file_size: file.size,
+          mime_type: file.type,
+          uploaded_by: userId || 'unknown',
+          created_at: new Date().toISOString()
+        });
+      }
+      return result;
+    }
+
+    // Supabase implementation
+    const ext = file.name.split(".").pop();
+    const path = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+    const { error: uploadError } = await supabase.storage
+      .from("review-media")
+      .upload(path, file, { contentType: file.type });
+
+    if (uploadError) throw uploadError;
+
+    const { data: publicData } = supabase.storage.from("review-media").getPublicUrl(path);
+
+    const { error: insertError } = await supabase.from("media_library").insert({
+      file_name: file.name,
+      file_path: path,
+      file_size: file.size,
+      mime_type: file.type,
+      uploaded_by: userId,
+    });
+
+    if (insertError) throw insertError;
+
+    return { success: true, url: publicData.publicUrl, directLink: publicData.publicUrl, path };
+  },
+
+  async searchReviews(query: string) {
+    if (USE_GOOGLE_SHEETS) {
+      try {
+        const data = await sheetsClient.select<SheetReview>('reviews');
+        const q = query.toLowerCase();
+        return data.filter(r =>
+          (r.published === true || r.published === 'TRUE' || r.published === 'true') &&
+          ((r.name && typeof r.name === 'string' && r.name.toLowerCase().includes(q)) ||
+           (r.brand && typeof r.brand === 'string' && r.brand.toLowerCase().includes(q)) ||
+           (r.name_en && typeof r.name_en === 'string' && r.name_en.toLowerCase().includes(q)) ||
+           (r.brand_en && typeof r.brand_en === 'string' && r.brand_en.toLowerCase().includes(q)))
+        );
+      } catch (err) {
+        console.error("Error searching reviews in sheets:", err);
+        return [];
+      }
+    }
+    const { data, error } = await supabase
+      .from("reviews")
+      .select("*")
+      .eq("published", true)
+      .or(`name.ilike.%${query}%,brand.ilike.%${query}%,name_en.ilike.%${query}%,brand_en.ilike.%${query}%`)
+      .limit(10);
+    if (error) throw error;
+    return data;
+  },
+
+  async deleteMedia(item: MediaItem) {
+    if (USE_GOOGLE_SHEETS) {
+      return sheetsClient.delete('media_library', item.id);
+    }
+
+    // 1. Delete from storage
+    const { error: storageError } = await supabase.storage
+      .from("review-media")
+      .remove([item.file_path]);
+
+    if (storageError) {
+      console.warn("Storage delete failed:", storageError);
+    }
+
+    // 2. Delete from database
+    return supabase.from("media_library").delete().eq("id", item.id);
   }
 };

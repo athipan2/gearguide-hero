@@ -3,7 +3,7 @@ import { useParams, Link } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { SEOHead } from "@/components/SEOHead";
-import { supabase } from "@/integrations/supabase/client";
+import { dataService } from "@/lib/data-service";
 import { CommentSection } from "@/components/CommentSection";
 import { Button } from "@/components/ui/button";
 import { Loader2, ArrowLeft, Calendar, User } from "lucide-react";
@@ -103,19 +103,20 @@ export default function ArticleDetail() {
 
   useEffect(() => {
     const fetchArticle = async () => {
+      if (!slug) return;
       setLoading(true);
-      const { data, error } = await supabase
-        .from("articles")
-        .select("*")
-        .eq("slug", slug)
-        .eq("published", true)
-        .maybeSingle();
-
-      if (!error && data) {
-        setArticle(data as Article);
-      } else if (slug && fallbackArticles[slug]) {
-        // Use fallback if DB is empty or article not found
-        setArticle(fallbackArticles[slug]);
+      try {
+        const data = await dataService.getArticleBySlug(slug);
+        if (data) {
+          setArticle(data as Article);
+        } else if (fallbackArticles[slug]) {
+          setArticle(fallbackArticles[slug]);
+        }
+      } catch (err) {
+        console.error("Error fetching article:", err);
+        if (fallbackArticles[slug]) {
+          setArticle(fallbackArticles[slug]);
+        }
       }
       setLoading(false);
     };
