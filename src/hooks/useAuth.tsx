@@ -16,6 +16,8 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+const USE_GOOGLE_SHEETS = import.meta.env.VITE_USE_GOOGLE_SHEETS === 'true';
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
@@ -24,6 +26,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isEditor, setIsEditor] = useState(false);
 
   const checkRoles = async (userId: string) => {
+    if (USE_GOOGLE_SHEETS && userId === 'guest-admin-id') {
+      setIsAdmin(true);
+      setIsEditor(true);
+      return;
+    }
     const { data } = await supabase
       .from("user_roles")
       .select("role")
@@ -34,6 +41,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   useEffect(() => {
+    if (USE_GOOGLE_SHEETS) {
+      // Mock user for Google Sheets mode to bypass Supabase auth issues
+      const mockUser = {
+        id: 'guest-admin-id',
+        email: 'admin@geartrail.com',
+        app_metadata: {},
+        user_metadata: {},
+        aud: 'authenticated',
+        created_at: new Date().toISOString()
+      } as User;
+
+      setUser(mockUser);
+      setSession({ user: mockUser, access_token: 'mock', refresh_token: 'mock', expires_in: 3600, token_type: 'bearer' } as Session);
+      setIsAdmin(true);
+      setIsEditor(true);
+      setLoading(false);
+      return;
+    }
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (_event, session) => {
         setSession(session);

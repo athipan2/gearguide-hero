@@ -4,7 +4,7 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { SEOHead } from "@/components/SEOHead";
 import { ProductCard } from "@/components/ProductCard";
-import { supabase } from "@/integrations/supabase/client";
+import { dataService } from "@/lib/data-service";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -251,66 +251,48 @@ export default function CategoryPage() {
   useEffect(() => {
     const fetch = async () => {
       setLoading(true);
-      let query = supabase
-        .from("reviews")
-        .select("name, name_en, brand, brand_en, image_url, overall_rating, price, badge, badge_en, pros, pros_en, cons, cons_en, specs, ratings, slug, affiliate_url, category, created_at")
-        .eq("published", true);
 
-      if (category) {
-        // Handle mapping from SEO slugs to DB categories
-        let dbCategory = decodeURIComponent(category);
+      try {
+        let dbCategory = category ? decodeURIComponent(category) : undefined;
         if (category === 'running-shoes') dbCategory = 'รองเท้าวิ่งถนน';
         if (category === 'trail-gear') dbCategory = 'อุปกรณ์วิ่งเทรล';
         if (category === 'gps-watches') dbCategory = 'นาฬิกา-gps';
 
-        query = query.eq("category", dbCategory);
-      }
+        const data = await dataService.getReviews({
+          publishedOnly: true,
+          order: { column: "created_at", ascending: false }
+        });
 
-      let { data, error } = await query.order("created_at", { ascending: false });
+        let items = (data as unknown as ReviewItem[]) || [];
 
-      // Fallback if localized query fails
-      if (error) {
-        console.warn("Localized category fetch failed, falling back to basic columns:", error);
-        let basicQuery = supabase
-          .from("reviews")
-          .select("name, brand, image_url, overall_rating, price, badge, pros, cons, specs, ratings, slug, affiliate_url, category, created_at")
-          .eq("published", true);
-        if (category) {
-          basicQuery = basicQuery.eq("category", decodeURIComponent(category));
+        // Client-side category filtering to ensure consistency between backends
+        if (dbCategory) {
+          items = items.filter(r => r.category === dbCategory);
         }
-        const basicFetch = await basicQuery.order("created_at", { ascending: false });
-        data = basicFetch.data;
-        error = basicFetch.error;
+
+        if (items.length === 0 && !category) {
+          items = fallbackReviews;
+        } else if (category && items.length === 0) {
+          items = fallbackReviews.filter(r => r.category === dbCategory);
+        }
+        setRawReviews(items);
+
+        // Extract unique brands & categories
+        const brands = [...new Set(items.map((r) => r.brand))].sort();
+        setAllBrands(brands);
+
+        const cats = [...new Set(items.map((r) => r.category))].sort();
+        setAllCategories(cats);
+
+        // Calculate max price
+        const prices = items.map((r) => parsePriceNum(r.price));
+        const mp = Math.max(...prices, 50000);
+        setMaxPrice(mp);
+        setPriceRange([0, mp]);
+      } catch (err) {
+        console.error("Error fetching category reviews:", err);
+        setRawReviews(fallbackReviews);
       }
-
-      let items = (data as unknown as ReviewItem[]) || [];
-
-      if ((error || items.length === 0) && !category) {
-        items = fallbackReviews;
-      } else if (category) {
-        // If specific category requested and no data, filter fallback
-        let dbCategory = decodeURIComponent(category);
-        if (category === 'running-shoes') dbCategory = 'รองเท้าวิ่งถนน';
-        if (category === 'trail-gear') dbCategory = 'อุปกรณ์วิ่งเทรล';
-        if (category === 'gps-watches') dbCategory = 'นาฬิกา-gps';
-
-        items = items.length > 0 ? items : fallbackReviews.filter(r => r.category === dbCategory);
-      }
-
-      setRawReviews(items);
-
-      // Extract unique brands & categories
-      const brands = [...new Set(items.map((r) => r.brand))].sort();
-      setAllBrands(brands);
-
-      const cats = [...new Set(items.map((r) => r.category))].sort();
-      setAllCategories(cats);
-
-      // Calculate max price
-      const prices = items.map((r) => parsePriceNum(r.price));
-      const mp = Math.max(...prices, 50000);
-      setMaxPrice(mp);
-      setPriceRange([0, mp]);
 
       setLoading(false);
     };

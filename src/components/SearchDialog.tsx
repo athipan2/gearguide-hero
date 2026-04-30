@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/command";
 import { DialogTitle } from "@/components/ui/dialog";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
-import { supabase } from "@/integrations/supabase/client";
+import { dataService } from "@/lib/data-service";
 import { useTranslation } from "@/hooks/useTranslation";
 import { translateData } from "@/lib/translation-utils";
 
@@ -36,15 +36,13 @@ export function SearchDialog({ open, onOpenChange }: { open: boolean, onOpenChan
         return;
       }
 
-      const { data } = await supabase
-        .from("reviews")
-        .select("name, name_en, slug, category, category_en")
-        .or(`name.ilike.%${query}%,name_en.ilike.%${query}%`)
-        .eq("published", true)
-        .limit(5);
-
-      if (data) {
-        setResults(data as SearchResult[]);
+      try {
+        const data = await dataService.searchReviews(query);
+        if (data) {
+          setResults(data.slice(0, 5) as SearchResult[]);
+        }
+      } catch (err) {
+        console.error("Search failed:", err);
       }
     };
 

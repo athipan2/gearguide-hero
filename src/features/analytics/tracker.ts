@@ -1,6 +1,7 @@
 import { AnalyticsEvent, EventType } from '../decision-engine/types';
 import { Category } from '../compare/v2/types';
 import { v4 as uuidv4 } from 'uuid';
+import { sheetsClient } from '@/lib/google-sheets';
 
 /**
  * PRODUCTION-READY BEHAVIOR TRACKING
@@ -65,16 +66,19 @@ class AnalyticsTracker {
     const eventsToShip = [...this.eventBuffer];
     this.eventBuffer = [];
 
-    try {
-      // production: send to Supabase Edge Function or Analytics Provider
-      console.log(`[Analytics] Shipping ${eventsToShip.length} events...`, eventsToShip);
+    const USE_GOOGLE_SHEETS = import.meta.env.VITE_USE_GOOGLE_SHEETS === 'true';
 
-      // In production, we'd use navigator.sendBeacon for better mobile reliability
-      // if (navigator.sendBeacon) {
-      //   navigator.sendBeacon('/api/v2/analytics', JSON.stringify(eventsToShip));
-      // } else {
-      //   await fetch('/api/v2/analytics', { method: 'POST', body: JSON.stringify(eventsToShip) });
-      // }
+    try {
+      if (USE_GOOGLE_SHEETS) {
+        console.log(`[Analytics] Shipping ${eventsToShip.length} events to Google Sheets...`, eventsToShip);
+        // Fire and forget individual inserts for now, or implement batch in sheets script
+        eventsToShip.forEach(event => {
+          sheetsClient.insert('analytics', event).catch(e => console.error('Individual analytics insert failed', e));
+        });
+      } else {
+        // Fallback or Supabase implementation
+        console.log(`[Analytics] Shipping ${eventsToShip.length} events (Local/Supabase mode)...`, eventsToShip);
+      }
     } catch (err) {
       console.error('[Analytics] Failed to ship events', err);
       // fallback: recover events to retry later

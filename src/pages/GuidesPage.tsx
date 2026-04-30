@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { SEOHead } from "@/components/SEOHead";
-import { supabase } from "@/integrations/supabase/client";
+import { dataService } from "@/lib/data-service";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Loader2, BookOpen, Clock, ArrowLeft } from "lucide-react";
@@ -56,15 +56,15 @@ export default function GuidesPage() {
 
   useEffect(() => {
     const fetchArticles = async () => {
-      const { data, error } = await supabase
-        .from("articles")
-        .select("*")
-        .eq("published", true)
-        .order("created_at", { ascending: false });
-
-      if (!error && data && data.length > 0) {
-        setArticles(data as Article[]);
-      } else {
+      try {
+        const data = await dataService.getArticles();
+        if (data && data.length > 0) {
+          setArticles(data as Article[]);
+        } else {
+          setArticles(fallbackArticles);
+        }
+      } catch (err) {
+        console.error("Error fetching articles:", err);
         setArticles(fallbackArticles);
       }
       setLoading(false);

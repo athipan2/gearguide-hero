@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef, useCallback } from "react";
 import { AdminLayout } from "@/components/admin/AdminLayout";
-import { supabase } from "@/integrations/supabase/client";
+import { dataService, MediaItem } from "@/lib/data-service";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Upload, Trash2, Copy, Search, Image as ImageIcon, Loader2 } from "lucide-react";
@@ -8,15 +8,6 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { getOptimizedImageUrl } from "@/lib/utils";
 import { useTranslation } from "@/hooks/useTranslation";
-
-interface MediaItem {
-  id: string;
-  file_name: string;
-  file_path: string;
-  file_size: number | null;
-  mime_type: string | null;
-  created_at: string;
-}
 
 export default function AdminMedia() {
   const [media, setMedia] = useState<MediaItem[]>([]);
@@ -30,23 +21,15 @@ export default function AdminMedia() {
 
   const fetchMedia = useCallback(async () => {
     try {
-      const { data, error } = await supabase
-        .from("media_library")
-        .select("*")
-        .order("created_at", { ascending: false });
-
-      if (error) {
-        console.error("Fetch media error:", error);
-        toast({
-          title: t('common.loading') + " " + t('404.title'),
-          description: error.message,
-          variant: "destructive",
-        });
-      } else {
-        setMedia(data || []);
-      }
+      const data = await dataService.getMedia();
+      setMedia(data || []);
     } catch (err) {
-      console.error("Fetch media unexpected error:", err);
+      console.error("Fetch media error:", err);
+      toast({
+        title: t('common.loading') + " " + t('404.title'),
+        description: err instanceof Error ? err.message : String(err),
+        variant: "destructive",
+      });
     }
   }, [toast, t]);
 
@@ -57,36 +40,26 @@ export default function AdminMedia() {
     if (!files?.length || !user) return;
     setUploading(true);
 
+    let successCount = 0;
     for (const file of Array.from(files)) {
-      const ext = file.name.split(".").pop();
-      const path = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
-
-      const { error: uploadError } = await supabase.storage
-        .from("review-media")
-        .upload(path, file, { contentType: file.type });
-
-      if (uploadError) {
-        toast({ title: `${t('admin.upload')} ${file.name} ${t('404.title')}`, description: uploadError.message, variant: "destructive" });
-        continue;
-      }
-
-      const { error: insertError } = await supabase.from("media_library").insert({
-        file_name: file.name,
-        file_path: path,
-        file_size: file.size,
-        mime_type: file.type,
-        uploaded_by: user.id,
-      });
-
-      if (insertError) {
-        console.error("Insert error:", insertError);
-        toast({ title: `${t('common.save')} ${file.name} ${t('404.title')}`, description: insertError.message, variant: "destructive" });
+      try {
+        await dataService.uploadImage(file, user.id);
+        successCount++;
+      } catch (err) {
+        console.error("Upload error:", err);
+        toast({
+          title: `${t('admin.upload')} ${file.name} ${t('404.title')}`,
+          description: err instanceof Error ? err.message : String(err),
+          variant: "destructive"
+        });
       }
     }
 
     setUploading(false);
     fetchMedia();
-    toast({ title: t('admin.upload') + " OK" });
+    if (successCount > 0) {
+      toast({ title: t('admin.upload') + ` OK (${successCount})` });
+    }
     if (fileRef.current) fileRef.current.value = "";
   };
 
@@ -95,41 +68,12 @@ export default function AdminMedia() {
 
     setDeletingId(item.id);
     try {
-      // 1. Delete from storage first
-      const { error: storageError } = await supabase.storage
-        .from("review-media")
-        .remove([item.file_path]);
-
-      if (storageError) {
-        console.error("Storage delete error:", storageError);
-        // Show warning but continue to delete DB record
-        toast({
-          title: "Storage Error",
-          description: `Could not remove from storage but trying DB... (${storageError.message})`,
-          variant: "destructive"
-        });
-      }
-
-      // 2. Delete from database
-      const { error: dbError } = await supabase
-        .from("media_library")
-        .delete()
-        .eq("id", item.id);
-
-      if (dbError) {
-        console.error("Database delete error:", dbError);
-        toast({
-          title: t('common.delete') + " " + t('404.title'),
-          description: dbError.message,
-          variant: "destructive"
-        });
-      } else {
-        toast({
-          title: t('common.delete') + " OK",
-          description: item.file_name,
-        });
-        await fetchMedia();
-      }
+      await dataService.deleteMedia(item);
+      toast({
+        title: t('common.delete') + " OK",
+        description: item.file_name,
+      });
+      await fetchMedia();
     } catch (error) {
       console.error("Unexpected delete error:", error);
       toast({
@@ -143,14 +87,17 @@ export default function AdminMedia() {
   };
 
   const copyUrl = (path: string) => {
-    const { data } = supabase.storage.from("review-media").getPublicUrl(path);
-    navigator.clipboard.writeText(data.publicUrl);
+    // If it's already a full URL (Google Drive), use it directly
+    const url = path.startsWith('http') ? path : getPublicUrl(path);
+    navigator.clipboard.writeText(url);
     toast({ title: t('admin.copy_url') + " OK" });
   };
 
   const getPublicUrl = (path: string) => {
-    const { data } = supabase.storage.from("review-media").getPublicUrl(path);
-    return data.publicUrl;
+    if (path.startsWith('http')) return path;
+    // Fallback/Legacy for Supabase paths
+    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
+    return `${supabaseUrl}/storage/v1/object/public/review-media/${path}`;
   };
 
   const filtered = media.filter((m) => m.file_name.toLowerCase().includes(search.toLowerCase()));
@@ -198,7 +145,7 @@ export default function AdminMedia() {
                       <div className="w-12 h-12 rounded overflow-hidden bg-muted border">
                         {m.mime_type?.startsWith("image/") ? (
                           <img
-                            src={getOptimizedImageUrl(getPublicUrl(m.file_path), 'thumbnail')}
+                            src={m.file_path.startsWith('http') ? m.file_path : getOptimizedImageUrl(getPublicUrl(m.file_path), 'thumbnail')}
                             alt={m.file_name}
                             className="w-full h-full object-cover"
                             loading="lazy"

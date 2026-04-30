@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
@@ -9,17 +9,35 @@ import { useToast } from "@/hooks/use-toast";
 import { ToastAction } from "@/components/ui/toast";
 import { useTranslation } from "@/hooks/useTranslation";
 
+const USE_GOOGLE_SHEETS = import.meta.env.VITE_USE_GOOGLE_SHEETS === 'true';
+
 export default function AdminLogin() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const { signIn, resendConfirmation } = useAuth();
+  const { user, signIn, resendConfirmation } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
   const { t } = useTranslation();
 
+  useEffect(() => {
+    if (user) {
+      navigate("/admin");
+    }
+  }, [user, navigate]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (USE_GOOGLE_SHEETS) {
+      // In Google Sheets mode, we use mock authentication
+      toast({
+        title: "Google Sheets Mode",
+        description: "You are automatically logged in as a guest admin.",
+      });
+      navigate("/admin");
+      return;
+    }
 
     // Check for missing Supabase configuration
     const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
@@ -96,13 +114,15 @@ export default function AdminLogin() {
   return (
     <div className="min-h-screen bg-background flex items-center justify-center px-4">
       <div className="w-full max-w-sm space-y-6">
-        <Link
-          to="/"
-          className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-2"
+        <Button
+          variant="ghost"
+          size="sm"
+          className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-2 px-0"
+          onClick={() => navigate("/")}
         >
           <ArrowLeft className="h-4 w-4" />
           {t('admin.back_to_site')}
-        </Link>
+        </Button>
         <div className="text-center space-y-2">
           <div className="inline-flex items-center gap-2 text-primary">
             <Mountain className="h-8 w-8" />

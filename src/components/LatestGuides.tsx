@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { dataService } from "@/lib/data-service";
 import { Link } from "react-router-dom";
 import { Clock, ArrowRight } from "lucide-react";
 import { getOptimizedImageUrl } from "@/lib/utils";
@@ -46,16 +46,15 @@ export function LatestGuides() {
 
   useEffect(() => {
     const fetchArticles = async () => {
-      const { data } = await supabase
-        .from("articles")
-        .select("*")
-        .eq("published", true)
-        .order("created_at", { ascending: false })
-        .limit(3);
-
-      if (data && data.length > 0) {
-        setArticles(data as Article[]);
-      } else {
+      try {
+        const data = await dataService.getArticles();
+        if (data && data.length > 0) {
+          setArticles(data.slice(0, 3) as Article[]);
+        } else {
+          setArticles(fallbackArticles);
+        }
+      } catch (err) {
+        console.error("Error fetching latest guides:", err);
         setArticles(fallbackArticles);
       }
     };
