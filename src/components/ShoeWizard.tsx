@@ -119,7 +119,10 @@ export function ShoeWizard({ onClose }: { onClose: () => void }) {
       const data = await dataService.getReviews({
         brand: (step === "express_details" && brandSearch) ? brandSearch : undefined,
         limit: 20,
-        order: { column: "created_at", ascending: false }
+        order: { column: "created_at", ascending: false },
+        feeling: activeFeeling,
+        footType: activeFootType,
+        suitableFor: activeGoal
       });
 
       if (!data || data.length === 0) {

@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { dataService, CommentItem } from "@/lib/data-service";
 import { useAuth } from "@/hooks/useAuth";
 import { useTranslation } from "@/hooks/useTranslation";
 import { Button } from "@/components/ui/button";
@@ -9,14 +9,6 @@ import { toast } from "sonner";
 import { RatingStars } from "./RatingStars";
 import { cn } from "@/lib/utils";
 
-interface Comment {
-  id: string;
-  content: string;
-  user_name: string | null;
-  created_at: string;
-  rating: number | null;
-}
-
 interface CommentSectionProps {
   reviewId?: string;
   articleId?: string;
@@ -25,7 +17,7 @@ interface CommentSectionProps {
 
 export function CommentSection({ reviewId, articleId, isCompact }: CommentSectionProps) {
   const { user } = useAuth();
-  const [comments, setComments] = useState<Comment[]>([]);
+  const [comments, setComments] = useState<CommentItem[]>([]);
   const [newComment, setNewComment] = useState("");
   const [rating, setRating] = useState<number>(0);
   const [hoveredRating, setHoveredRating] = useState<number>(0);
@@ -38,18 +30,11 @@ export function CommentSection({ reviewId, articleId, isCompact }: CommentSectio
     if (!referenceId) return;
 
     setLoading(true);
-    let query = supabase
-      .from("comments")
-      .select("id, content, user_name, created_at, rating")
-      .order("created_at", { ascending: false });
-
-    if (reviewId) query = query.eq("review_id", reviewId);
-    if (articleId) query = query.eq("article_id", articleId);
-
-    const { data, error } = await query;
-
-    if (!error && data) {
-      setComments(data as Comment[]);
+    try {
+      const data = await dataService.getComments({ reviewId, articleId });
+      setComments(data as CommentItem[]);
+    } catch (error) {
+      console.error("Error fetching comments:", error);
     }
     setLoading(false);
   }, [reviewId, articleId, referenceId]);
@@ -69,22 +54,22 @@ export function CommentSection({ reviewId, articleId, isCompact }: CommentSectio
     if (!newComment.trim()) return;
 
     setSubmitting(true);
-    const { error } = await supabase.from("comments").insert({
-      content: newComment,
-      user_id: user.id,
-      user_name: user.email?.split("@")[0] || t('comments.default_user_name'),
-      review_id: reviewId,
-      article_id: articleId,
-      rating: rating > 0 ? rating : null,
-    });
+    try {
+      await dataService.saveComment({
+        content: newComment,
+        user_id: user.id,
+        user_name: user.email?.split("@")[0] || t('comments.default_user_name'),
+        review_id: reviewId,
+        article_id: articleId,
+        rating: rating > 0 ? rating : null,
+      });
 
-    if (error) {
-      toast.error(t('comments.error'));
-    } else {
       setNewComment("");
       setRating(0);
       toast.success(t('comments.success'));
       fetchComments();
+    } catch (error) {
+      toast.error(t('comments.error'));
     }
     setSubmitting(false);
   };
