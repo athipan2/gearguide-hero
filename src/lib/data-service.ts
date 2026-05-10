@@ -24,14 +24,28 @@ export interface MediaItem {
   uploaded_by?: string;
 }
 
+export interface CommentItem {
+  id: string;
+  content: string;
+  user_id: string;
+  user_name: string | null;
+  created_at: string;
+  rating: number | null;
+  review_id?: string;
+  article_id?: string;
+}
+
 export const dataService = {
   async getReviews(options?: {
     brand?: string;
     limit?: number;
     order?: { column: string; ascending?: boolean };
     publishedOnly?: boolean;
+    feeling?: string;
+    footType?: string;
+    suitableFor?: string;
   }) {
-    const { brand, limit, order, publishedOnly = true } = options || {};
+    const { brand, limit, order, publishedOnly = true, feeling, footType, suitableFor } = options || {};
 
     if (USE_GOOGLE_SHEETS) {
       let data = await sheetsClient.select<SheetReview>('reviews');
@@ -47,6 +61,33 @@ export const dataService = {
           (r.name && typeof r.name === 'string' && r.name.toLowerCase().includes(brand.toLowerCase())) ||
           (r.brand && typeof r.brand === 'string' && r.brand.toLowerCase().includes(brand.toLowerCase()))
         );
+      }
+
+      // Filter feeling
+      if (feeling) {
+        data = data.filter(r => r.feeling === feeling);
+      }
+
+      // Filter footType
+      if (footType) {
+        data = data.filter(r => r.foot_type === footType);
+      }
+
+      // Filter suitableFor
+      if (suitableFor) {
+        data = data.filter(r => {
+          const suitable = r.suitable_for;
+          if (Array.isArray(suitable)) return (suitable as string[]).includes(suitableFor);
+          if (typeof suitable === 'string') {
+            try {
+              const parsed = JSON.parse(suitable);
+              return Array.isArray(parsed) && parsed.includes(suitableFor);
+            } catch {
+              return (suitable as string).includes(suitableFor);
+            }
+          }
+          return false;
+        });
       }
 
       // Sort
@@ -88,6 +129,18 @@ export const dataService = {
 
     if (brand) {
       query = query.ilike("name", `%${brand}%`);
+    }
+
+    if (feeling) {
+      query = query.eq("feeling", feeling);
+    }
+
+    if (footType) {
+      query = query.eq("foot_type", footType);
+    }
+
+    if (suitableFor) {
+      query = query.contains("suitable_for", [suitableFor]);
     }
 
     if (order) {
@@ -298,5 +351,44 @@ export const dataService = {
 
     // 2. Delete from database
     return supabase.from("media_library").delete().eq("id", item.id);
+  },
+
+  async getComments(options: { reviewId?: string; articleId?: string }) {
+    const { reviewId, articleId } = options;
+    if (USE_GOOGLE_SHEETS) {
+      let data = await sheetsClient.select<CommentItem>('comments');
+      if (reviewId) data = data.filter(c => c.review_id === reviewId);
+      if (articleId) data = data.filter(c => c.article_id === articleId);
+      // Sort by created_at desc
+      data.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+      return data;
+    }
+
+    let query = supabase.from("comments").select("*").order("created_at", { ascending: false });
+    if (reviewId) query = query.eq("review_id", reviewId);
+    if (articleId) query = query.eq("article_id", articleId);
+
+    const { data, error } = await query;
+    if (error) throw error;
+    return data;
+  },
+
+  async saveComment(payload: Record<string, unknown>) {
+    if (USE_GOOGLE_SHEETS) {
+      const id = crypto.randomUUID();
+      return sheetsClient.insert('comments', {
+        ...payload,
+        id,
+        created_at: new Date().toISOString()
+      });
+    }
+    return supabase.from("comments").insert([payload]);
+  },
+
+  async deleteComment(id: string) {
+    if (USE_GOOGLE_SHEETS) {
+      return sheetsClient.delete('comments', id);
+    }
+    return supabase.from("comments").delete().eq("id", id);
   }
 };

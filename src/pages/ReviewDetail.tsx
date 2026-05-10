@@ -145,20 +145,21 @@ export default function ReviewDetail() {
           setReview(currentReview);
         }
 
-        // Comments still use direct Supabase for now as it's a dynamic user interaction
-        if (currentReview?.id && import.meta.env.VITE_USE_GOOGLE_SHEETS !== 'true') {
-          const { data: ratingData } = await (await import("@/integrations/supabase/client")).supabase
-            .from("comments")
-            .select("rating")
-            .eq("review_id", currentReview.id)
-            .not("rating", "is", null);
+        // Get average rating from comments
+        if (currentReview?.id) {
+          try {
+            const comments = await dataService.getComments({ reviewId: currentReview.id });
+            const ratedComments = comments.filter(c => c.rating !== null && c.rating !== undefined);
 
-          if (ratingData && ratingData.length > 0) {
-            const sum = ratingData.reduce((acc, curr) => acc + (curr.rating || 0), 0);
-            setUserRating({
-              average: sum / ratingData.length,
-              count: ratingData.length
-            });
+            if (ratedComments.length > 0) {
+              const sum = ratedComments.reduce((acc, curr) => acc + (curr.rating || 0), 0);
+              setUserRating({
+                average: sum / ratedComments.length,
+                count: ratedComments.length
+              });
+            }
+          } catch (err) {
+            console.warn("Failed to fetch user ratings:", err);
           }
         }
       } catch (err) {

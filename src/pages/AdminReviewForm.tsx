@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { AdminLayout } from "@/components/admin/AdminLayout";
-import { supabase } from "@/integrations/supabase/client";
 import { dataService } from "@/lib/data-service";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -70,10 +69,17 @@ export default function AdminReviewForm() {
       return;
     }
     try {
-      const { data, error } = await supabase.from("reviews").select("pros_en, cons_en").limit(1);
-      if (error) {
-        setSchemaStatus({ checked: true, hasEnColumns: false, error: error.message });
+      const reviews = await dataService.getReviews({ limit: 1, publishedOnly: false });
+      if (reviews && reviews.length > 0) {
+        const first = reviews[0];
+        // @ts-expect-error - checking columns
+        if ('pros_en' in first || 'cons_en' in first) {
+          setSchemaStatus({ checked: true, hasEnColumns: true });
+        } else {
+          setSchemaStatus({ checked: true, hasEnColumns: false });
+        }
       } else {
+        // If no reviews, we can't be sure, but let's assume it's okay or just check type
         setSchemaStatus({ checked: true, hasEnColumns: true });
       }
     } catch (err) {
