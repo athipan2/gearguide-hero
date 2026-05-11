@@ -381,10 +381,22 @@ export default function AdminReviewForm() {
       updateField("image_url", result.directLink || result.url);
       toast({ title: "อัปโหลดรูปหน้าปกสำเร็จ (Google Drive)" });
     } catch (error) {
+      console.error("Cover Upload Error:", error);
       toast({
         title: "อัปโหลดรูปหน้าปกไม่สำเร็จ",
-        description: error instanceof Error ? error.message : "เกิดข้อผิดพลาดไม่ทราบสาเหตุ",
-        variant: "destructive"
+        description: (
+          <div className="text-xs mt-1 space-y-1">
+            <p>{error instanceof Error ? error.message : "เกิดข้อผิดพลาดไม่ทราบสาเหตุ"}</p>
+            <p className="font-semibold text-amber-600 mt-2">คำแนะนำ:</p>
+            <ul className="list-disc list-inside">
+              <li>ตรวจสอบว่า Google Sheet ของคุณมีแท็บชื่อ "media_library"</li>
+              <li>ตรวจสอบว่า VITE_GOOGLE_SCRIPT_URL ใน .env ถูกต้อง</li>
+              <li>ลองอัปเดตโค้ด Google Apps Script เป็นเวอร์ชันล่าสุด</li>
+            </ul>
+          </div>
+        ),
+        variant: "destructive",
+        duration: 10000
       });
     } finally {
       setUploadingCover(false);
@@ -416,10 +428,21 @@ export default function AdminReviewForm() {
       setImages(prev => [...prev, ...newUrls]);
       toast({ title: `อัปโหลด ${newUrls.length} รูปสำเร็จ (Google Drive)` });
     } catch (error) {
+      console.error("Gallery Upload Error:", error);
       toast({
         title: "เกิดข้อผิดพลาดในการอัปโหลด",
-        description: error instanceof Error ? error.message : "เกิดข้อผิดพลาดไม่ทราบสาเหตุ",
-        variant: "destructive"
+        description: (
+          <div className="text-xs mt-1 space-y-1">
+            <p>{error instanceof Error ? error.message : "เกิดข้อผิดพลาดไม่ทราบสาเหตุ"}</p>
+            <p className="font-semibold text-amber-600 mt-2">คำแนะนำ:</p>
+            <ul className="list-disc list-inside">
+              <li>ตรวจสอบอินเทอร์เน็ตและการตั้งค่า Google Script</li>
+              <li>ไฟล์รูปภาพอาจมีขนาดใหญ่เกินไป</li>
+            </ul>
+          </div>
+        ),
+        variant: "destructive",
+        duration: 10000
       });
     } finally {
       setUploadingGallery(false);
