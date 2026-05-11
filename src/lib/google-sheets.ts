@@ -22,11 +22,23 @@ class GoogleSheetsClient {
 
   async fetch<T>(params: Record<string, string>): Promise<T> {
     const queryString = new URLSearchParams(params).toString();
+    const fullUrl = `${this.url}?${queryString}`;
     try {
-      const response = await fetch(`${this.url}?${queryString}`);
+      const response = await fetch(fullUrl);
       if (!response.ok) {
-        throw new Error(`Google Sheets API Error: ${response.statusText}`);
+        const text = await response.text();
+        console.error("GAS Fetch Error Response:", text);
+        throw new Error(`Google Sheets API Error: ${response.status} ${response.statusText}`);
       }
+
+      const contentType = response.headers.get("content-type");
+      if (contentType && !contentType.includes("application/json")) {
+        const text = await response.text();
+        if (text.includes("TypeError") || text.includes("Error")) {
+          throw new Error(`GAS Script Error: ${text.substring(0, 200)}...`);
+        }
+      }
+
       return response.json();
     } catch (err) {
       console.error("Google Sheets Fetch Failed:", err);
@@ -38,17 +50,35 @@ class GoogleSheetsClient {
    * Robust POST that handles the redirect behavior of GAS
    */
   async postJson<T>(payload: SheetRequest): Promise<T> {
-    const response = await fetch(this.url, {
-      method: 'POST',
-      body: JSON.stringify(payload),
-      headers: {
-        'Content-Type': 'text/plain;charset=utf-8',
-      },
-    });
-    if (!response.ok) {
-       throw new Error(`Google Sheets API Error: ${response.statusText}`);
+    try {
+      const response = await fetch(this.url, {
+        method: 'POST',
+        body: JSON.stringify(payload),
+        headers: {
+          'Content-Type': 'text/plain;charset=utf-8',
+        },
+      });
+
+      if (!response.ok) {
+        const text = await response.text();
+        console.error("GAS Post Error Response:", text);
+        throw new Error(`Google Sheets API Error: ${response.status} ${response.statusText}`);
+      }
+
+      const contentType = response.headers.get("content-type");
+      if (contentType && !contentType.includes("application/json")) {
+        const text = await response.text();
+        console.warn("GAS Post Non-JSON Response:", text.substring(0, 200));
+        if (text.includes("TypeError") || text.includes("Error")) {
+          throw new Error(`GAS Script Error (Post): ${text.substring(0, 200)}...`);
+        }
+      }
+
+      return response.json();
+    } catch (err) {
+      console.error("Google Sheets Post Failed:", err);
+      throw err;
     }
-    return response.json();
   }
 
   async select<T>(table: string, id?: string | number): Promise<T[]> {
