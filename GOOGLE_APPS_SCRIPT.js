@@ -17,7 +17,7 @@
 
 // If you are using a standalone script (not bound to a sheet),
 // you can manually put your Spreadsheet ID here:
-const MANUAL_SPREADSHEET_ID = "1-QRegWSznISxU7a0_j_wXoRsw34902sUhnPHd1WqzVY";
+const MANUAL_SPREADSHEET_ID = "1-MBJ-LXyBY_dohifYPTO7epvWlFORp5GuLDQ9IXMjFQ";
 
 function getSs() {
   if (MANUAL_SPREADSHEET_ID) {
