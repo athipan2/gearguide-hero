@@ -194,17 +194,17 @@ function handleUpload(fileName, mimeType, base64Data) {
     const bytes = Utilities.base64Decode(base64Data);
     const blob = Utilities.newBlob(bytes, mimeType, fileName);
 
-    let folder;
-    const folderName = "GearTrail Uploads";
-    const folders = DriveApp.getFoldersByName(folderName);
+    let file;
+    const folderId = "1724iPB7LYavmNFeUFD4do7V7FFinmGIn";
 
-    if (folders.hasNext()) {
-      folder = folders.next();
-    } else {
-      folder = DriveApp.createFolder(folderName);
+    try {
+      const folder = DriveApp.getFolderById(folderId);
+      file = folder.createFile(blob);
+    } catch (e) {
+      // Fallback to root if folder access fails
+      file = DriveApp.createFile(blob);
     }
 
-    const file = folder.createFile(blob);
     file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
 
     const fileId = file.getId();
