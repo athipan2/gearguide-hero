@@ -195,19 +195,24 @@ function handleUpload(fileName, mimeType, base64Data) {
     const blob = Utilities.newBlob(bytes, mimeType, fileName);
 
     let file;
+    // Specific folder for GearTrail media
     const folderId = "1724iPB7LYavmNFeUFD4do7V7FFinmGIn";
 
     try {
+      // Attempt to save to the specific folder
       const folder = DriveApp.getFolderById(folderId);
       file = folder.createFile(blob);
     } catch (e) {
-      // Fallback to root if folder access fails
+      // Fallback to root if folder ID is invalid or inaccessible
+      console.warn("Folder ID not found, saving to root: " + e.message);
       file = DriveApp.createFile(blob);
     }
 
+    // Set file to be viewable by anyone with the link
     file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
 
     const fileId = file.getId();
+    // Direct link format for Google Drive images
     const directLink = "https://lh3.googleusercontent.com/d/" + fileId;
 
     return createResponse({
@@ -217,7 +222,11 @@ function handleUpload(fileName, mimeType, base64Data) {
       id: fileId
     });
   } catch (err) {
-    return createResponse({ error: "Upload error: " + err.toString() });
+    // This often happens if the user hasn't authorized "DriveApp" in the script editor
+    return createResponse({
+      error: "Upload error: " + err.toString(),
+      troubleshooting: "Please open the Apps Script editor, click the 'Run' button for any function to trigger the authorization prompt, and ensure you grant access to Google Drive."
+    });
   }
 }
 
