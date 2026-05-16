@@ -202,22 +202,32 @@ function handleUpload(fileName, mimeType, base64Data) {
       try {
         folder = DriveApp.getFolderById(UPLOAD_FOLDER_ID);
       } catch (e) {
-        console.warn("Could not find folder by ID, falling back to name search: " + e.toString());
+        console.warn("Could not find folder by ID: " + e.toString());
       }
     }
 
     if (!folder) {
       const folderName = "GearTrail Uploads";
       const folders = DriveApp.getFoldersByName(folderName);
-
       if (folders.hasNext()) {
         folder = folders.next();
       } else {
-        folder = DriveApp.createFolder(folderName);
+        try {
+          folder = DriveApp.createFolder(folderName);
+        } catch (e) {
+          console.warn("Could not create folder, using root: " + e.toString());
+          folder = DriveApp.getRootFolder();
+        }
       }
     }
 
-    const file = folder.createFile(blob);
+    let file;
+    try {
+      file = folder.createFile(blob);
+    } catch (e) {
+      console.warn("Could not create file in target folder, trying root: " + e.toString());
+      file = DriveApp.getRootFolder().createFile(blob);
+    }
     try {
       file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
     } catch (e) {
