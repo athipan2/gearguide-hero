@@ -19,6 +19,9 @@
 // you can manually put your Spreadsheet ID here:
 const MANUAL_SPREADSHEET_ID = "1-MBJ-LXyBY_dohifYPTO7epvWlFORp5GuLDQ9IXMjFQ";
 
+// YOUR DRIVE FOLDER
+const UPLOAD_FOLDER_ID = "17ZOvB0KYJ1_2TXjIkJYghsQsBc7Fxw5E";
+
 function getSs() {
   if (MANUAL_SPREADSHEET_ID) {
     return SpreadsheetApp.openById(MANUAL_SPREADSHEET_ID);
@@ -195,13 +198,23 @@ function handleUpload(fileName, mimeType, base64Data) {
     const blob = Utilities.newBlob(bytes, mimeType, fileName);
 
     let folder;
-    const folderName = "GearTrail Uploads";
-    const folders = DriveApp.getFoldersByName(folderName);
+    if (UPLOAD_FOLDER_ID) {
+      try {
+        folder = DriveApp.getFolderById(UPLOAD_FOLDER_ID);
+      } catch (e) {
+        console.warn("Could not find folder by ID, falling back to name search: " + e.toString());
+      }
+    }
 
-    if (folders.hasNext()) {
-      folder = folders.next();
-    } else {
-      folder = DriveApp.createFolder(folderName);
+    if (!folder) {
+      const folderName = "GearTrail Uploads";
+      const folders = DriveApp.getFoldersByName(folderName);
+
+      if (folders.hasNext()) {
+        folder = folders.next();
+      } else {
+        folder = DriveApp.createFolder(folderName);
+      }
     }
 
     const file = folder.createFile(blob);
