@@ -17,7 +17,10 @@
 
 // If you are using a standalone script (not bound to a sheet),
 // you can manually put your Spreadsheet ID here:
-const MANUAL_SPREADSHEET_ID = "1-QRegWSznISxU7a0_j_wXoRsw34902sUhnPHd1WqzVY";
+const MANUAL_SPREADSHEET_ID = "1-MBJ-LXyBY_dohifYPTO7epvWlFORp5GuLDQ9IXMjFQ";
+
+// YOUR DRIVE FOLDER
+const UPLOAD_FOLDER_ID = "17ZOvB0KYJ1_2TXjIkJYghsQsBc7Fxw5E";
 
 function getSs() {
   if (MANUAL_SPREADSHEET_ID) {
@@ -195,17 +198,41 @@ function handleUpload(fileName, mimeType, base64Data) {
     const blob = Utilities.newBlob(bytes, mimeType, fileName);
 
     let folder;
-    const folderName = "GearTrail Uploads";
-    const folders = DriveApp.getFoldersByName(folderName);
-
-    if (folders.hasNext()) {
-      folder = folders.next();
-    } else {
-      folder = DriveApp.createFolder(folderName);
+    if (UPLOAD_FOLDER_ID) {
+      try {
+        folder = DriveApp.getFolderById(UPLOAD_FOLDER_ID);
+      } catch (e) {
+        console.warn("Could not find folder by ID: " + e.toString());
+      }
     }
 
-    const file = folder.createFile(blob);
-    file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+    if (!folder) {
+      const folderName = "GearTrail Uploads";
+      const folders = DriveApp.getFoldersByName(folderName);
+      if (folders.hasNext()) {
+        folder = folders.next();
+      } else {
+        try {
+          folder = DriveApp.createFolder(folderName);
+        } catch (e) {
+          console.warn("Could not create folder, using root: " + e.toString());
+          folder = DriveApp.getRootFolder();
+        }
+      }
+    }
+
+    let file;
+    try {
+      file = folder.createFile(blob);
+    } catch (e) {
+      console.warn("Could not create file in target folder, trying root: " + e.toString());
+      file = DriveApp.getRootFolder().createFile(blob);
+    }
+    try {
+      file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+    } catch (e) {
+      console.warn("Could not set sharing permissions automatically: " + e.toString());
+    }
 
     const fileId = file.getId();
     const directLink = "https://lh3.googleusercontent.com/d/" + fileId;
